@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Pick {
+  id              Int       @default(autoincrement()) @id
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  year            Int       @default(0)
+  show            String    @db.VarChar(255)
+  week            Int?      
+  person          String    @db.VarChar(255)
+  type            String    @db.VarChar(255)
+  description     String    @db.VarChar(255)
+  homeTeam        NflTeam 
+  awayTeam        NflTeam 
+  homeTeamScore   Int?
+  awayTeamScore   Int?
+  winner          Int?
+  push            Int?
+  gameDate        DateTime?
+  result          String?    @db.VarChar(255)
+  league          String    @db.VarChar(255)
+  betLink         String?    @db.VarChar(255)
+  espnLink        String?    @db.VarChar(255)
+  highlighLink    String?    @db.VarChar(255)
+  specialBet      String    @db.VarChar(255)
+  fade            Int?      
+  tail            Int?      
+  nerdNugget      String?    @db.VarChar(255)
+}
+
+enum NflTeam {
+  cardinals
+  falcons
+  ravens
+  bills
+  panthers
+  bears
+  bengals
+  browns
+  cowboys
+  broncos
+  lions
+  packers
+  texans
+  colts
+  jaguars
+  chiefs
+  chargers
+  rams
+  dolphins
+  vikings
+  patriots
+  saints
+  giants
+  jets
+  raiders
+  eagles
+  steelers
+  fortyNiners
+  seahawks
+  buccaneers
+  titans
+  commanders
+}
