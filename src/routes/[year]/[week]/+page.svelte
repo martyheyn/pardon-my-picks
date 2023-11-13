@@ -13,8 +13,6 @@
 
 	export let data: PageData;
 
-	$: console.log('picks hereeee');
-
 	$: ({ picks } = data);
 
 	$: ({ year, week } = $page.params);
