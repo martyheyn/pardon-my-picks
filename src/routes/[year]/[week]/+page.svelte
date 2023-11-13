@@ -20,7 +20,7 @@
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
 
-	$: console.log(picks);
+	$: console.log('pciks', picks);
 
 	$: picksByPerson = picks.reduce((acc: PickByPerson, pick) => {
 		const { person } = pick;
