@@ -6,7 +6,7 @@
 
 	// TODO: make it possible to change stroke / fill of svg and path
 
-	let icons: { [key: string]: { box: number; svg: string } } = {
+	let icons: { [key: string]: { box: number; box2?: number; svg: string } } = {
 		stats: {
 			box: 32,
 			svg: `
@@ -76,19 +76,24 @@
 		apple: {
 			box: 24,
 			svg: `<path d="M22 17.607c-.786 2.28-3.139 6.317-5.563 6.361-1.608.031-2.125-.953-3.963-.953-1.837 0-2.412.923-3.932.983-2.572.099-6.542-5.827-6.542-10.995 0-4.747 3.308-7.1 6.198-7.143 1.55-.028 3.014 1.045 3.959 1.045.949 0 2.727-1.29 4.596-1.101.782.033 2.979.315 4.389 2.377-3.741 2.442-3.158 7.549.858 9.426zm-5.222-17.607c-2.826.114-5.132 3.079-4.81 5.531 2.612.203 5.118-2.725 4.81-5.531z"/>`
+		},
+		lunder: {
+			box: 60,
+			box2: 30,
+			svg: `<path d="M0 0v30h60V0z"/></clipPath><clipPath id="b"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath><g clip-path="url(#a)"><path d="M0 0v30h60V0z" fill="#012169"/><path d="M0 0l60 30m0-30L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30m0-30L0 30" clip-path="url(#b)" stroke="#C8102E" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></g>`
+		},
+		timezone: {
+			box: 24,
+			svg: `<path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm0 11h6v1h-7v-9h1v8z"/>`
 		}
 	};
 	let displayIcon = icons[iconName];
 </script>
 
-<svg class={$$props.class} {width} {height} viewBox="0 0 {displayIcon.box} {displayIcon.box}"
+<svg
+	class={$$props.class}
+	{width}
+	{height}
+	viewBox="0 0 {displayIcon.box} {displayIcon.box2 ? displayIcon.box2 : displayIcon.box}"
 	>{@html displayIcon.svg}</svg
 >
-
-<!-- <path
-d="M4 9V18C4 19.1046 4.89543 20 6 20H9M4 9V6C4 4.89543 4.89543 4 6 4H18C19.1046 4 20 4.89543 20 6V9M4 9H9M20 9H9M20 9V14.5M9 9V14.5M9 20H18C19.1046 20 20 19.1046 20 18V14.5M9 20V14.5M9 14.5H20"
-stroke="#000000"
-stroke-width="1.5"
-stroke-linecap="round"
-stroke-linejoin="round"
-class="stroke-white" -->

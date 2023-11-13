@@ -22,6 +22,7 @@ export type Pick = {
 	betLink?: string | null;
 	espnLink?: string | null;
 	highlighLink?: string | null;
+	specialBet?: string | null;
 	// order?: number;
 };
 

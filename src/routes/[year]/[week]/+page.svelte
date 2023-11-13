@@ -10,6 +10,7 @@
 
 	import Icon from '../../../components/icon.svelte';
 	import Race from '../../../components/race.svelte';
+	import SpecialBet from '../../../components/special-bet.svelte';
 
 	export let data: PageData;
 
@@ -89,7 +90,7 @@
 			{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 				{#key week}
 					<div
-						class="rounded-md border border-black border-opacity-20 shadow-lg px-6 sm:px-10 py-4 sm:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph"
+						class="rounded-md border border-black border-opacity-20 shadow-lg px-6 sm:px-10 py-4 sm:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
 						in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 					>
 						<div class="">
@@ -107,6 +108,12 @@
 								{pick.description}
 							</h4>
 						</div>
+
+						{#if pick.specialBet}
+							<div class="absolute top-1 sm:top-2 -right-3 sm:-right-4 z-50">
+								<SpecialBet betType={pick.specialBet} />
+							</div>
+						{/if}
 
 						<div
 							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25"
