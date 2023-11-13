@@ -41,7 +41,7 @@
 			sortOrder[Object.keys(b)[0] as keyof typeof sortOrder]
 		);
 	});
-	$: console.log('picksArr', picksArr);
+	// $: console.log('picksArr', picksArr);
 
 	// set height on pick description element to max-h of row
 

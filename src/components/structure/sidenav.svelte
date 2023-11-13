@@ -7,6 +7,7 @@
 
 	import Icon from '../icon.svelte';
 	import { sideNavItems } from '../../utils/sidenav-tree';
+	import Tooltip from '../tooltip.svelte';
 
 	// Retrieve user store from context
 	const sideNavCollasped: Writable<boolean> = getContext('sideNavCollasped');
@@ -48,9 +49,9 @@
 </script>
 
 <div
-	class={`bg-[#18314FFF] fixed top-0 z-20 ${
+	class={`bg-[#18314FFF] dark:bg-[] fixed top-0 z-10 ${
 		$sideNavCollasped ? 'w-14' : sideNavHeight > 800 ? 'w-[164px] sm:w-44' : 'w-40'
-	} h-screen shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white overflow-y-auto overflow-x-hidden`}
+	} h-screen shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
 	id="elementToCheck"
 >
 	<div class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'}`}>
@@ -81,8 +82,12 @@
 	>
 		{#each sideNavItems as navItem}
 			<li
-				class="w-full py-2 hover:bg-[#b9bab6] relative flex justify-between items-center h-full font-header"
+				class="w-full py-2 hover:bg-[#b9bab6] relative group flex justify-between items-center h-full font-header"
 			>
+				{#if $sideNavCollasped}
+					<Tooltip text={navItem.label} />
+				{/if}
+
 				<a
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
 					href={navItem.route}

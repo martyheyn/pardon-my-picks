@@ -6,7 +6,7 @@
 	let showSocials = false;
 </script>
 
-<div class="w-full bg-[#18314FFF] ml-14 h-14 flex justify-center items-center relative text-white">
+<div class="bg-[#18314FFF] ml-14 h-14 flex justify-center items-center relative text-white">
 	<h2 class=" text-lg pr-32 font-header">Pardon My Picks</h2>
 
 	<div class="absolute right-24 top-[8px]">
