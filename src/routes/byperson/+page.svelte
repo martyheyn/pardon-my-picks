@@ -90,12 +90,12 @@
 
 				<div class="flex flex-col gap-y-2">
 					<p
-						class={`text-4xl [text-shadow:1px_1px_1px_gray] mb-1 ${
+						class={`text-4xl [text-shadow:1px_1px_1px_gray] dark:[text-shadow:1px_1px_1px_white] mb-1 ${
 							getRecordPct(persona) > 50
-								? 'text-green-500'
+								? 'text-green-500 dark:text-green-300'
 								: getRecordPct(persona) < 50
-								? 'text-red-500'
-								: 'text-yellow-500'
+								? 'text-red-500 dark:text-red-300'
+								: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
 						{getRecordPct(persona).toFixed(1)}%

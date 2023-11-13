@@ -90,7 +90,7 @@
 			{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 				{#key week}
 					<div
-						class="rounded-md border border-black border-opacity-20 shadow-lg px-6 sm:px-10 py-4 sm:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
+						class="rounded-md border border-black border-opacity-20 dark:border-opacity-100 shadow-lg px-6 sm:px-10 py-4 sm:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
 						in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 					>
 						<div class="">
@@ -99,10 +99,10 @@
 									pick.gameDate && now < pick.gameDate
 										? 'bg-slate-300 bg-opacity-70'
 										: pick.winner
-										? 'bg-green-400'
+										? 'bg-green-400 dark:bg-green-900'
 										: pick.push
-										? 'bg-yellow-400'
-										: 'bg-red-400'
+										? 'bg-yellow-400 dark:bg-yellow-500'
+										: 'bg-red-400 dark:bg-red-900'
 								} w-fit px-6 rounded-md flex justify-start items-center`}
 							>
 								{pick.description}
@@ -116,7 +116,7 @@
 						{/if}
 
 						<div
-							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25"
+							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-opacity-100"
 						>
 							<div class="flex flex-col items-center gap-2">
 								<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
@@ -178,14 +178,14 @@
 						>
 							{#if pick.espnLink}
 								<button
-									class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg`}
+									class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
 									><a href={pick.espnLink} target="_blank"> Box Score </a>
 								</button>
 							{/if}
 
 							{#if pick.highlighLink}
 								<button
-									class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
+									class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
 									><a href={pick.highlighLink} target="_blank"> Highlights </a>
 								</button>
 							{/if}
