@@ -72,6 +72,7 @@
 		{#each personas as persona}
 			<div
 				class="rounded-md border border-black border-opacity-20 shadow-lg p-6 flex flex-col gap-y-2"
+				id={personasLabelToslug(persona.person)}
 			>
 				<div class="flex justify-between items-start">
 					<a

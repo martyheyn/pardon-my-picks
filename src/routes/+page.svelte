@@ -6,8 +6,8 @@
 	import { redirect } from '@sveltejs/kit';
 
 	$: if (browser) {
-		goto('/2023/9');
+		goto('/2023/10');
 	} else {
-		redirect(301, '/2023/9');
+		redirect(301, '/2023/10');
 	}
 </script>

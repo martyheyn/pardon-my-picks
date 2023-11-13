@@ -6,4 +6,8 @@
 	$: ({ person, spreads } = data);
 </script>
 
-<div>Individual Person</div>
+<div>
+	<h1>Individual Person {person}</h1>
+
+	<p>This Page is under construction / Not sure if it is even needed</p>
+</div>
