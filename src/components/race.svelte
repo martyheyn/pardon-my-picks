@@ -6,11 +6,8 @@
 		personasLabelToCamelCase,
 		camelCaseToLabel
 	} from '../utils/matching-format';
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
 
 	$: ({ week } = $page.params);
-	const currWeek: Writable<number> = getContext('currWeek');
 
 	type weeklyPersonDataType = {
 		[key: string]: {
@@ -69,11 +66,12 @@
 	let mainActVar: weeklyPersonDataType[] = [];
 	let openerWeeklyDataByPersonArr: weeklyPersonDataType[] = [];
 	let openerVar: weeklyPersonDataType[] = [];
+	let lastWeekWithData: number;
 
 	onMount(async () => {
 		const response = await fetch(`/api/race-results`);
 		let data: resWeeklyDataByPersonType[] = await response.json();
-		console.log(data);
+		// console.log(data);
 
 		if (data) {
 			data.forEach((x) => {
@@ -121,6 +119,7 @@
 		// for some reason I have to assign this and push it into an array for it to be reactive in the HTML
 		mainActWeeklyDataByPersonArr = mainActVar;
 		openerWeeklyDataByPersonArr = openerVar;
+		lastWeekWithData = mainActWeeklyDataByPersonArr[0].bigCat.data.length;
 	});
 
 	// TODO: do it by points down instead of record when small
@@ -136,7 +135,7 @@
 	<table class="w-full">
 		<tr class="">
 			<th class="text-left font-paragraph" />
-			{#each Array.from({ length: week ? parseInt(week) : $currWeek }, (_, i) => i + 1) as i}
+			{#each Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
 				<th class="text-center pb-1">{i}</th>
 			{/each}
 		</tr>

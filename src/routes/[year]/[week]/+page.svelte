@@ -3,9 +3,9 @@
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
 	import { quadInOut } from 'svelte/easing';
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import { logo, personaImgPath, sortOrder } from '../../../utils/matching-format';
-	import type { PickByPerson, Pick } from '../../../utils/types';
+	import type { PickByPerson } from '../../../utils/types';
 	import type { Writable } from 'svelte/store';
 
 	import Icon from '../../../components/icon.svelte';
@@ -19,8 +19,6 @@
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
-
-	$: console.log('pciks', picks);
 
 	$: picksByPerson = picks.reduce((acc: PickByPerson, pick) => {
 		const { person } = pick;
@@ -42,7 +40,7 @@
 			sortOrder[Object.keys(b)[0] as keyof typeof sortOrder]
 		);
 	});
-	// $: console.log('picksArr', picksArr);
+	$: console.log('picksArr', picksArr);
 
 	// set height on pick description element to max-h of row
 
@@ -64,6 +62,8 @@
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
 	// TODO: special bet absolute positioning
+
+	console.log(now);
 </script>
 
 <svelte:head>

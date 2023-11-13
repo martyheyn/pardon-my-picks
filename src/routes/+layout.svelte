@@ -8,7 +8,7 @@
 	import Topnav from '../components/structure/topnav.svelte';
 
 	const sideNavCollasped = writable(false);
-	const currWeek = writable(10);
+	const currWeek = writable(11);
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
