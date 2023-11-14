@@ -90,7 +90,7 @@
 			{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 				{#key week}
 					<div
-						class="rounded-md border border-black border-opacity-20 dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
+						class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
 						in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 					>
 						<div class="">
@@ -116,7 +116,7 @@
 						{/if}
 
 						<div
-							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-opacity-100"
+							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
 						>
 							<div class="flex flex-col items-center gap-2">
 								<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
@@ -178,14 +178,14 @@
 						>
 							{#if pick.espnLink}
 								<button
-									class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
+									class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
 									><a href={pick.espnLink} target="_blank"> Box Score </a>
 								</button>
 							{/if}
 
 							{#if pick.highlighLink}
 								<button
-									class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
+									class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
 									><a href={pick.highlighLink} target="_blank"> Highlights </a>
 								</button>
 							{/if}

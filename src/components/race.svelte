@@ -127,7 +127,7 @@
 </script>
 
 <div
-	class="rounded-md border border-black border-opacity-20 dark:border-opacity-100 shadow-lg px-4 md:px-8 py-4 md:col-span-3 flex flex-col gap-y-2 max-w-6xl overflow-x-auto"
+	class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-4 md:px-8 py-4 md:col-span-3 flex flex-col gap-y-2 max-w-6xl overflow-x-auto"
 >
 	<div class="flex justify-center items-center w-full">
 		<h1 class="text-xl font-semibold font-header">Race to the Stage</h1>

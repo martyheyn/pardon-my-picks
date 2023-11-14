@@ -2,13 +2,29 @@
 	import '../app.css';
 
 	// create store
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Sidenav from '../components/structure/sidenav.svelte';
 	import Topnav from '../components/structure/topnav.svelte';
 
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(11);
+
+	const darkMode = writable(false);
+
+	onMount(() => {
+		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		darkMode.set(mediaQuery.matches);
+
+		const updateDarkMode = (e: any) => darkMode.set(e.matches);
+		mediaQuery.addEventListener('change', updateDarkMode);
+
+		return () => {
+			mediaQuery.removeEventListener('change', updateDarkMode);
+		};
+	});
+
+	$: $darkMode = $darkMode; // This line triggers reactivity when the dark mode changes
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
