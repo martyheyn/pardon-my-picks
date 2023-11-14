@@ -17,10 +17,12 @@
 		darkMode.set(mediaQuery.matches);
 
 		const updateDarkMode = (e: any) => darkMode.set(e.matches);
-		mediaQuery.addEventListener('change', updateDarkMode);
+
+		// Use addListener for Safari compatibility
+		mediaQuery.addListener(updateDarkMode);
 
 		return () => {
-			mediaQuery.removeEventListener('change', updateDarkMode);
+			mediaQuery.removeListener(updateDarkMode);
 		};
 	});
 
