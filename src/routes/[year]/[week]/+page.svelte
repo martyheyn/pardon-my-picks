@@ -99,7 +99,7 @@
 									pick.gameDate && now < pick.gameDate
 										? 'bg-slate-300 bg-opacity-70'
 										: pick.winner
-										? 'bg-green-300  dark:bg-green-900'
+										? 'bg-green-300 dark:bg-green-900'
 										: pick.push
 										? 'bg-yellow-300 dark:bg-yellow-500'
 										: 'bg-red-300 dark:bg-red-900'

@@ -30,7 +30,7 @@
 		>
 			<ul class="">
 				<li
-					class="py-1.5 hover:bg-[#2f5583] pr-6 pl-3 border-b border-b-white border-t border-t-white border-opacity-30"
+					class="py-1.5 hover:bg-[#2f5583] hover:dark:bg-[#424141] pr-6 pl-3 border-b border-b-white border-t border-t-white border-opacity-30"
 				>
 					<a
 						href="https://twitter.com/PardonMyTake"
@@ -46,7 +46,9 @@
 						Twitter</a
 					>
 				</li>
-				<li class="py-1.5 hover:bg-[#2f5583] pr-6 pl-3 border-b border-b-white border-opacity-30">
+				<li
+					class="py-1.5 hover:bg-[#2f5583] hover:dark:bg-[#424141] pr-6 pl-3 border-b border-b-white border-opacity-30"
+				>
 					<a
 						href="https://www.youtube.com/@PardonMyTakePodcast"
 						class="flex gap-x-4 items-center"
@@ -61,7 +63,9 @@
 						Youtube</a
 					>
 				</li>
-				<li class="py-1.5 hover:bg-[#2f5583] pr-6 pl-3 border-b border-b-white border-opacity-30">
+				<li
+					class="py-1.5 hover:bg-[#2f5583] hover:dark:bg-[#424141] pr-6 pl-3 border-b border-b-white border-opacity-30"
+				>
 					<a
 						href="https://www.instagram.com/pardonmytake/"
 						class="flex gap-x-4 items-center"
@@ -76,7 +80,9 @@
 						Instagram</a
 					>
 				</li>
-				<li class="py-1.5 hover:bg-[#2f5583] pr-6 pl-3 border-b border-b-white border-opacity-30">
+				<li
+					class="py-1.5 hover:bg-[#2f5583] hover:dark:bg-[#424141] pr-6 pl-3 border-b border-b-white border-opacity-30"
+				>
 					<a
 						href="https://open.spotify.com/show/5ss1pqMFqWjkOpt6Ag0fZW?si=c44b4e44e8c04e90&nd=1"
 						target="_blank"
@@ -92,7 +98,9 @@
 					>
 				</li>
 
-				<li class="py-1.5 hover:bg-[#2f5583] pr-6 pl-3 border-b border-b-white border-opacity-30">
+				<li
+					class="py-1.5 hover:bg-[#2f5583] hover:dark:bg-[#424141] pr-6 pl-3 border-b border-b-white border-opacity-30"
+				>
 					<a
 						href="https://podcasts.apple.com/us/podcast/pardon-my-take/id1089022756"
 						target="_blank"

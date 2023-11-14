@@ -78,7 +78,7 @@
 	<div
 		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
 			mobile && $sideNavCollasped && scrollY > 50
-				? 'bg-[#18314FFF] dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#292828] '
+				? 'bg-[#18314FFF] dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141]'
 				: ''
 		} transition-all duration-300 ease-in-out cursor-pointer`}
 	>
@@ -126,7 +126,7 @@
 	>
 		{#each sideNavItems as navItem}
 			<li
-				class="w-full py-2 hover:bg-[#b9bab6] relative group flex justify-between items-center h-full font-header"
+				class="w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative group flex justify-between items-center h-full font-header"
 			>
 				{#if $sideNavCollasped}
 					<Tooltip text={navItem.label} />
