@@ -46,7 +46,7 @@ export const sideNavItems = [
 		icon: 'calendar',
 		route: '/2023/10',
 		subItems: weekSubNavArr,
-		subItemsOpen: true
+		subItemsOpen: false
 	},
 	{
 		label: 'Person',
