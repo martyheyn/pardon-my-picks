@@ -38,7 +38,7 @@ export const personaImgPath = (person: string) => {
 		case 'Big Cat':
 			return '/personas/big-cat.png';
 		case 'PFT':
-			return '/personas/pft-pmt.png';
+			return '/personas/pft-jnco.png';
 		case 'Hank':
 			return '/personas/hank-f45.png';
 		case 'Jake':

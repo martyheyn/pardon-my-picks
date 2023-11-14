@@ -64,6 +64,18 @@
 				Sup ...
 			</p>
 		{/if}
+
+		<!-- <button class={`cursor-pointer h-full flex items-center`}>
+			<Icon
+				class={`${
+					$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'
+				} transition-all duration-300 ease-in-out fill-none`}
+				width="24px"
+				height="24px"
+				iconName="search"
+			/>
+		</button> -->
+
 		<button class={`cursor-pointer h-full flex items-center`} on:click={toggleSideNav}>
 			<Icon
 				class={`${
