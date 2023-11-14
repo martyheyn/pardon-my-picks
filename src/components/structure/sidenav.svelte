@@ -78,7 +78,7 @@
 	<div
 		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
 			mobile && $sideNavCollasped && scrollY > 50
-				? 'bg-[#18314FFF] dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141]'
+				? 'bg-[#18314FFF] dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141] translate-x-2 translate-y-2'
 				: ''
 		} transition-all duration-300 ease-in-out cursor-pointer`}
 	>
