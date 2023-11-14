@@ -30,7 +30,7 @@
 
 <svelte:window bind:innerWidth={screenWidth} bind:scrollY />
 
-<div class="bg-slate-50 min-h-screen" bind:clientHeight={fullPageHeight}>
+<div class="min-h-screen dark:text-white" bind:clientHeight={fullPageHeight}>
 	<Topnav />
 
 	<Sidenav {mobile} {scrollY} />
