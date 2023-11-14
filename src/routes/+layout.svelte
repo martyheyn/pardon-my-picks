@@ -7,7 +7,7 @@
 	import Sidenav from '../components/structure/sidenav.svelte';
 	import Topnav from '../components/structure/topnav.svelte';
 
-	const sideNavCollasped = writable(false);
+	const sideNavCollasped = writable(true);
 	const currWeek = writable(11);
 
 	setContext('sideNavCollasped', sideNavCollasped);
@@ -44,7 +44,7 @@
 			mobile ? 'ml-0' : 'ml-14 '
 		}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
 	>
-		<div class={`p-4 sm:p-8 bg-slate-100 min-h-[${fullPageHeight - 56}px]`}>
+		<div class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] min-h-[${fullPageHeight - 56}px]`}>
 			<slot />
 		</div>
 	</div>

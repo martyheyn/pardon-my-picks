@@ -52,17 +52,17 @@
 </script>
 
 <div
-	class={`dark:bg-[] fixed top-0 z-10 ${
+	class={`fixed top-0 z-10 ${
 		$sideNavCollasped ? 'w-14' : sideNavHeight > 800 ? 'w-[164px] sm:w-44' : 'w-40'
 	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
-		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF]'
+		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF] dark:bg-[#1f1f1f]'
 	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
 	id="elementToCheck"
 >
 	<div
 		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
 			mobile && $sideNavCollasped && scrollY > 50
-				? 'bg-[#18314FFF] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b]'
+				? 'bg-[#18314FFF] dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#292828] '
 				: ''
 		} transition-all duration-300 ease-in-out cursor-pointer`}
 	>

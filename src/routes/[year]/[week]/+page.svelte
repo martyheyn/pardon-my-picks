@@ -78,7 +78,7 @@
 		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-4 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 	>
 		{#each picksArr as pickPerson}
-			<div class="flex flex-row md:flex-col gap-x-4 md:col-span-2">
+			<div class="flex flex-row items-center md:flex-col gap-x-4 md:col-span-2">
 				<h2 class="text-2xl pl-3 font-semibold">{Object.keys(pickPerson)}</h2>
 				<img
 					src={personaImgPath(Object.keys(pickPerson)[0])}
@@ -95,14 +95,14 @@
 					>
 						<div class="">
 							<h4
-								class={`min-h-[56px] text-lg shadow-lg ${
+								class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
 									pick.gameDate && now < pick.gameDate
 										? 'bg-slate-300 bg-opacity-70'
 										: pick.winner
-										? 'bg-green-400 dark:bg-green-900'
+										? 'bg-green-300  dark:bg-green-900'
 										: pick.push
-										? 'bg-yellow-400 dark:bg-yellow-500'
-										: 'bg-red-400 dark:bg-red-900'
+										? 'bg-yellow-300 dark:bg-yellow-500'
+										: 'bg-red-300 dark:bg-red-900'
 								} w-fit px-6 rounded-md flex justify-start items-center`}
 							>
 								{pick.description}
@@ -189,6 +189,26 @@
 									><a href={pick.highlighLink} target="_blank"> Highlights </a>
 								</button>
 							{/if}
+
+							{#if pick.nerdNugget}
+								<button
+									class={`p-1.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full ${
+										showNerdNug &&
+										showNerdNug.person === Object.keys(pickPerson)[0] &&
+										showNerdNug.indx === i
+											? 'bg-gray-300 bg-opacity-50'
+											: ''
+									}`}
+									on:click={() => toggleNerdNug(Object.keys(pickPerson)[0], i)}
+								>
+									<Icon
+										class={`transition-all duration-300 ease-in-out cursor-pointer fill-none`}
+										width="24px"
+										height="24px"
+										iconName="glasses"
+									/>
+								</button>
+							{/if}
 						</div>
 
 						<div class="flex items-center gap-x-8 sm:gap-x-4 lg:gap-x-8">
@@ -227,26 +247,6 @@
 								</form>
 								<p>{pick.fade}</p>
 							</div> -->
-
-							{#if pick.nerdNugget}
-								<button
-									class={`p-1.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full ${
-										showNerdNug &&
-										showNerdNug.person === Object.keys(pickPerson)[0] &&
-										showNerdNug.indx === i
-											? 'bg-gray-300 bg-opacity-50'
-											: ''
-									}`}
-									on:click={() => toggleNerdNug(Object.keys(pickPerson)[0], i)}
-								>
-									<Icon
-										class={`transition-all duration-300 ease-in-out cursor-pointer fill-none`}
-										width="24px"
-										height="24px"
-										iconName="glasses"
-									/>
-								</button>
-							{/if}
 						</div>
 					</div>
 				{/key}

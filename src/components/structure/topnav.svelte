@@ -6,10 +6,14 @@
 	let showSocials = false;
 </script>
 
-<div class="bg-[#18314FFF] ml-14 h-14 flex justify-center items-center relative text-white">
-	<h2 class=" text-lg pr-32 font-header">Pardon My Picks</h2>
+<div
+	class="bg-[#18314FFF] dark:bg-[#1f1f1f] ml-14 h-14 flex justify-center items-center relative text-white"
+>
+	<h2 class=" text-lg pr-12 lg:pr-32 font-header transition-all duration-300 ease-in-out">
+		Pardon My Picks
+	</h2>
 
-	<div class="absolute right-24 top-[8px]">
+	<div class="absolute right-4 lg:right-12 top-[8px] transition-all duration-300 ease-in-out">
 		<button class="cursor-pointer" on:click={() => (showSocials = !showSocials)}>
 			<img
 				class="w-10 h-10 rounded-[20px] border-2 border-white"

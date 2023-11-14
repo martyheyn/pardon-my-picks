@@ -127,7 +127,7 @@
 </script>
 
 <div
-	class="rounded-md border border-black border-opacity-20 shadow-lg px-4 md:px-8 py-4 md:col-span-3 flex flex-col gap-y-2 max-w-6xl overflow-x-auto"
+	class="rounded-md border border-black border-opacity-20 dark:border-opacity-100 shadow-lg px-4 md:px-8 py-4 md:col-span-3 flex flex-col gap-y-2 max-w-6xl overflow-x-auto"
 >
 	<div class="flex justify-center items-center w-full">
 		<h1 class="text-xl font-semibold font-header">Race to the Stage</h1>
@@ -147,7 +147,7 @@
 		{#each mainActWeeklyDataByPersonArr as mainActByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
+					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
 				>
 					<a href={Object.values(mainActByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(mainActByPerson)[0].img} alt="avatar" class="rounded-full" />
@@ -156,7 +156,7 @@
 				</td>
 				{#each week ? Object.values(mainActByPerson)[0].data.slice(0, parseInt(week)) : Object.values(mainActByPerson)[0].data as weekData}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 rounded-md text-center min-w-[50px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
 					>
 						{weekData.record}
 					</td>
@@ -173,7 +173,7 @@
 		{#each openerWeeklyDataByPersonArr as openerByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
+					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
 				>
 					<a href={Object.values(openerByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(openerByPerson)[0].img} alt="avatar" class="rounded-full" />
@@ -182,7 +182,7 @@
 				</td>
 				{#each week ? Object.values(openerByPerson)[0].data.slice(0, parseInt(week)) : Object.values(openerByPerson)[0].data as weekData}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 w-fit rounded-md text-center min-w-[50px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 w-fit rounded-md text-center min-w-[50px]"
 					>
 						{weekData.record}
 					</td>
