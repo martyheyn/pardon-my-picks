@@ -147,7 +147,7 @@
 		{#each mainActWeeklyDataByPersonArr as mainActByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 shadow-sm min-w-[80px]"
+					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
 				>
 					<a href={Object.values(mainActByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(mainActByPerson)[0].img} alt="avatar" class="rounded-full" />
@@ -156,7 +156,7 @@
 				</td>
 				{#each week ? Object.values(mainActByPerson)[0].data.slice(0, parseInt(week)) : Object.values(mainActByPerson)[0].data as weekData}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 rounded-md text-center min-w-[40px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 rounded-md text-center min-w-[50px]"
 					>
 						{weekData.record}
 					</td>
@@ -167,13 +167,13 @@
 
 	<table class="w-full mb-2">
 		<tr>
-			<th class="text-left font-semibold text-lg font-header">Opening Act</th>
+			<th class="text-left font-semibold text-lg font-header whitespace-nowrap">Opening Act</th>
 		</tr>
 
 		{#each openerWeeklyDataByPersonArr as openerByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 shadow-sm min-w-[80px]"
+					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
 				>
 					<a href={Object.values(openerByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(openerByPerson)[0].img} alt="avatar" class="rounded-full" />
@@ -182,7 +182,7 @@
 				</td>
 				{#each week ? Object.values(openerByPerson)[0].data.slice(0, parseInt(week)) : Object.values(openerByPerson)[0].data as weekData}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 w-fit rounded-md text-center min-w-[40px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 w-fit rounded-md text-center min-w-[50px]"
 					>
 						{weekData.record}
 					</td>

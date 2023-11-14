@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, getContext, onDestroy, onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
@@ -11,6 +11,9 @@
 
 	// Retrieve user store from context
 	const sideNavCollasped: Writable<boolean> = getContext('sideNavCollasped');
+	export let mobile: boolean;
+	export let scrollY: number;
+
 	const toggleSideNav = () => {
 		sideNavCollasped.update((value) => !value);
 
@@ -49,12 +52,20 @@
 </script>
 
 <div
-	class={`bg-[#18314FFF] dark:bg-[] fixed top-0 z-10 ${
+	class={`dark:bg-[] fixed top-0 z-10 ${
 		$sideNavCollasped ? 'w-14' : sideNavHeight > 800 ? 'w-[164px] sm:w-44' : 'w-40'
+	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
+		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF]'
 	} h-screen shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
 	id="elementToCheck"
 >
-	<div class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'}`}>
+	<div
+		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
+			mobile && $sideNavCollasped && scrollY > 50
+				? 'bg-[#18314FFF] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b]'
+				: ''
+		} transition-all duration-300 ease-in-out cursor-pointer`}
+	>
 		{#if !$sideNavCollasped}
 			<p
 				class={`w-full flex justify-center items-center font-header`}
@@ -65,31 +76,36 @@
 			</p>
 		{/if}
 
-		<!-- <button class={`cursor-pointer h-full flex items-center`}>
-			<Icon
-				class={`${
-					$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'
-				} transition-all duration-300 ease-in-out fill-none`}
-				width="24px"
-				height="24px"
-				iconName="search"
-			/>
-		</button> -->
-
-		<button class={`cursor-pointer h-full flex items-center`} on:click={toggleSideNav}>
-			<Icon
-				class={`${
-					$sideNavCollasped ? '' : 'rotate-180'
-				} transition-all duration-300 ease-in-out fill-none`}
-				width="24px"
-				height="24px"
-				iconName="arrow"
-			/>
-		</button>
+		{#if mobile}
+			<button class={`cursor-pointer h-full flex items-center`} on:click={toggleSideNav}>
+				<Icon
+					class={`transition-all duration-300 ease-in-out fill-white`}
+					width="24px"
+					height="24px"
+					iconName="hambuger"
+				/>
+			</button>
+		{:else}
+			<button
+				class={`cursor-pointer h-full flex items-center transition-all duration-300 ease-in-out`}
+				on:click={toggleSideNav}
+			>
+				<Icon
+					class={`${
+						$sideNavCollasped ? '' : 'rotate-180'
+					} transition-all duration-300 ease-in-out fill-none`}
+					width="24px"
+					height="24px"
+					iconName="arrow"
+				/>
+			</button>
+		{/if}
 	</div>
 
 	<ul
-		class="list-none m-0 pt-[1px] flex flex-col items-center border-t border-t-white border-opacity-10"
+		class={`list-none m-0 pt-[1px] flex flex-col items-center border-t border-t-white border-opacity-10 ${
+			mobile && $sideNavCollasped ? 'hidden' : 'block'
+		}`}
 		bind:clientHeight={sideNavHeight}
 	>
 		{#each sideNavItems as navItem}

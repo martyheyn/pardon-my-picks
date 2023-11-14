@@ -63,8 +63,6 @@
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
 	// TODO: special bet absolute positioning
-
-	console.log(now);
 </script>
 
 <svelte:head>
@@ -76,21 +74,23 @@
 		<h1 class="font-header">{year} Week: {week}</h1>
 	</div>
 
-	<div class="grid grid-cols-1 md:grid-cols-8 my-8 gap-x-12 gap-y-4 max-w-6xl font-paragraph">
+	<div
+		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-4 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
+	>
 		{#each picksArr as pickPerson}
 			<div class="flex flex-row md:flex-col gap-x-4 md:col-span-2">
 				<h2 class="text-2xl pl-3 font-semibold">{Object.keys(pickPerson)}</h2>
 				<img
 					src={personaImgPath(Object.keys(pickPerson)[0])}
 					alt="sad max"
-					class=" w-16 h-16 rounded-full md:rounded-none md:w-full md:min-h-[225px] md:max-h-[300px] object-fit"
+					class=" w-16 h-16 md:rounded-none md:w-full md:min-h-[225px] md:max-h-[300px] object-fit"
 				/>
 			</div>
 
 			{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 				{#key week}
 					<div
-						class="rounded-md border border-black border-opacity-20 dark:border-opacity-100 shadow-lg px-6 sm:px-10 py-4 sm:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
+						class="rounded-md border border-black border-opacity-20 dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
 						in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 					>
 						<div class="">

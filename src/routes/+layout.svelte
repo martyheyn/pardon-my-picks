@@ -14,6 +14,9 @@
 	setContext('currWeek', currWeek);
 
 	let fullPageHeight: number;
+	let screenWidth: number;
+	let scrollY: number;
+	$: mobile = screenWidth < 640;
 </script>
 
 <svelte:head>
@@ -25,17 +28,21 @@
 	<title>Pardon My Picks</title>
 </svelte:head>
 
+<svelte:window bind:innerWidth={screenWidth} bind:scrollY />
+
 <div class="bg-slate-50 min-h-screen" bind:clientHeight={fullPageHeight}>
 	<Topnav />
 
-	<Sidenav />
+	<Sidenav {mobile} {scrollY} />
 
 	<div
 		class={`${
 			$sideNavCollasped
-				? 'w-[calc(100vw - 64px)] ml-14'
-				: 'w-[calc(100vw - 64px)] ml-14 lg:w-[calc(100vw - 224px)] lg:ml-40'
-		} z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
+				? 'w-[calc(100vw - 64px)]'
+				: 'w-[calc(100vw - 64px)] lg:w-[calc(100vw - 224px)] lg:ml-40'
+		} ${
+			mobile ? 'ml-0' : 'ml-14 '
+		}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
 	>
 		<div class={`p-4 sm:p-8 bg-slate-100 min-h-[${fullPageHeight - 56}px]`}>
 			<slot />
