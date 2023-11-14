@@ -70,7 +70,7 @@
 <div
 	class={`fixed top-0 z-10 ${
 		$sideNavCollasped ? 'w-14' : sideNavHeight > 800 ? 'w-[164px] sm:w-44' : 'w-40'
-	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
+	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'} ${
 		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF] dark:bg-[#1f1f1f]'
 	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
 	id="elementToCheck"

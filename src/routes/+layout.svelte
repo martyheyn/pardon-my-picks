@@ -10,29 +10,11 @@
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(11);
 
-	const darkMode = writable(false);
-
-	onMount(() => {
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-		darkMode.set(mediaQuery.matches);
-
-		const updateDarkMode = (e: any) => darkMode.set(e.matches);
-
-		// Use addListener for Safari compatibility
-		mediaQuery.addListener(updateDarkMode);
-
-		return () => {
-			mediaQuery.removeListener(updateDarkMode);
-		};
-	});
-
-	$: $darkMode = $darkMode; // This line triggers reactivity when the dark mode changes
-
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
 
 	let fullPageHeight: number;
-	let screenWidth: number;
+	let screenWidth: number = 0;
 	let scrollY: number;
 	$: mobile = screenWidth < 640;
 </script>
