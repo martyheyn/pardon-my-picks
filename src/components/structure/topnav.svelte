@@ -25,7 +25,7 @@
 
 	{#if showSocials}
 		<div
-			class="absolute right-14 top-14 bg-[#18314FFF] z-50"
+			class="absolute right-0 top-14 bg-[#18314FFF] dark:bg-[#1f1f1f] z-50"
 			transition:fly={{ y: -100, duration: 300, easing: quadInOut }}
 		>
 			<ul class="">
