@@ -49,6 +49,22 @@
 			active = 'Stats';
 		}
 	});
+
+	const handleItemClick = (label: string) => {
+		active = label;
+
+		// if mobile close sidenav and open items
+		if (mobile) {
+			if (sideNavCollasped) {
+				sideNavItems.forEach((navItem, i) => {
+					if (navItem.subItemsOpen) {
+						sideNavItems[i].subItemsOpen = false;
+					}
+				});
+			}
+			sideNavCollasped.set(true);
+		}
+	};
 </script>
 
 <div
@@ -119,7 +135,7 @@
 				<a
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
 					href={navItem.route}
-					on:click={() => (active = navItem.label)}
+					on:click={() => handleItemClick(navItem.label)}
 				>
 					<div
 						class={`w-2 h-full bg-yellow-400 absolute left-0 top-0 rounded-r-md transition-all duration-300 ease-in-out ${

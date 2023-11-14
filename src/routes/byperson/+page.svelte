@@ -73,7 +73,7 @@
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl my-6 font-paragraph">
 		{#each personas as persona}
 			<div
-				class="rounded-md border border-black border-opacity-20 shadow-lg p-6 flex flex-col gap-y-2"
+				class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg p-6 flex flex-col gap-y-2"
 				id={personasLabelToslug(persona.person)}
 			>
 				<div class="flex justify-between items-start">
