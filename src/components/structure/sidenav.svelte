@@ -56,7 +56,7 @@
 		$sideNavCollasped ? 'w-14' : sideNavHeight > 800 ? 'w-[164px] sm:w-44' : 'w-40'
 	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
 		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF]'
-	} h-screen shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
+	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
 	id="elementToCheck"
 >
 	<div
