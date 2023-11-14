@@ -12,38 +12,21 @@
 
 	const darkMode = writable(false);
 
-	function detectDarkMode() {
+	onMount(() => {
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 		darkMode.set(mediaQuery.matches);
 
 		const updateDarkMode = (e: any) => darkMode.set(e.matches);
 
-		if (mediaQuery.addEventListener) {
-			mediaQuery.addEventListener('change', updateDarkMode);
-		} else if (mediaQuery.addListener) {
-			mediaQuery.addListener(updateDarkMode);
-		} else {
-			// Fallback: Polling mechanism if listeners are not supported
-			const interval = setInterval(() => {
-				darkMode.set(mediaQuery.matches);
-			}, 1000); // Check every second
-
-			return () => clearInterval(interval);
-		}
+		// Use addListener for Safari compatibility
+		mediaQuery.addListener(updateDarkMode);
 
 		return () => {
-			if (mediaQuery.removeEventListener) {
-				mediaQuery.removeEventListener('change', updateDarkMode);
-			} else if (mediaQuery.removeListener) {
-				mediaQuery.removeListener(updateDarkMode);
-			}
+			mediaQuery.removeListener(updateDarkMode);
 		};
-	}
-
-	onMount(detectDarkMode);
+	});
 
 	$: $darkMode = $darkMode; // This line triggers reactivity when the dark mode changes
-	$: console.log('darkMode', $darkMode);
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
