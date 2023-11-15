@@ -4,6 +4,8 @@
 	import { personasLabelToslug, personaAvatarPath, sortOrder } from '../../utils/matching-format';
 	import Race from '../../components/race.svelte';
 	import AvatarModal from '../../components/avatar-modal.svelte';
+	import { fade } from 'svelte/transition';
+	import { linear, quadInOut } from 'svelte/easing';
 
 	// const currWeek: Writable<number> = getContext('currWeek');
 
@@ -68,7 +70,11 @@
 	<title>Pardon My Picks - Stats</title>
 </svelte:head>
 
-<div class="">
+<div
+	class=""
+	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
+	out:fade={{ duration: 150, easing: linear }}
+>
 	<div
 		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>

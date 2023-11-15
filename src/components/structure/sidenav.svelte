@@ -192,6 +192,7 @@
 							<a
 								class={`w-full flex items-center justify-center no-underline transition-all duration-300 ease-in-out relative`}
 								href={subItem.route}
+								on:click={() => handleItemClick(navItem.label)}
 							>
 								<div class={`w-full flex items-cente lg:justify-between h-full pl-6`}>
 									<p class={``}>

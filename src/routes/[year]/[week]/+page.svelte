@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
-	import { quadInOut } from 'svelte/easing';
+	import { linear, quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
 	import { logo, personaImgPath, sortOrder } from '../../../utils/matching-format';
 	import type { PickByPerson } from '../../../utils/types';
@@ -17,6 +17,7 @@
 	$: ({ picks } = data);
 
 	$: ({ year, week } = $page.params);
+	console.log($page.route.id);
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
@@ -69,7 +70,7 @@
 	<title>Pardon My Picks - Week {week}</title>
 </svelte:head>
 
-<div class="">
+<div class="" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
 		class="flex justify-start items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
 	>
