@@ -129,7 +129,7 @@
 				class="w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative group flex justify-between items-center h-full font-header"
 			>
 				{#if $sideNavCollasped}
-					<Tooltip text={navItem.label} />
+					<Tooltip text={navItem.label} placement="right" />
 				{/if}
 
 				<a

@@ -46,7 +46,7 @@ export const personaImgPath = (person: string) => {
 		case 'Max':
 			return '/personas/sad-max-pmt.png';
 		case 'Memes':
-			return '/barstool-logo.jpg';
+			return '/personas/zach-wilson-bench.jpg';
 		default:
 			return '/personas/sad-max-pmt.png';
 	}
@@ -65,7 +65,7 @@ export const personaAvatarPath = (person: string) => {
 		case 'Max':
 			return '/avatars/max-avatar.jpg';
 		case 'Memes':
-			return '/avatars/memes-avatar.jpg';
+			return '/avatars/zach-wilson-mirror.jpg';
 		default:
 			return '/avatars/sad-max-pmt.png';
 	}
