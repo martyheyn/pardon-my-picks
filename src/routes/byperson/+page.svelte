@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { personasLabelToslug, personaAvatarPath, sortOrder } from '../../utils/matching-format';
 	import Race from '../../components/race.svelte';
+	import AvatarModal from '../../components/avatar-modal.svelte';
 
 	// const currWeek: Writable<number> = getContext('currWeek');
 
@@ -57,6 +58,10 @@
 			}`
 		);
 	};
+
+	// modal
+	let showModal = false;
+	let profilePic = '';
 </script>
 
 <svelte:head>
@@ -83,11 +88,18 @@
 					>
 						{persona.person}
 					</a>
-					<img
-						src={personaAvatarPath(persona.person)}
-						alt="avatar"
-						class="w-16 h-16 rounded-full"
-					/>
+					<button
+						on:click={() => {
+							showModal = true;
+							profilePic = personaAvatarPath(persona.person);
+						}}
+					>
+						<img
+							src={personaAvatarPath(persona.person)}
+							alt="avatar"
+							class="w-16 h-16 rounded-full"
+						/>
+					</button>
 				</div>
 
 				<div class="flex flex-col gap-y-2">
@@ -145,3 +157,5 @@
 
 	<Race />
 </div>
+
+<AvatarModal bind:showModal imgSrc={profilePic} />
