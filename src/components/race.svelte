@@ -1,13 +1,21 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { fly, slide } from 'svelte/transition';
+	import { quadInOut } from 'svelte/easing';
+
 	import {
 		personaAvatarPath,
 		personasLabelToCamelCase,
 		camelCaseToLabel
 	} from '../utils/matching-format';
+	import type { Writable } from 'svelte/store';
+
+	import Icon from './icon.svelte';
 
 	$: ({ week } = $page.params);
+
+	let screenWidth: Writable<number> = getContext('screenWidth');
 
 	type weeklyPersonDataType = {
 		[key: string]: {
@@ -122,8 +130,16 @@
 		lastWeekWithData = mainActWeeklyDataByPersonArr[0].bigCat.data.length;
 	});
 
+	let dataExpanded = false;
+
+	// when screen width gets below, reset dataExpanded reset to false
+	$: if ($screenWidth < 600) {
+		dataExpanded = false;
+	} else {
+		dataExpanded = true;
+	}
+
 	// TODO: do it by points down instead of record when small
-	// TODO: figure out small way to do it
 </script>
 
 <div
@@ -135,7 +151,11 @@
 	<table class="w-full">
 		<tr class="">
 			<th class="text-left font-paragraph" />
-			{#each Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
+			{#if $screenWidth < 600}
+				<th class="text-center pb-1" />
+			{/if}
+
+			{#each Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : !dataExpanded ? 1 : lastWeekWithData }, (_, i) => i + 1) as i}
 				<th class="text-center pb-1">{i}</th>
 			{/each}
 		</tr>
@@ -154,13 +174,45 @@
 					</a>
 					<p>{camelCaseToLabel(Object.keys(mainActByPerson)[0])}</p>
 				</td>
-				{#each week ? Object.values(mainActByPerson)[0].data.slice(0, parseInt(week)) : Object.values(mainActByPerson)[0].data as weekData}
+
+				{#if $screenWidth < 600 && !dataExpanded}
+					<td
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] cursor-pointer hover:font-bold transition-bold duration-200 ease-out"
+						on:click={() => (dataExpanded = true)}>. . .</td
+					>
+				{:else if $screenWidth < 600 && dataExpanded}
 					<td
 						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+						on:click={() => (dataExpanded = false)}
 					>
-						{weekData.record}
+						<Icon
+							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[180deg] w-full flex justify-center`}
+							width="24px"
+							height="24px"
+							iconName="arrow"
+						/>
 					</td>
-				{/each}
+				{/if}
+
+				{#if dataExpanded}
+					{#each week ? Object.values(mainActByPerson)[0].data.slice(0, parseInt(week)) : Object.values(mainActByPerson)[0].data as weekData}
+						<td
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
+							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
+						>
+							{weekData.record}
+						</td>
+					{/each}
+				{:else}
+					{#each Object.values(mainActByPerson)[0].data.slice(Object.values(mainActByPerson)[0].data.length - 1, Object.values(mainActByPerson)[0].data.length) as weekData}
+						<td
+							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
+						>
+							{weekData.record}
+						</td>
+					{/each}
+				{/if}
 			</tr>
 		{/each}
 	</table>
@@ -180,13 +232,45 @@
 					</a>
 					<p>{camelCaseToLabel(Object.keys(openerByPerson)[0])}</p>
 				</td>
-				{#each week ? Object.values(openerByPerson)[0].data.slice(0, parseInt(week)) : Object.values(openerByPerson)[0].data as weekData}
+
+				{#if $screenWidth < 600 && !dataExpanded}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 w-fit rounded-md text-center min-w-[50px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] cursor-pointer hover:font-bold transition-bold duration-200 ease-out"
+						on:click={() => (dataExpanded = true)}>. . .</td
 					>
-						{weekData.record}
+				{:else if $screenWidth < 600 && dataExpanded}
+					<td
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+						on:click={() => (dataExpanded = false)}
+					>
+						<Icon
+							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[180deg] w-full flex justify-center`}
+							width="24px"
+							height="24px"
+							iconName="arrow"
+						/>
 					</td>
-				{/each}
+				{/if}
+
+				{#if dataExpanded}
+					{#each week ? Object.values(openerByPerson)[0].data.slice(0, parseInt(week)) : Object.values(openerByPerson)[0].data as weekData}
+						<td
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
+							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
+						>
+							{weekData.record}
+						</td>
+					{/each}
+				{:else}
+					{#each Object.values(openerByPerson)[0].data.slice(Object.values(openerByPerson)[0].data.length - 1, Object.values(openerByPerson)[0].data.length) as weekData}
+						<td
+							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
+						>
+							{weekData.record}
+						</td>
+					{/each}
+				{/if}
 			</tr>
 		{/each}
 	</table>

@@ -2,21 +2,24 @@
 	import '../app.css';
 
 	// create store
-	import { onMount, setContext } from 'svelte';
+	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import Sidenav from '../components/structure/sidenav.svelte';
 	import Topnav from '../components/structure/topnav.svelte';
 
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(11);
+	const screenWidth = writable(0);
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
+	setContext('screenWidth', screenWidth);
 
 	let fullPageHeight: number;
-	let screenWidth: number = 0;
+	// let screenWidth: number = 0;
 	let scrollY: number;
-	$: mobile = screenWidth < 640;
+
+	$: mobile = $screenWidth < 640;
 </script>
 
 <svelte:head>
@@ -28,7 +31,7 @@
 	<title>Pardon My Picks</title>
 </svelte:head>
 
-<svelte:window bind:innerWidth={screenWidth} bind:scrollY />
+<svelte:window bind:innerWidth={$screenWidth} bind:scrollY />
 
 <div class="min-h-screen dark:text-white" bind:clientHeight={fullPageHeight}>
 	<Topnav />
