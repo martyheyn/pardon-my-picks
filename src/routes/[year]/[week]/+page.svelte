@@ -70,16 +70,21 @@
 </svelte:head>
 
 <div class="">
-	<div class="flex text-3xl pb-2 border-b border-b-black border-opacity-10">
+	<div
+		class="flex justify-start items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
+	>
 		<h1 class="font-header">{year} Week: {week}</h1>
+		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
 	</div>
 
 	<div
 		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-4 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 	>
 		{#each picksArr as pickPerson}
-			<div class="flex flex-row items-center md:flex-col gap-x-4 md:col-span-2">
-				<h2 class="text-2xl pl-3 font-semibold">{Object.keys(pickPerson)}</h2>
+			<div
+				class="flex flex-row justify-start items-center md:items-start md:flex-col gap-x-4 md:col-span-2"
+			>
+				<h2 class="text-2xl pl-3 font-semibold text-left">{Object.keys(pickPerson)}</h2>
 				<img
 					src={personaImgPath(Object.keys(pickPerson)[0])}
 					alt="sad max"

@@ -149,8 +149,10 @@
 		<h1 class="text-xl font-semibold font-header">Race to the Stage</h1>
 	</div>
 	<table class="w-full">
-		<caption class="text-lg font-semibold font-header text-right mr-12 sm:text-center sm:mr-0"
-			>Week</caption
+		<caption
+			class={`text-lg font-semibold font-header ${
+				dataExpanded ? 'text-center mr-0' : 'text-right mr-12'
+			}`}>Week</caption
 		>
 		<tr class="">
 			<th class="text-left font-paragraph" />

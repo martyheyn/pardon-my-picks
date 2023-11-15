@@ -9,7 +9,7 @@
 <div
 	class="bg-[#18314FFF] dark:bg-[#1f1f1f] ml-14 h-14 flex justify-center items-center relative text-white"
 >
-	<h2 class=" text-lg pr-12 lg:pr-32 font-header transition-all duration-300 ease-in-out">
+	<h2 class=" text-lg pr-12 lg:pr-24 font-header transition-all duration-300 ease-in-out">
 		Pardon My Picks
 	</h2>
 
@@ -26,7 +26,7 @@
 	{#if showSocials}
 		<div
 			class="absolute right-0 top-14 bg-[#18314FFF] dark:bg-[#1f1f1f] z-50"
-			transition:fly={{ x: 100, duration: 300, easing: quadInOut }}
+			transition:fly={{ y: -50, duration: 300, easing: quadInOut }}
 		>
 			<ul class="">
 				<li
