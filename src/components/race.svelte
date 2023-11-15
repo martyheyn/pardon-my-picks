@@ -206,7 +206,7 @@
 						</td>
 					{/each}
 				{:else}
-					{#each Object.values(mainActByPerson)[0].data.slice(Object.values(mainActByPerson)[0].data.length - 1, Object.values(mainActByPerson)[0].data.length) as weekData}
+					{#each Object.values(mainActByPerson)[0].data.slice(parseInt(week) - 1, parseInt(week)) as weekData}
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
@@ -262,7 +262,7 @@
 						</td>
 					{/each}
 				{:else}
-					{#each Object.values(openerByPerson)[0].data.slice(Object.values(openerByPerson)[0].data.length - 1, Object.values(openerByPerson)[0].data.length) as weekData}
+					{#each Object.values(openerByPerson)[0].data.slice(parseInt(week) - 1, parseInt(week)) as weekData}
 						<td
 							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
 						>
