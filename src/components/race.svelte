@@ -145,17 +145,20 @@
 <div
 	class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-4 md:px-8 py-4 md:col-span-3 flex flex-col gap-y-2 max-w-6xl overflow-x-auto"
 >
-	<div class="flex justify-center items-center w-full">
+	<div class="flex flex-col justify-center items-center w-full">
 		<h1 class="text-xl font-semibold font-header">Race to the Stage</h1>
 	</div>
 	<table class="w-full">
+		<caption class="text-lg font-semibold font-header text-right mr-12 sm:text-center sm:mr-0"
+			>Week</caption
+		>
 		<tr class="">
 			<th class="text-left font-paragraph" />
 			{#if $screenWidth < 600}
 				<th class="text-center pb-1" />
 			{/if}
 
-			{#each Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : !dataExpanded ? 1 : lastWeekWithData }, (_, i) => i + 1) as i}
+			{#each !dataExpanded ? [week] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
 				<th class="text-center pb-1">{i}</th>
 			{/each}
 		</tr>
@@ -186,7 +189,7 @@
 						on:click={() => (dataExpanded = false)}
 					>
 						<Icon
-							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[180deg] w-full flex justify-center`}
+							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer w-full flex justify-center hover:scale-110`}
 							width="24px"
 							height="24px"
 							iconName="arrow"
@@ -197,8 +200,7 @@
 				{#if dataExpanded}
 					{#each week ? Object.values(mainActByPerson)[0].data.slice(0, parseInt(week)) : Object.values(mainActByPerson)[0].data as weekData}
 						<td
-							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
-							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] transition-all duration-300 ease-in-out`}
 						>
 							{weekData.record}
 						</td>
@@ -206,8 +208,7 @@
 				{:else}
 					{#each Object.values(mainActByPerson)[0].data.slice(Object.values(mainActByPerson)[0].data.length - 1, Object.values(mainActByPerson)[0].data.length) as weekData}
 						<td
-							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
-							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
 							{weekData.record}
 						</td>
@@ -244,7 +245,7 @@
 						on:click={() => (dataExpanded = false)}
 					>
 						<Icon
-							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[180deg] w-full flex justify-center`}
+							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer w-full flex justify-center hover:scale-110`}
 							width="24px"
 							height="24px"
 							iconName="arrow"
@@ -256,7 +257,6 @@
 					{#each week ? Object.values(openerByPerson)[0].data.slice(0, parseInt(week)) : Object.values(openerByPerson)[0].data as weekData}
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
-							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
 						>
 							{weekData.record}
 						</td>
@@ -265,7 +265,6 @@
 					{#each Object.values(openerByPerson)[0].data.slice(Object.values(openerByPerson)[0].data.length - 1, Object.values(openerByPerson)[0].data.length) as weekData}
 						<td
 							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
-							transition:fly={{ duration: 300, x: 100, easing: quadInOut }}
 						>
 							{weekData.record}
 						</td>
