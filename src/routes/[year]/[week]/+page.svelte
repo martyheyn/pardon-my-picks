@@ -17,7 +17,6 @@
 	$: ({ picks } = data);
 
 	$: ({ year, week } = $page.params);
-	console.log($page.route.id);
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
@@ -63,7 +62,6 @@
 
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
-	// TODO: special bet absolute positioning
 </script>
 
 <svelte:head>

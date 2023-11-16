@@ -16,10 +16,10 @@
 	setContext('screenWidth', screenWidth);
 
 	let fullPageHeight: number;
-	// let screenWidth: number = 0;
 	let scrollY: number;
 
 	$: mobile = $screenWidth < 640;
+	$: console.log('fullPageHeight', fullPageHeight);
 </script>
 
 <svelte:head>
@@ -31,9 +31,9 @@
 	<title>Pardon My Picks</title>
 </svelte:head>
 
-<svelte:window bind:innerWidth={$screenWidth} bind:scrollY />
+<svelte:window bind:innerWidth={$screenWidth} bind:scrollY bind:innerHeight={fullPageHeight} />
 
-<div class="min-h-screen dark:text-white" bind:clientHeight={fullPageHeight}>
+<div class="min-h-screen dark:text-white">
 	<Topnav />
 
 	<Sidenav {mobile} {scrollY} />
@@ -47,7 +47,9 @@
 			mobile ? 'ml-0' : 'ml-14 '
 		}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
 	>
-		<div class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] min-h-[${fullPageHeight - 56}px]`}>
+		<div
+			class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] min-h-[91vh] transition-all duration-500 ease-in-out`}
+		>
 			<slot />
 		</div>
 	</div>
