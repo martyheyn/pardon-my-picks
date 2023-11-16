@@ -25,6 +25,22 @@ export const load: PageServerLoad = async () => {
 			_count: {
 				winner: true
 			}
+		}),
+
+		specialBets: await prisma.pick.groupBy({
+			by: ['person', 'specialBet'],
+			_sum: {
+				winner: true,
+				push: true
+			},
+			_count: {
+				winner: true
+			},
+			where: {
+				specialBet: {
+					not: undefined || ''
+				}
+			}
 		})
 	};
 };

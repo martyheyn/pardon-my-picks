@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
-	import { personasLabelToslug, personaAvatarPath, sortOrder } from '../../utils/matching-format';
+	import {
+		personasLabelToslug,
+		personaAvatarPath,
+		sortOrder,
+		specialBetsLabel
+	} from '../../utils/matching-format';
 	import Race from '../../components/race.svelte';
 	import AvatarModal from '../../components/avatar-modal.svelte';
 	import { fade } from 'svelte/transition';
@@ -19,7 +24,9 @@
 
 	export let data: PageData;
 
-	$: ({ personas, spreads } = data);
+	$: ({ personas, spreads, specialBets } = data);
+	$: console.log('personas', personas);
+	$: console.log('specialBets', specialBets);
 
 	$: personas.sort((a, b) => {
 		return (
@@ -37,6 +44,11 @@
 			betTypeStats._sum.winner && betTypeStats._count.winner - betTypeStats._sum.winner
 		} - ${betTypeStats._sum.push}
 		`;
+	};
+
+	// get specialBet by person
+	const getSpecialBets = (persona: string) => {
+		return specialBets.filter((bet) => bet.person === persona);
 	};
 
 	const getRecordPct = (persona: {
@@ -145,6 +157,22 @@
 							>{getBetTypeStats(persona.person, 'totals')}</span
 						>
 					</p>
+
+					{#if getSpecialBets(persona.person)}
+						{#each getSpecialBets(persona.person) as bet}
+							<p class=" text-[16px] leading-4">
+								{specialBetsLabel(bet.specialBet)}:
+								<span class="text-lg font-semibold ml-2 leading-4"
+									>{bet._sum.winner} - {bet._sum.winner && bet._sum.push
+										? bet._count.winner - bet._sum.winner - bet._sum.push
+										: bet._sum.winner
+										? bet._count.winner - bet._sum.winner
+										: ''}
+									{bet._sum.push ? ` - ${bet._sum.push}` : ''}</span
+								>
+							</p>
+						{/each}
+					{/if}
 
 					<!-- <div class="flex gap-x-4">
 						<p class=" text-[16px] leading-4">

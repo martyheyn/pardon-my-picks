@@ -155,3 +155,16 @@ export const sortOrder = {
 	Max: 5,
 	Memes: 6
 };
+
+export const specialBetsLabel = (specialBet: string) => {
+	switch (specialBet) {
+		case 'lunder':
+			return "L'Under";
+		case 'timezone':
+			return 'Timezone';
+		case 'gameOfTheYear':
+			return 'Game of the Year';
+		default:
+			return "L'Under";
+	}
+};
