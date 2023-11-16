@@ -160,7 +160,7 @@
 				<th class="text-center pb-1" />
 			{/if}
 
-			{#each !dataExpanded ? [week] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
+			{#each !dataExpanded && week ? [week] : !dataExpanded && !week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
 				<th class="text-center pb-1">{i}</th>
 			{/each}
 		</tr>
@@ -200,7 +200,7 @@
 				{/if}
 
 				{#if dataExpanded}
-					{#each week ? Object.values(mainActByPerson)[0].data.slice(0, parseInt(week)) : Object.values(mainActByPerson)[0].data as weekData}
+					{#each week ? Object.values(mainActByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(mainActByPerson)[0].data as weekData}
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] transition-all duration-300 ease-in-out`}
 						>
@@ -208,7 +208,7 @@
 						</td>
 					{/each}
 				{:else}
-					{#each Object.values(mainActByPerson)[0].data.slice(parseInt(week) - 1, parseInt(week)) as weekData}
+					{#each Object.values(mainActByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
@@ -256,7 +256,7 @@
 				{/if}
 
 				{#if dataExpanded}
-					{#each week ? Object.values(openerByPerson)[0].data.slice(0, parseInt(week)) : Object.values(openerByPerson)[0].data as weekData}
+					{#each week ? Object.values(openerByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(openerByPerson)[0].data as weekData}
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
@@ -264,7 +264,7 @@
 						</td>
 					{/each}
 				{:else}
-					{#each Object.values(openerByPerson)[0].data.slice(parseInt(week) - 1, parseInt(week)) as weekData}
+					{#each Object.values(openerByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
 						<td
 							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
 						>
