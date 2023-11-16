@@ -4,6 +4,9 @@
 	// create store
 	import { setContext } from 'svelte';
 	import { writable } from 'svelte/store';
+	import { dev } from '$app/environment';
+	import { inject } from '@vercel/analytics';
+
 	import Sidenav from '../components/structure/sidenav.svelte';
 	import Topnav from '../components/structure/topnav.svelte';
 
@@ -19,7 +22,9 @@
 	let scrollY: number;
 
 	$: mobile = $screenWidth < 640;
-	$: console.log('fullPageHeight', fullPageHeight);
+
+	// Inject the Analytics functionality
+	inject({ mode: dev ? 'development' : 'production' });
 </script>
 
 <svelte:head>
