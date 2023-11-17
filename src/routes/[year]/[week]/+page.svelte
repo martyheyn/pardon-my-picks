@@ -15,6 +15,7 @@
 	export let data: PageData;
 
 	$: ({ picks } = data);
+	$: console.log(picks);
 
 	$: ({ year, week } = $page.params);
 
@@ -177,7 +178,9 @@
 						<div
 							class={`flex flex-row ${
 								btnsDivWidth < 250 ? 'flex-col gap-y-4 items-start' : 'flex-row items-center'
-							} justify-start gap-x-4 ${!pick.espnLink && !pick.highlighLink ? 'hidden' : 'block'}`}
+							} justify-start gap-x-4 ${
+								!pick.espnLink && !pick.highlighLink && !pick.nerdNugget ? 'hidden' : 'block'
+							}`}
 							bind:clientWidth={btnsDivWidth}
 						>
 							{#if pick.espnLink}

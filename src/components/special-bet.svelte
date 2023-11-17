@@ -11,6 +11,9 @@
 		case 'timezone':
 			betText = 'Timezone';
 			break;
+		case 'huh':
+			betText = 'Huh ???';
+			break;
 	}
 </script>
 
@@ -20,7 +23,7 @@
 	>
 		<Icon
 			class={`transition-all duration-300 ease-in-out ${
-				betType === 'timezone' ? '[fill-rule:evenodd] [clip-rule:evenodd]' : ''
+				betType !== 'lunder' ? '[fill-rule:evenodd] [clip-rule:evenodd]' : ''
 			}`}
 			width="24px"
 			height="24px"

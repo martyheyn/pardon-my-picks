@@ -1,5 +1,5 @@
 const weekSubNavArr: { label: string; icon: string; route: string }[] = [];
-for (let i = 1; i <= 10; i++) {
+for (let i = 1; i <= 11; i++) {
 	weekSubNavArr.push({
 		label: `Week ${i}`,
 		icon: 'calendar',
@@ -44,7 +44,7 @@ export const sideNavItems = [
 	{
 		label: 'Week',
 		icon: 'calendar',
-		route: '/2023/10',
+		route: '/2023/11',
 		subItems: weekSubNavArr,
 		subItemsOpen: false
 	},
