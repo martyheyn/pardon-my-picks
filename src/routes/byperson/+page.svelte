@@ -25,8 +25,6 @@
 	export let data: PageData;
 
 	$: ({ personas, spreads, specialBets } = data);
-	$: console.log('personas', personas);
-	$: console.log('specialBets', specialBets);
 
 	$: personas.sort((a, b) => {
 		return (
