@@ -4,7 +4,7 @@
 	import { fade, slide } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
-	import { logo, personaImgPath, sortOrder } from '../../../utils/matching-format';
+	import { logo, personaImgPath, sortOrder, teamLink } from '../../../utils/matching-format';
 	import type { PickByPerson } from '../../../utils/types';
 	import type { Writable } from 'svelte/store';
 
@@ -124,7 +124,9 @@
 							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
 						>
 							<div class="flex flex-col items-center gap-2">
-								<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
+								<a href={`${teamLink[pick.awayTeam]}`} target="_blank">
+									<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
+								</a>
 								{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
 									<p
 										class={`${
@@ -139,7 +141,10 @@
 							<p class="font-semibold">@</p>
 
 							<div class="flex flex-col items-center gap-2">
-								<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
+								<a href={`${teamLink[pick.homeTeam]}`} target="_blank">
+									<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
+								</a>
+
 								{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
 									<p
 										class={`${

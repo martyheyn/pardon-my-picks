@@ -33,6 +33,41 @@ export const logo = {
 	commanders: '/nfl-team-logos/commanders.png'
 };
 
+export const teamLink = {
+	cardinals: 'https://www.espn.com/nfl/team/_/name/ari/arizona-cardinals',
+	falcons: 'https://www.espn.com/nfl/team/_/name/atl/atlanta-falcons',
+	ravens: 'https://www.espn.com/nfl/team/_/name/bal/baltimore-ravens',
+	bills: 'https://www.espn.com/nfl/team/_/name/buf/buffalo-bills',
+	panthers: 'https://www.espn.com/nfl/team/_/name/car/carolina-panthers',
+	bears: 'https://www.espn.com/nfl/team/_/name/chi/chicago-bears',
+	bengals: 'https://www.espn.com/nfl/team/_/name/cin/cincinnati-bengals',
+	browns: 'https://www.espn.com/nfl/team/_/name/cle/cleveland-browns',
+	cowboys: 'https://www.espn.com/nfl/team/_/name/dal/dallas-cowboys',
+	broncos: 'https://www.espn.com/nfl/team/_/name/den/denver-broncos',
+	lions: 'https://www.espn.com/nfl/team/_/name/det/detroit-lions',
+	packers: 'https://www.espn.com/nfl/team/_/name/gb/green-bay-packers',
+	texans: 'https://www.espn.com/nfl/team/_/name/hou/houston-texans',
+	colts: 'https://www.espn.com/nfl/team/_/name/ind/indianapolis-colts',
+	jaguars: 'https://www.espn.com/nfl/team/_/name/jax/jacksonville-jaguars',
+	chiefs: 'https://www.espn.com/nfl/team/_/name/kc/kansas-city-chiefs',
+	chargers: 'https://www.espn.com/nfl/team/_/name/lac/los-angeles-chargers',
+	rams: 'https://www.espn.com/nfl/team/_/name/lar/los-angeles-rams',
+	dolphins: 'https://www.espn.com/nfl/team/_/name/mia/miami-dolphins',
+	vikings: 'https://www.espn.com/nfl/team/_/name/min/minnesota-vikings',
+	patriots: 'https://www.espn.com/nfl/team/_/name/ne/new-england-patriots',
+	saints: 'https://www.espn.com/nfl/team/_/name/no/new-orleans-saints',
+	giants: 'https://www.espn.com/nfl/team/_/name/nyg/new-york-giants',
+	jets: 'https://www.espn.com/nfl/team/_/name/nyj/new-york-jets',
+	raiders: 'https://www.espn.com/nfl/team/_/name/lv/las-vegas-raiders',
+	eagles: 'https://www.espn.com/nfl/team/_/name/phi/philadelphia-eagles',
+	steelers: 'https://www.espn.com/nfl/team/_/name/pit/pittsburgh-steelers',
+	fortyNiners: 'https://www.espn.com/nfl/team/_/name/sf/san-francisco-49ers',
+	seahawks: 'https://www.espn.com/nfl/team/_/name/sea/seattle-seahawks',
+	buccaneers: 'https://www.espn.com/nfl/team/_/name/tb/tampa-bay-buccaneers',
+	titans: 'https://www.espn.com/nfl/team/_/name/ten/tennessee-titans',
+	commanders: 'https://www.espn.com/nfl/team/_/name/wsh/washington-commanders'
+};
+
 export const personaImgPath = (person: string) => {
 	switch (person) {
 		case 'Big Cat':
