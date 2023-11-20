@@ -15,7 +15,6 @@
 	export let data: PageData;
 
 	$: ({ picks } = data);
-	$: console.log(picks);
 
 	$: ({ year, week } = $page.params);
 

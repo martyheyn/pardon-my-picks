@@ -199,6 +199,8 @@ export const specialBetsLabel = (specialBet: string) => {
 			return 'Timezone';
 		case 'gameOfTheYear':
 			return 'Game of the Year';
+		case 'huh':
+			return 'Huh?';
 		default:
 			return "L'Under";
 	}

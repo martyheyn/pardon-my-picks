@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
 	import {
 		personasLabelToslug,
 		personaAvatarPath,
@@ -9,18 +8,9 @@
 	} from '../../utils/matching-format';
 	import Race from '../../components/race.svelte';
 	import AvatarModal from '../../components/avatar-modal.svelte';
-	import { fade } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
-
-	// const currWeek: Writable<number> = getContext('currWeek');
-
-	// pass the currWeek as a param to the server
-	// onMount(async () => {
-	// 	if (!$currWeek || $currWeek < 1) return;
-	// 	const response = await fetch(`api/byperson?currWeek=${$currWeek}`);
-	// 	const data = await response.json();
-	// 	console.log(data);
-	// });
+	import Icon from '../../components/icon.svelte';
 
 	export let data: PageData;
 
@@ -71,6 +61,31 @@
 		);
 	};
 
+	let showSpecialBetDetials: { person: string; indx: number } | undefined;
+	let specialBetDetails: any;
+
+	const getSpecialBetDetails = async (person: string, specialBet: string, indx: number) => {
+		if (
+			showSpecialBetDetials &&
+			showSpecialBetDetials.person === person &&
+			showSpecialBetDetials.indx === indx
+		) {
+			showSpecialBetDetials = undefined;
+			return;
+		}
+
+		try {
+			const res = await fetch(`/api/special-bet-details?person=${person}&specialBet=${specialBet}`);
+			const data = await res.json();
+
+			showSpecialBetDetials = { person, indx };
+
+			specialBetDetails = data;
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	// modal
 	let showModal = false;
 	let profilePic = '';
@@ -118,7 +133,7 @@
 					</button>
 				</div>
 
-				<div class="flex flex-col gap-y-2">
+				<div class="flex flex-col gap-y-[10px]">
 					<p
 						class={`text-4xl [text-shadow:1px_1px_1px_gray] dark:[text-shadow:1px_1px_1px_white] mb-1 ${
 							getRecordPct(persona) > 50
@@ -157,18 +172,54 @@
 					</p>
 
 					{#if getSpecialBets(persona.person)}
-						{#each getSpecialBets(persona.person) as bet}
-							<p class=" text-[16px] leading-4">
-								{specialBetsLabel(bet.specialBet)}:
-								<span class="text-lg font-semibold ml-2 leading-4"
-									>{bet._sum.winner} - {bet._sum.winner && bet._sum.push
-										? bet._count.winner - bet._sum.winner - bet._sum.push
-										: bet._sum.winner
-										? bet._count.winner - bet._sum.winner
-										: ''}
-									{bet._sum.push ? ` - ${bet._sum.push}` : ''}</span
+						{#each getSpecialBets(persona.person) as bet, i}
+							<div class="flex flex-row gap-4 items-center">
+								<p class="text-[16px] leading-4">
+									{specialBetsLabel(bet.specialBet)}:
+									<span class="text-lg font-semibold ml-2 leading-4"
+										>{bet._sum.winner} - {bet._sum.winner && bet._sum.push
+											? bet._count.winner - bet._sum.winner - bet._sum.push
+											: bet._sum.winner
+											? bet._count.winner - bet._sum.winner
+											: ''}
+										{bet._sum.push ? ` - ${bet._sum.push}` : ''}</span
+									>
+								</p>
+								<button
+									class=""
+									on:click={() => getSpecialBetDetails(bet.person, bet.specialBet, i)}
 								>
-							</p>
+									<Icon
+										class={`transition-all duration-300 ease-in-out fill-black cursor-pointer mt-[1px] ${
+											showSpecialBetDetials &&
+											showSpecialBetDetials.person === bet.person &&
+											showSpecialBetDetials.indx === i
+												? 'rotate-[270deg]'
+												: 'rotate-[90deg]'
+										}`}
+										width="24px"
+										height="24px"
+										iconName="arrow"
+									/>
+								</button>
+							</div>
+
+							{#if showSpecialBetDetials && showSpecialBetDetials.person === bet.person && showSpecialBetDetials.indx === i && specialBetDetails}
+								<div
+									class="flex flex-col gap-y-2 ml-2"
+									transition:slide={{ duration: 300, easing: quadInOut }}
+								>
+									{#each specialBetDetails as betDetail}
+										<a href={`/2023/${betDetail.week}`}>
+											<div class="flex flex-row gap-x-2">
+												<p class="font-semibold mr-1">Week {betDetail.week}:</p>
+												<p class="mr-1">{betDetail.description},</p>
+												<p class="">{betDetail.result}</p>
+											</div>
+										</a>
+									{/each}
+								</div>
+							{/if}
 						{/each}
 					{/if}
 
