@@ -189,17 +189,23 @@
 							bind:clientWidth={btnsDivWidth}
 						>
 							{#if pick.espnLink}
-								<button
-									class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
-									><a href={pick.espnLink} target="_blank"> Box Score </a>
-								</button>
+								<a href={pick.espnLink} target="_blank">
+									<button
+										class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
+									>
+										Box Score
+									</button>
+								</a>
 							{/if}
 
 							{#if pick.highlighLink}
-								<button
-									class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
-									><a href={pick.highlighLink} target="_blank"> Highlights </a>
-								</button>
+								<a href={pick.highlighLink} target="_blank">
+									<button
+										class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
+									>
+										Highlights
+									</button>
+								</a>
 							{/if}
 
 							{#if pick.nerdNugget}
