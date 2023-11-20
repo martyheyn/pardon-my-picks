@@ -11,7 +11,9 @@
 
 	// Retrieve user store from context
 	const sideNavCollasped: Writable<boolean> = getContext('sideNavCollasped');
-	export let mobile: boolean;
+	const screenWidth: Writable<number> = getContext('screenWidth');
+	$: mobile = $screenWidth && $screenWidth < 640;
+
 	export let scrollY: number;
 
 	const toggleSideNav = () => {
@@ -70,7 +72,7 @@
 <div
 	class={`fixed top-0 z-10 ${
 		$sideNavCollasped ? 'w-14' : sideNavHeight > 800 ? 'w-[164px] sm:w-44' : 'w-40'
-	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'} ${
+	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
 		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF] dark:bg-[#1f1f1f]'
 	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white`}
 	id="elementToCheck"
@@ -122,8 +124,8 @@
 
 	<ul
 		class={`list-none m-0 pt-[1px] flex flex-col items-center border-t border-t-white border-opacity-10 ${
-			mobile && $sideNavCollasped ? 'hidden' : 'block'
-		}`}
+			mobile && $sideNavCollasped ? 'hidden opacity-0' : 'block opacity-100'
+		} transition-all duration-300 ease-in-out`}
 		bind:clientHeight={sideNavHeight}
 	>
 		{#each sideNavItems as navItem}

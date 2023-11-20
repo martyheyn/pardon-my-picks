@@ -38,24 +38,27 @@
 
 <svelte:window bind:innerWidth={$screenWidth} bind:scrollY bind:innerHeight={fullPageHeight} />
 
-<div class="min-h-screen dark:text-white">
-	<Topnav />
+<!-- only render app if screen width is not undefined, not have jumpy navbar -->
+{#if $screenWidth}
+	<div class="min-h-screen dark:text-white">
+		<Topnav />
 
-	<Sidenav {mobile} {scrollY} />
+		<Sidenav {scrollY} />
 
-	<div
-		class={`${
-			$sideNavCollasped
-				? 'w-[calc(100vw - 64px)]'
-				: 'w-[calc(100vw - 64px)] lg:w-[calc(100vw - 224px)] lg:ml-40'
-		} ${
-			mobile ? 'ml-0' : 'ml-14 '
-		}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
-	>
 		<div
-			class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] min-h-[91vh] transition-all duration-500 ease-in-out`}
+			class={`${
+				$sideNavCollasped
+					? 'w-[calc(100vw - 64px)]'
+					: 'w-[calc(100vw - 64px)] lg:w-[calc(100vw - 224px)] lg:ml-40'
+			} ${
+				mobile ? 'ml-0' : 'ml-14 '
+			}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
 		>
-			<slot />
+			<div
+				class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] min-h-[91vh] transition-all duration-500 ease-in-out`}
+			>
+				<slot />
+			</div>
 		</div>
 	</div>
-</div>
+{/if}
