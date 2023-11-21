@@ -44,7 +44,23 @@
 		href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&family=Kanit:wght@400;500&display=swap"
 		rel="stylesheet"
 	/>
-	<meta name="Pardon My Tale Weekly Football Picks" />
+	<meta name="pardon my picks" />
+	<meta name="description" content="Pardon My Take Weekly Football Picks" />
+	<meta name="keywords" content="Pardon My Take, Football, Picks, NFL, Weekly" />
+	<meta name="author" content="Pardon My Picks" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta property="og:url" content="https://pardonmypicks.com" />
+	<meta property="og:title" content="Pardon My Picks" />
+	<meta property="og:description" content="Pardon My Take Weekly Football Picks" />
+	<meta property="og:image" content="https://pardonmypicks.com/og-image.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="Pardon My Picks" />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Pardon My Picks" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="fb:app_id" content="123456789" />
+
 	<title>Pardon My Picks</title>
 </svelte:head>
 
