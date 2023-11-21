@@ -28,32 +28,32 @@
 	let weeklyDataByPerson: weeklyPersonDataType = {
 		bigCat: {
 			img: personaAvatarPath('Big Cat'),
-			link: '/byperson/#big-cat',
+			link: '/stats/#big-cat',
 			data: []
 		},
 		pft: {
 			img: personaAvatarPath('PFT'),
-			link: '/byperson/#pft-commenter',
+			link: '/stats/#pft-commenter',
 			data: []
 		},
 		hank: {
 			img: personaAvatarPath('Hank'),
-			link: '/byperson/#handsome-hank',
+			link: '/stats/#handsome-hank',
 			data: []
 		},
 		jake: {
 			img: personaAvatarPath('Jake'),
-			link: '/byperson/#cake-marsh',
+			link: '/stats/#cake-marsh',
 			data: []
 		},
 		max: {
 			img: personaAvatarPath('Max'),
-			link: '/byperson/#bat-girl',
+			link: '/stats/#bat-girl',
 			data: []
 		},
 		memes: {
 			img: personaAvatarPath('Memes'),
-			link: '/byperson/#memes',
+			link: '/stats/#memes',
 			data: []
 		}
 	};

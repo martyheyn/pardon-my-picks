@@ -103,7 +103,7 @@
 	<div
 		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>
-		<h1 class="font-header">By Person</h1>
+		<h1 class="font-header">Sabermetrics</h1>
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl my-6 font-paragraph">
@@ -114,7 +114,7 @@
 			>
 				<div class="flex justify-between items-start">
 					<a
-						href="/byperson/{personasLabelToslug(persona.person)}"
+						href="/stats/{personasLabelToslug(persona.person)}"
 						class="text-2xl hover:text-gray-600 transition duration-200 ease-in-out cursor-pointer"
 					>
 						{persona.person}

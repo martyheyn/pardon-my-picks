@@ -11,32 +11,32 @@ for (let i = 1; i <= 11; i++) {
 // 	{
 // 		label: 'Big Cat',
 // 		icon: 'user',
-// 		route: '/byperson/bigcat'
+// 		route: '/stats/bigcat'
 // 	},
 // 	{
 // 		label: 'PFT',
 // 		icon: 'user',
-// 		route: '/byperson/pft-commenter'
+// 		route: '/stats/pft-commenter'
 // 	},
 // 	{
 // 		label: 'Hank',
 // 		icon: 'user',
-// 		route: '/byperson/handsome-hank'
+// 		route: '/stats/handsome-hank'
 // 	},
 // 	{
 // 		label: 'Jake Marsh',
 // 		icon: 'user',
-// 		route: '/byperson/cake-marsh'
+// 		route: '/stats/cake-marsh'
 // 	},
 // 	{
 // 		label: 'Max',
 // 		icon: 'user',
-// 		route: '/byperson/bat-girl'
+// 		route: '/stats/bat-girl'
 // 	},
 // 	{
 // 		label: 'Memes',
 // 		icon: 'user',
-// 		route: '/byperson/memes'
+// 		route: '/stats/memes'
 // 	}
 // ];
 
@@ -49,15 +49,15 @@ export const sideNavItems = [
 		subItemsOpen: false
 	},
 	{
-		label: 'Person',
-		icon: 'user',
-		route: '/byperson'
+		label: 'Stats',
+		icon: 'stats',
+		route: '/stats'
 		// subItems: personaSubNavArr,
 		// subItemsOpen: false
-	},
-	{
-		label: 'History',
-		icon: 'history',
-		route: '/archive'
 	}
+	// {
+	// 	label: 'History',
+	// 	icon: 'history',
+	// 	route: '/archive'
+	// }
 ];
