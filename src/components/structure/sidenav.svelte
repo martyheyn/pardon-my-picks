@@ -12,6 +12,7 @@
 	// Retrieve user store from context
 	const sideNavCollasped: Writable<boolean> = getContext('sideNavCollasped');
 	const screenWidth: Writable<number> = getContext('screenWidth');
+	const active: Writable<string> = getContext('active');
 	$: mobile = $screenWidth && $screenWidth < 640;
 
 	export let scrollY: number;
@@ -29,31 +30,11 @@
 		}
 	};
 
-	let active = '';
 	let sideNavHeight: number;
 
-	onMount(() => {
-		// get current year
-		const currentYear = new Date().getFullYear();
-		if ($page.route.id?.includes('year')) {
-			if ($page.params.year === currentYear.toString()) {
-				active = 'Week';
-			} else {
-				active = 'History';
-			}
-		}
-
-		if ($page.route.id?.includes('person')) {
-			active = 'Person';
-		}
-
-		if ($page.route.id?.includes('stats')) {
-			active = 'Stats';
-		}
-	});
-
 	const handleItemClick = (label: string) => {
-		active = label;
+		// set active store to label
+		active.set(label);
 
 		// if mobile close sidenav and open items
 		if (mobile) {
@@ -143,7 +124,7 @@
 				>
 					<div
 						class={`w-2 h-full bg-yellow-400 absolute left-0 top-0 rounded-r-md transition-all duration-300 ease-in-out ${
-							active === navItem.label ? 'opacity-100' : 'opacity-0'
+							$active === navItem.label ? 'opacity-100' : 'opacity-0'
 						}`}
 					/>
 

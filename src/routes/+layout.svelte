@@ -6,6 +6,7 @@
 	import { writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
+	import { page } from '$app/stores';
 
 	import Sidenav from '../components/structure/sidenav.svelte';
 	import Topnav from '../components/structure/topnav.svelte';
@@ -13,10 +14,21 @@
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(11);
 	const screenWidth = writable(0);
+	const active = writable('');
+
+	$: if ($page.route) {
+		if ($page.route.id?.includes('week')) {
+			active.set('Week');
+		}
+		if ($page.route.id?.includes('stats')) {
+			active.set('Stats');
+		}
+	}
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
 	setContext('screenWidth', screenWidth);
+	setContext('active', active);
 
 	let fullPageHeight: number;
 	let scrollY: number;
