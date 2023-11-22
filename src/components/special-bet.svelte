@@ -13,6 +13,8 @@
 			break;
 		case 'huh':
 			betText = 'Huh ???';
+		case 'thanksgiving':
+			betText = 'Thanksgiving';
 			break;
 	}
 </script>
