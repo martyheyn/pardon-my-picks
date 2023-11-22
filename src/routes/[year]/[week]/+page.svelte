@@ -77,7 +77,7 @@
 	</div>
 
 	<div
-		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-4 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
+		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-6 md:gap-y-12 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 	>
 		{#each picksArr as pickPerson}
 			<div
@@ -91,145 +91,149 @@
 				/>
 			</div>
 
-			{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
-				{#key week}
-					<div
-						class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 md:col-span-3 flex flex-col gap-y-4 font-paragraph relative"
-						in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
-					>
-						<div class="">
-							<h4
-								class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
-									!pick.homeTeamScore
-										? 'bg-slate-300 bg-opacity-70'
-										: pick.winner
-										? 'bg-green-300 dark:bg-green-900'
-										: pick.push
-										? 'bg-yellow-300 dark:bg-yellow-500'
-										: 'bg-red-300 dark:bg-red-900'
-								} w-fit px-6 rounded-md flex justify-start items-center`}
-							>
-								{pick.description}
-							</h4>
-						</div>
-
-						{#if pick.specialBet}
-							<div class="absolute top-1 sm:top-2 -right-3 sm:-right-4 z-50">
-								<SpecialBet betType={pick.specialBet} />
-							</div>
-						{/if}
-
-						<div
-							class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
-						>
-							<div class="flex flex-col items-center gap-2">
-								<a href={`${teamLink[pick.awayTeam]}`} target="_blank">
-									<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
-								</a>
-								{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
-									<p
-										class={`${
-											pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
-										} text-lg`}
-									>
-										{pick.awayTeamScore}
-									</p>
-								{/if}
-							</div>
-
-							<p class="font-semibold">@</p>
-
-							<div class="flex flex-col items-center gap-2">
-								<a href={`${teamLink[pick.homeTeam]}`} target="_blank">
-									<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
-								</a>
-
-								{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
-									<p
-										class={`${
-											pick.homeTeamScore - pick.awayTeamScore > 0 ? 'font-bold' : ''
-										} text-lg`}
-									>
-										{pick.homeTeamScore}
-									</p>
-								{/if}
-							</div>
-						</div>
-
-						{#if showNerdNug && showNerdNug.person === Object.keys(pickPerson)[0] && showNerdNug.indx === i}
+			<div class="md:col-span-6">
+				<div
+					class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 transition-all ease-in-out duration-300"
+				>
+					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
+						{#key week}
 							<div
-								transition:slide={{ duration: 300, easing: quadInOut }}
-								class="flex flex-col gap-y-2"
+								class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col gap-y-4 font-paragraph relative"
+								in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 							>
-								<div class="flex justify-between">
-									<p class="font-semibold">Nerd Nugget</p>
-									<button
-										class="p-0.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full"
-										on:click={() => (showNerdNug = undefined)}
+								<div class="">
+									<h4
+										class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
+											!pick.homeTeamScore
+												? 'bg-slate-300 bg-opacity-70'
+												: pick.winner
+												? 'bg-green-300 dark:bg-green-900'
+												: pick.push
+												? 'bg-yellow-300 dark:bg-yellow-500'
+												: 'bg-red-300 dark:bg-red-900'
+										} w-fit px-6 rounded-md flex justify-start items-center`}
 									>
-										<Icon
-											class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[270deg]`}
-											width="24px"
-											height="24px"
-											iconName="arrow"
-										/>
-									</button>
+										{pick.description}
+									</h4>
 								</div>
-								<p>{pick.nerdNugget}</p>
-							</div>
-						{/if}
 
-						<div
-							class={`flex flex-row ${
-								btnsDivWidth < 250 ? 'flex-col gap-y-4 items-start' : 'flex-row items-center'
-							} justify-start gap-x-4 ${
-								!pick.espnLink && !pick.highlighLink && !pick.nerdNugget ? 'hidden' : 'block'
-							}`}
-							bind:clientWidth={btnsDivWidth}
-						>
-							{#if pick.espnLink}
-								<a href={pick.espnLink} target="_blank">
-									<button
-										class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
-									>
-										Box Score
-									</button>
-								</a>
-							{/if}
+								{#if pick.specialBet}
+									<div class="absolute top-1 sm:top-2 -right-3 sm:-right-4 z-50">
+										<SpecialBet betType={pick.specialBet} />
+									</div>
+								{/if}
 
-							{#if pick.highlighLink}
-								<a href={pick.highlighLink} target="_blank">
-									<button
-										class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
-									>
-										Highlights
-									</button>
-								</a>
-							{/if}
-
-							{#if pick.nerdNugget}
-								<button
-									class={`p-1.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full ${
-										showNerdNug &&
-										showNerdNug.person === Object.keys(pickPerson)[0] &&
-										showNerdNug.indx === i
-											? 'bg-gray-300 bg-opacity-50'
-											: ''
-									}`}
-									on:click={() => toggleNerdNug(Object.keys(pickPerson)[0], i)}
+								<div
+									class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
 								>
-									<Icon
-										class={`transition-all duration-300 ease-in-out cursor-pointer fill-none`}
-										width="24px"
-										height="24px"
-										iconName="glasses"
-									/>
-								</button>
-							{/if}
-						</div>
+									<div class="flex flex-col items-center gap-2">
+										<a href={`${teamLink[pick.awayTeam]}`} target="_blank">
+											<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
+										</a>
+										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
+											<p
+												class={`${
+													pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
+												} text-lg`}
+											>
+												{pick.awayTeamScore}
+											</p>
+										{/if}
+									</div>
 
-						<div class="flex items-center gap-x-8 sm:gap-x-4 lg:gap-x-8">
-							<!-- <div class="flex flex-col items-center gap-y-2">
+									<p class="font-semibold">@</p>
+
+									<div class="flex flex-col items-center gap-2">
+										<a href={`${teamLink[pick.homeTeam]}`} target="_blank">
+											<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
+										</a>
+
+										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
+											<p
+												class={`${
+													pick.homeTeamScore - pick.awayTeamScore > 0 ? 'font-bold' : ''
+												} text-lg`}
+											>
+												{pick.homeTeamScore}
+											</p>
+										{/if}
+									</div>
+								</div>
+
+								{#if showNerdNug && showNerdNug.person === Object.keys(pickPerson)[0] && showNerdNug.indx === i}
+									<div
+										transition:slide={{ duration: 300, easing: quadInOut }}
+										class="flex flex-col gap-y-2"
+									>
+										<div class="flex justify-between">
+											<p class="font-semibold">Nerd Nugget</p>
+											<button
+												class="p-0.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full"
+												on:click={() => (showNerdNug = undefined)}
+											>
+												<Icon
+													class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[270deg]`}
+													width="24px"
+													height="24px"
+													iconName="arrow"
+												/>
+											</button>
+										</div>
+										<p>{pick.nerdNugget}</p>
+									</div>
+								{/if}
+
+								<div
+									class={`flex flex-row ${
+										btnsDivWidth < 250 ? 'flex-col gap-y-4 items-start' : 'flex-row items-center'
+									} justify-start gap-x-4 ${
+										!pick.espnLink && !pick.highlighLink && !pick.nerdNugget ? 'hidden' : 'block'
+									}`}
+									bind:clientWidth={btnsDivWidth}
+								>
+									{#if pick.espnLink}
+										<a href={pick.espnLink} target="_blank">
+											<button
+												class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
+											>
+												Box Score
+											</button>
+										</a>
+									{/if}
+
+									{#if pick.highlighLink}
+										<a href={pick.highlighLink} target="_blank">
+											<button
+												class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
+											>
+												Highlights
+											</button>
+										</a>
+									{/if}
+
+									{#if pick.nerdNugget}
+										<button
+											class={`p-1.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full ${
+												showNerdNug &&
+												showNerdNug.person === Object.keys(pickPerson)[0] &&
+												showNerdNug.indx === i
+													? 'bg-gray-300 bg-opacity-50'
+													: ''
+											}`}
+											on:click={() => toggleNerdNug(Object.keys(pickPerson)[0], i)}
+										>
+											<Icon
+												class={`transition-all duration-300 ease-in-out cursor-pointer fill-none`}
+												width="24px"
+												height="24px"
+												iconName="glasses"
+											/>
+										</button>
+									{/if}
+								</div>
+
+								<div class="flex items-center gap-x-8 sm:gap-x-4 lg:gap-x-8">
+									<!-- <div class="flex flex-col items-center gap-y-2">
 								<p class="">Tail</p>
 								<form action="?/tailPick&id={pick.id}" method="POST">
 									<button type="submit">
@@ -264,10 +268,12 @@
 								</form>
 								<p>{pick.fade}</p>
 							</div> -->
-						</div>
-					</div>
-				{/key}
-			{/each}
+								</div>
+							</div>
+						{/key}
+					{/each}
+				</div>
+			</div>
 		{/each}
 	</div>
 
