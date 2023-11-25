@@ -98,30 +98,32 @@
 					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 						{#key week}
 							<div
-								class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col gap-y-4 font-paragraph relative"
+								class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col gap-y-4 font-paragraph md:relative"
 								in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 							>
-								<div class="">
-									<h4
-										class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
-											!pick.homeTeamScore
-												? 'bg-slate-300 bg-opacity-70'
-												: pick.winner
-												? 'bg-green-300 dark:bg-green-900'
-												: pick.push
-												? 'bg-yellow-300 dark:bg-yellow-500'
-												: 'bg-red-300 dark:bg-red-900'
-										} w-fit px-6 rounded-md flex justify-start items-center`}
-									>
-										{pick.description}
-									</h4>
-								</div>
-
-								{#if pick.specialBet}
-									<div class="absolute top-1 sm:top-2 -right-3 sm:-right-4 z-50">
-										<SpecialBet betType={pick.specialBet} />
+								<div class="flex flex-row justify-between gap-x-8">
+									<div class="">
+										<h4
+											class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
+												!pick.homeTeamScore
+													? 'bg-slate-300 bg-opacity-70'
+													: pick.winner
+													? 'bg-green-300 dark:bg-green-900'
+													: pick.push
+													? 'bg-yellow-300 dark:bg-yellow-500'
+													: 'bg-red-300 dark:bg-red-900'
+											} w-fit px-6 rounded-md flex justify-start items-center`}
+										>
+											{pick.description}
+										</h4>
 									</div>
-								{/if}
+
+									{#if pick.specialBet}
+										<div class="black md:absolute md::top-2 md:-right-4 z-50 w-fit">
+											<SpecialBet betType={pick.specialBet} />
+										</div>
+									{/if}
+								</div>
 
 								<div
 									class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
