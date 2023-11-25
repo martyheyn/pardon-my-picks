@@ -36,6 +36,7 @@
 						href="https://twitter.com/PardonMyTake"
 						class="flex gap-x-4 items-center"
 						target="_blank"
+						rel="noopener"
 					>
 						<Icon
 							class={`transition-all duration-300 ease-in-out fill-white`}
@@ -53,6 +54,7 @@
 						href="https://www.youtube.com/@PardonMyTakePodcast"
 						class="flex gap-x-4 items-center"
 						target="_blank"
+						rel="noopener"
 					>
 						<Icon
 							class={`transition-all duration-300 ease-in-out fill-white`}
@@ -70,6 +72,7 @@
 						href="https://www.instagram.com/pardonmytake/"
 						class="flex gap-x-4 items-center"
 						target="_blank"
+						rel="noopener"
 					>
 						<Icon
 							class={`transition-all duration-300 ease-in-out fill-white`}
@@ -86,6 +89,7 @@
 					<a
 						href="https://open.spotify.com/show/5ss1pqMFqWjkOpt6Ag0fZW?si=c44b4e44e8c04e90&nd=1"
 						target="_blank"
+						rel="noopener"
 						class="flex gap-x-4 items-center"
 					>
 						<Icon
@@ -104,6 +108,7 @@
 					<a
 						href="https://podcasts.apple.com/us/podcast/pardon-my-take/id1089022756"
 						target="_blank"
+						rel="noopener"
 						class="flex gap-x-4 items-center"
 					>
 						<Icon

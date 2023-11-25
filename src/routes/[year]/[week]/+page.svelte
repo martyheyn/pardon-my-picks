@@ -129,7 +129,7 @@
 									class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
 								>
 									<div class="flex flex-col items-center gap-2">
-										<a href={`${teamLink[pick.awayTeam]}`} target="_blank">
+										<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
 											<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
 										</a>
 										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
@@ -146,7 +146,7 @@
 									<p class="font-semibold">@</p>
 
 									<div class="flex flex-col items-center gap-2">
-										<a href={`${teamLink[pick.homeTeam]}`} target="_blank">
+										<a href={`${teamLink[pick.homeTeam]}`} target="_blank" rel="noopener">
 											<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
 										</a>
 
@@ -194,7 +194,7 @@
 									bind:clientWidth={btnsDivWidth}
 								>
 									{#if pick.espnLink}
-										<a href={pick.espnLink} target="_blank">
+										<a href={pick.espnLink} target="_blank" rel="noopener">
 											<button
 												class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
 											>
@@ -204,7 +204,7 @@
 									{/if}
 
 									{#if pick.highlighLink}
-										<a href={pick.highlighLink} target="_blank">
+										<a href={pick.highlighLink} target="_blank" rel="noopener">
 											<button
 												class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
 											>
