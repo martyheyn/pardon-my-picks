@@ -21,7 +21,7 @@
 
 <div class="">
 	<p
-		class="flex justify-center items-center gap-x-2 text-sm font-semibold bg-slate-300 bg-opacity-70 px-4 py-1.5 md:rotate-[32.5deg] rounded-md"
+		class="flex justify-center items-center gap-x-2 text-sm font-semibold bg-slate-300 bg-opacity-70 px-4 py-1.5 rotate-[15deg] md:rotate-[32.5deg] rounded-md"
 	>
 		<Icon
 			class={`transition-all duration-300 ease-in-out ${
