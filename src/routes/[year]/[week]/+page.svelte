@@ -93,7 +93,7 @@
 
 			<div class="md:col-span-6">
 				<div
-					class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12 transition-all ease-in-out duration-300"
+					class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 transition-all ease-in-out duration-300"
 				>
 					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 						{#key week}
