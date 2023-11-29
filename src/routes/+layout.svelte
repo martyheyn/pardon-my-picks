@@ -15,6 +15,7 @@
 	const currWeek = writable(12);
 	const screenWidth = writable(0);
 	const active = writable('');
+	const fullPageHeight = writable(0);
 
 	$: if ($page.route) {
 		if ($page.route.id?.includes('week')) {
@@ -29,8 +30,8 @@
 	setContext('currWeek', currWeek);
 	setContext('screenWidth', screenWidth);
 	setContext('active', active);
+	setContext('fullPageHeight', fullPageHeight);
 
-	let fullPageHeight: number;
 	let scrollY: number;
 
 	$: mobile = $screenWidth < 640;
@@ -74,7 +75,7 @@
 	<meta name="twitter:image" content="https://pardonmypicks.com/og-image.png" />
 </svelte:head>
 
-<svelte:window bind:innerWidth={$screenWidth} bind:scrollY bind:innerHeight={fullPageHeight} />
+<svelte:window bind:innerWidth={$screenWidth} bind:scrollY bind:innerHeight={$fullPageHeight} />
 
 <!-- only render app if screen width is not undefined, not have jumpy navbar -->
 {#if $screenWidth}
