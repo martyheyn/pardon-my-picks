@@ -56,7 +56,10 @@
 		$sideNavCollasped ? 'w-14' : sideNavHeight > $fullPageHeight ? 'w-[164px] sm:w-44' : 'w-40'
 	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
 		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF] dark:bg-[#1f1f1f]'
-	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-[#18314FFF] dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]`}
+	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white ${
+		!mobile &&
+		'overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-[#18314FFF] dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
+	}`}
 >
 	<div
 		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
