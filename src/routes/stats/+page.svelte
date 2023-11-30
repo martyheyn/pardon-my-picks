@@ -36,6 +36,8 @@
 
 	// get specialBet by person
 	const getSpecialBets = (persona: string) => {
+		console.log(specialBets.filter((bet) => bet.person === persona));
+
 		return specialBets.filter((bet) => bet.person === persona);
 	};
 
@@ -150,7 +152,7 @@
 						<span class="text-lg font-semibold ml-2 leading-4"
 							>{persona._sum.winner} - {persona._sum.winner && persona._sum.push
 								? persona._count.winner - persona._sum.winner - persona._sum.push
-								: persona._sum.winner
+								: persona._sum.winner !== null
 								? persona._count.winner - persona._sum.winner
 								: ''}
 							{persona._sum.push ? ` - ${persona._sum.push}` : ''}</span
@@ -179,7 +181,7 @@
 									<span class="text-lg font-semibold ml-2 leading-4"
 										>{bet._sum.winner} - {bet._sum.winner && bet._sum.push
 											? bet._count.winner - bet._sum.winner - bet._sum.push
-											: bet._sum.winner
+											: bet._sum.winner !== null
 											? bet._count.winner - bet._sum.winner
 											: ''}
 										{bet._sum.push ? ` - ${bet._sum.push}` : ''}</span
@@ -197,8 +199,8 @@
 												? 'rotate-[270deg]'
 												: 'rotate-[90deg]'
 										}`}
-										width="24px"
-										height="24px"
+										width="16px"
+										height="16px"
 										iconName="arrow"
 									/>
 								</button>

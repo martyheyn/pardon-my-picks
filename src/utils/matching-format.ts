@@ -201,6 +201,8 @@ export const specialBetsLabel = (specialBet: string) => {
 			return 'Game of the Year';
 		case 'huh':
 			return 'Huh?';
+		case 'thanksgiving':
+			return 'Thanksgiving';
 		default:
 			return "L'Under";
 	}
