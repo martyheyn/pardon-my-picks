@@ -103,13 +103,15 @@
 						: x._sum.push +
 						  weeklyDataByPerson[personasLabelToCamelCase(x.person)].data[x.week - 2].pushes;
 				let record = `${wins}-${losses}-${pushes}`;
+				let points = wins + pushes * 0.5;
 
 				let recordByWeek = {
 					week: x.week,
 					wins: wins,
 					losses: losses,
 					pushes: pushes,
-					record: record
+					record: record,
+					points: points
 				};
 
 				weeklyDataByPerson[personasLabelToCamelCase(x.person)].data.push(recordByWeek);
@@ -204,7 +206,8 @@
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] transition-all duration-300 ease-in-out`}
 						>
-							{weekData.record}
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
 						</td>
 					{/each}
 				{:else}
@@ -212,7 +215,8 @@
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
-							{weekData.record}
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
 						</td>
 					{/each}
 				{/if}
@@ -260,7 +264,8 @@
 						<td
 							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
-							{weekData.record}
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
 						</td>
 					{/each}
 				{:else}
@@ -268,7 +273,8 @@
 						<td
 							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
 						>
-							{weekData.record}
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
 						</td>
 					{/each}
 				{/if}
