@@ -36,7 +36,7 @@ model Pick {
   specialBet      String    @db.VarChar(255)
   fade            Int?      
   tail            Int?      
-  nerdNugget      String?    @db.VarChar(255)
+  nerdNugget      String?    @db.VarChar(510)
 }
 
 enum NflTeam {
