@@ -104,7 +104,7 @@
 								<div class="">
 									<h4
 										class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
-											!pick.homeTeamScore
+											pick.homeTeamScore === null || pick.homeTeamScore === undefined
 												? 'bg-slate-300 bg-opacity-70'
 												: pick.winner
 												? 'bg-green-300 dark:bg-green-900'
