@@ -55,7 +55,7 @@
 </script>
 
 <div
-	class={`fixed top-0 bottom-0 overflow-y-auto z-10 ${
+	class={`fixed top-0 bottom-0 ${$sideNavCollasped ? '' : 'overflow-y-auto'} z-10 ${
 		$sideNavCollasped
 			? 'w-14'
 			: sideNavHeight > $fullPageHeight - 60 && !mobile
