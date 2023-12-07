@@ -49,11 +49,18 @@
 			sideNavCollasped.set(true);
 		}
 	};
+
+	$: console.log('sideNavHeight', sideNavHeight);
+	$: console.log('fullPageHeight', $fullPageHeight);
 </script>
 
 <div
-	class={`fixed top-0 z-10 ${
-		$sideNavCollasped ? 'w-14' : sideNavHeight > $fullPageHeight ? 'w-[164px] sm:w-44' : 'w-40'
+	class={`fixed top-0 bottom-0 overflow-y-auto z-10 ${
+		$sideNavCollasped
+			? 'w-14'
+			: sideNavHeight > $fullPageHeight - 60 && !mobile
+			? 'w-[164px] sm:w-44'
+			: 'w-40'
 	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
 		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF] dark:bg-[#1f1f1f]'
 	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white ${
