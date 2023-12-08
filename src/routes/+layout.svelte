@@ -8,8 +8,8 @@
 	import { inject } from '@vercel/analytics';
 	import { page } from '$app/stores';
 
-	import Sidenav from '../components/structure/sidenav.svelte';
-	import Topnav from '../components/structure/topnav.svelte';
+	import Sidenav from '$lib/components/structure/sidenav.svelte';
+	import Topnav from '$lib/components/structure/topnav.svelte';
 
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(14);

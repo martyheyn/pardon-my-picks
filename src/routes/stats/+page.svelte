@@ -5,12 +5,12 @@
 		personaAvatarPath,
 		sortOrder,
 		specialBetsLabel
-	} from '../../utils/matching-format';
-	import Race from '../../components/race.svelte';
-	import AvatarModal from '../../components/avatar-modal.svelte';
+	} from '../../lib/utils/matching-format';
+	import Race from '../$lib/components/race.svelte';
+	import AvatarModal from '../$lib/components/avatar-modal.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
-	import Icon from '../../components/icon.svelte';
+	import Icon from '../$lib/components/icon.svelte';
 
 	export let data: PageData;
 

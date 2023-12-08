@@ -6,7 +6,7 @@
 	import { quintInOut } from 'svelte/easing';
 
 	import Icon from '../icon.svelte';
-	import { sideNavItems } from '../../utils/sidenav-tree';
+	import { sideNavItems } from '$lib/utils/sidenav-tree';
 	import Tooltip from '../tooltip.svelte';
 
 	// Retrieve user store from context

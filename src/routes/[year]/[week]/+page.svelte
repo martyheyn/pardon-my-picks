@@ -4,13 +4,13 @@
 	import { fade, slide } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
-	import { logo, personaImgPath, sortOrder, teamLink } from '../../../utils/matching-format';
-	import type { PickByPerson } from '../../../utils/types';
+	import { logo, personaImgPath, sortOrder, teamLink } from '$lib/utils/matching-format';
+	import type { PickByPerson } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
 
-	import Icon from '../../../components/icon.svelte';
-	import Race from '../../../components/race.svelte';
-	import SpecialBet from '../../../components/special-bet.svelte';
+	import Icon from '$lib/components/icon.svelte';
+	import Race from '$lib/components/race.svelte';
+	import SpecialBet from '$lib/components/special-bet.svelte';
 
 	export let data: PageData;
 
