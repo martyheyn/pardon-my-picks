@@ -12,7 +12,7 @@
 	import Topnav from '$lib/components/structure/topnav.svelte';
 
 	const sideNavCollasped = writable(true);
-	const currWeek = writable(15);
+	const currWeek = writable(16);
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);
