@@ -16,6 +16,9 @@
 		case 'thanksgiving':
 			betText = 'Thanksgiving';
 			break;
+		case 'holiday':
+			betText = 'Holiday';
+			break;
 	}
 </script>
 
