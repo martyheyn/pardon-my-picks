@@ -174,12 +174,12 @@
 		{#each mainActWeeklyDataByPersonArr as mainActByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
+					class="flex gap-x-2 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm min-w-[110px] w-[115px] md:w-full max-w-[140px]"
 				>
 					<a href={Object.values(mainActByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(mainActByPerson)[0].img} alt="avatar" class="rounded-full" />
 					</a>
-					<p>{camelCaseToLabel(Object.keys(mainActByPerson)[0])}</p>
+					<p class="">{camelCaseToLabel(Object.keys(mainActByPerson)[0])}</p>
 				</td>
 
 				{#if $screenWidth < 600 && !dataExpanded}
