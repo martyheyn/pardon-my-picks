@@ -129,7 +129,10 @@
 		// for some reason I have to assign this and push it into an array for it to be reactive in the HTML
 		mainActWeeklyDataByPersonArr = mainActVar;
 		openerWeeklyDataByPersonArr = openerVar;
-		lastWeekWithData = mainActWeeklyDataByPersonArr[0].bigCat.data.length;
+
+		// TODO: Make this more dynamic
+		// had to change it because Max & Memes picked
+		lastWeekWithData = openerWeeklyDataByPersonArr[1].max.data.length;
 	});
 
 	let dataExpanded = false;
@@ -140,6 +143,8 @@
 	} else {
 		dataExpanded = true;
 	}
+
+	$: console.log(week);
 
 	// TODO: do it by points down instead of record when small
 </script>
@@ -163,7 +168,7 @@
 			{/if}
 
 			{#each !dataExpanded && week ? [week] : !dataExpanded && !week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
-				<th class="text-center pb-1">{i}</th>
+				<th class="text-center pb-1 min-w-[50px]">{i}</th>
 			{/each}
 		</tr>
 
@@ -174,7 +179,7 @@
 		{#each mainActWeeklyDataByPersonArr as mainActByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-2 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm min-w-[110px] w-[115px] md:w-full max-w-[140px]"
+					class="flex gap-x-2 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm w-[120px]"
 				>
 					<a href={Object.values(mainActByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(mainActByPerson)[0].img} alt="avatar" class="rounded-full" />
@@ -189,7 +194,7 @@
 					>
 				{:else if $screenWidth < 600 && dataExpanded}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
 						on:click={() => (dataExpanded = false)}
 					>
 						<Icon
@@ -204,7 +209,7 @@
 				{#if dataExpanded}
 					{#each week ? Object.values(mainActByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(mainActByPerson)[0].data as weekData}
 						<td
-							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] transition-all duration-300 ease-in-out`}
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px] transition-all duration-300 ease-in-out`}
 						>
 							<p class="py-[2px] font-semibold">{weekData.points}</p>
 							<p class="py-[2px]">{weekData.record}</p>
@@ -232,7 +237,7 @@
 		{#each openerWeeklyDataByPersonArr as openerByPerson, i}
 			<tr class="">
 				<td
-					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm min-w-[80px] w-[115px] md:w-full max-w-[140px]"
+					class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm w-[120px]"
 				>
 					<a href={Object.values(openerByPerson)[0].link} class="w-8 h-8">
 						<img src={Object.values(openerByPerson)[0].img} alt="avatar" class="rounded-full" />
@@ -247,7 +252,7 @@
 					>
 				{:else if $screenWidth < 600 && dataExpanded}
 					<td
-						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
 						on:click={() => (dataExpanded = false)}
 					>
 						<Icon
@@ -271,7 +276,7 @@
 				{:else}
 					{#each Object.values(openerByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
 						<td
-							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]"
+							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
 						>
 							<p class="py-[2px] font-semibold">{weekData.points}</p>
 							<p class="py-[2px]">{weekData.record}</p>
