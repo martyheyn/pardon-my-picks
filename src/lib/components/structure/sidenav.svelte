@@ -59,16 +59,16 @@
 			? 'w-[164px] sm:w-44'
 			: 'w-40'
 	} ${mobile && $sideNavCollasped ? 'h-[56px]' : 'h-screen'}  ${
-		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-[#18314FFF] dark:bg-[#1f1f1f]'
+		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-primary dark:bg-[#1f1f1f]'
 	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white ${
 		!mobile &&
-		'overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-[#18314FFF] dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
+		'overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-primary dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
 	}`}
 >
 	<div
 		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
 			mobile && $sideNavCollasped && scrollY > 10
-				? 'bg-[#18314FFF] dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141] translate-x-2 translate-y-2'
+				? 'bg-primary dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141] translate-x-2 translate-y-2'
 				: ''
 		} transition-all duration-300 ease-in-out cursor-pointer relative`}
 	>
@@ -113,7 +113,7 @@
 	<ul
 		class={`list-none m-0 pt-[1px] flex flex-col items-center border-t border-t-white border-opacity-10 ${
 			mobile && $sideNavCollasped ? 'hidden opacity-0' : 'block opacity-100'
-		} transition-all duration-300 ease-in-out scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-[#18314FFF] dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]`}
+		} transition-all duration-300 ease-in-out scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-primary dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]`}
 		bind:clientHeight={sideNavHeight}
 	>
 		{#each sideNavItems as navItem}

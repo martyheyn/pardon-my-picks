@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="bg-[#18314FFF] dark:bg-[#1f1f1f] ml-14 h-14 flex justify-center items-center relative text-white"
+	class="bg-primary dark:bg-[#1f1f1f] ml-14 h-14 flex justify-center items-center relative text-white"
 >
 	<h2 class=" text-lg pr-12 lg:pr-24 font-header transition-all duration-300 ease-in-out">
 		Pardon My Picks
@@ -32,7 +32,7 @@
 
 	{#if showSocials}
 		<div
-			class="absolute right-0 top-14 bg-[#18314FFF] dark:bg-[#1f1f1f] z-50"
+			class="absolute right-0 top-14 bg-primary dark:bg-[#1f1f1f] z-50"
 			transition:fly={{ y: -50, duration: 300, easing: quadInOut }}
 		>
 			<ul class="">
