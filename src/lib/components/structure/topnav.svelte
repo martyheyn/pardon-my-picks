@@ -13,7 +13,14 @@
 		Pardon My Picks
 	</h2>
 
-	<div class="absolute right-4 lg:right-12 top-[8px] transition-all duration-300 ease-in-out">
+	<div
+		class="absolute right-4 lg:right-12 top-[8px] transition-all duration-300 ease-in-out flex gap-x-3"
+	>
+		<button
+			class="border border-white rounded-md px-4 py-1.5 hover:bg-[#345680] transition-all duration-200 ease-in-out"
+			>Log In</button
+		>
+
 		<button class="cursor-pointer" on:click={() => (showSocials = !showSocials)}>
 			<img
 				class="w-10 h-10 rounded-[20px] border-2 border-white"

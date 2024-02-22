@@ -36,8 +36,6 @@
 
 	// get specialBet by person
 	const getSpecialBets = (persona: string) => {
-		console.log(specialBets.filter((bet) => bet.person === persona));
-
 		return specialBets.filter((bet) => bet.person === persona);
 	};
 

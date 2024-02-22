@@ -144,8 +144,6 @@
 		dataExpanded = true;
 	}
 
-	$: console.log(week);
-
 	// TODO: do it by points down instead of record when small
 </script>
 
