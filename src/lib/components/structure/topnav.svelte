@@ -5,13 +5,13 @@
 
 	import SignInModal from '../modal.svelte';
 	import LoginModal from '../signup/login-modal.svelte';
-	import Login from '../signup/login.svelte';
-	import Signup from '../signup/signup.svelte';
 
 	let showSocials = false;
+
 	let showModal = true;
 	let loginStep = 1;
-	let modalInfo: {
+
+	let loginModalInfo: {
 		header: string;
 		description: string;
 		footer: string;
@@ -20,7 +20,7 @@
 	};
 
 	$: if (loginStep === 1) {
-		modalInfo = {
+		loginModalInfo = {
 			header: 'Log In',
 			description: 'Log in to view your picks and more.',
 			footer: "Don't have an account?",
@@ -28,7 +28,7 @@
 			nextStep: 2
 		};
 	} else {
-		modalInfo = {
+		loginModalInfo = {
 			header: 'Sign Up',
 			description: 'Sign up to view your picks and more.',
 			footer: 'Got an account already?',
@@ -165,11 +165,5 @@
 </div>
 
 <SignInModal bind:showModal>
-	<LoginModal bind:loginStep {modalInfo}>
-		{#if loginStep === 1}
-			<Login />
-		{:else}
-			<Signup />
-		{/if}
-	</LoginModal>
+	<LoginModal bind:loginStep bind:loginModalInfo />
 </SignInModal>

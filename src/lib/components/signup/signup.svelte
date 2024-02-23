@@ -1,4 +1,13 @@
 <script lang="ts">
+	export let signupValues: {
+		username: string;
+		password: string;
+		confirmPassword?: string;
+	} = {
+		username: '',
+		password: '',
+		confirmPassword: ''
+	};
 </script>
 
 <label for="username" class="block text-sm font-medium text-gray-600"
@@ -7,6 +16,7 @@
 		id="username"
 		type="text"
 		class="mt-[2px] py-2 indent-2 border focus:outline-none focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
+		bind:value={signupValues.username}
 	/>
 </label>
 
@@ -16,6 +26,7 @@
 		id="password"
 		type="password"
 		class="mt-[2px] py-2 indent-2 border focus:outline-none focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
+		bind:value={signupValues.password}
 	/>
 </label>
 
@@ -25,5 +36,6 @@
 		id="confirmPassword"
 		type="confirmPassword"
 		class="mt-[2px] py-2 indent-2 border focus:outline-none focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
+		bind:value={signupValues.confirmPassword}
 	/>
 </label>
