@@ -2,40 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { quadInOut } from 'svelte/easing';
 	import Icon from '../icon.svelte';
-
-	import SignInModal from '../modal.svelte';
-	import LoginModal from '../signup/login-modal.svelte';
-
 	let showSocials = false;
-
-	let showModal = true;
-	let loginStep = 1;
-
-	let loginModalInfo: {
-		header: string;
-		description: string;
-		footer: string;
-		alt: string;
-		nextStep: number;
-	};
-
-	$: if (loginStep === 1) {
-		loginModalInfo = {
-			header: 'Log In',
-			description: 'Log in to view your picks and more.',
-			footer: "Don't have an account?",
-			alt: 'Sign up',
-			nextStep: 2
-		};
-	} else {
-		loginModalInfo = {
-			header: 'Sign Up',
-			description: 'Sign up to view your picks and more.',
-			footer: 'Got an account already?',
-			alt: 'Log in',
-			nextStep: 1
-		};
-	}
 </script>
 
 <div
@@ -50,7 +17,7 @@
 	>
 		<button
 			class="border border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
-			on:click={() => (showModal = true)}>Log In</button
+			>Log In</button
 		>
 
 		<button class="cursor-pointer" on:click={() => (showSocials = !showSocials)}>
@@ -163,7 +130,3 @@
 		</div>
 	{/if}
 </div>
-
-<SignInModal bind:showModal>
-	<LoginModal bind:loginStep bind:loginModalInfo />
-</SignInModal>

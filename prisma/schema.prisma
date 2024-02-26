@@ -39,6 +39,21 @@ model Pick {
   nerdNugget      String?    @db.VarChar(510)
 }
 
+model User {
+  id       String    @id
+  username String    @unique
+  sessions Session[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 enum NflTeam {
   cardinals
   falcons
