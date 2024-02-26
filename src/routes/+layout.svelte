@@ -94,7 +94,8 @@
 			}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
 		>
 			<div
-				class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] min-h-[91vh] transition-all duration-500 ease-in-out`}
+				class={`p-4 sm:p-8 bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out`}
+				style="min-height: calc(100vh - 56px);"
 			>
 				<slot />
 			</div>
