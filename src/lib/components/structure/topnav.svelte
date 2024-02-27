@@ -2,6 +2,10 @@
 	import { fly } from 'svelte/transition';
 	import { quadInOut } from 'svelte/easing';
 	import Icon from '../icon.svelte';
+	import type { User } from 'lucia';
+
+	export let user: User | null;
+	$: console.log('user', user);
 	let showSocials = false;
 </script>
 
@@ -15,10 +19,24 @@
 	<div
 		class="absolute right-4 lg:right-12 top-[8px] transition-all duration-300 ease-in-out flex gap-x-3"
 	>
-		<button
-			class="border border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
-			>Log In</button
-		>
+		<form method="POST">
+			<!-- formaction={ && "/logout"} -->
+
+			{#if user}
+				<button
+					formaction="/logout"
+					class="border border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
+					>Logout</button
+				>
+			{:else}
+				<a href="/login">
+					<button
+						class="border border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
+						>Login</button
+					></a
+				>
+			{/if}
+		</form>
 
 		<button class="cursor-pointer" on:click={() => (showSocials = !showSocials)}>
 			<img

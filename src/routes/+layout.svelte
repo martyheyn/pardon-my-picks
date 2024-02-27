@@ -1,5 +1,7 @@
 <script lang="ts">
 	import '../app.css';
+	import type { PageData } from './$types';
+	export let data: PageData;
 
 	// create store
 	import { setContext } from 'svelte';
@@ -38,6 +40,8 @@
 
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });
+
+	// TODO:: if route is login different padding
 </script>
 
 <svelte:head>
@@ -80,7 +84,7 @@
 <!-- only render app if screen width is not undefined, not have jumpy navbar -->
 {#if $screenWidth}
 	<div class="min-h-screen dark:text-white">
-		<Topnav />
+		<Topnav user={data.user} />
 
 		<Sidenav {scrollY} />
 
