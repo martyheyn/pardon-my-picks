@@ -20,7 +20,6 @@ export const actions: Actions = {
 				message: 'Invalid username'
 			});
 		}
-		// TODO:: check if username is already taken
 		const user = await prisma.user.findUnique({
 			where: {
 				username
@@ -45,7 +44,6 @@ export const actions: Actions = {
 		const userId = generateId(15);
 		const passwordHash = await new Argon2id().hash(password);
 
-		// TODO:: input user into database
 		const userData = {
 			id: userId,
 			username: username,

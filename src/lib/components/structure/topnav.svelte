@@ -5,7 +5,6 @@
 	import type { User } from 'lucia';
 
 	export let user: User | null;
-	$: console.log('user', user);
 	let showSocials = false;
 </script>
 
