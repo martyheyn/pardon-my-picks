@@ -54,6 +54,11 @@ export const sideNavItems = [
 		route: '/stats'
 		// subItems: personaSubNavArr,
 		// subItemsOpen: false
+	},
+	{
+		label: 'Profile',
+		icon: 'user',
+		route: '/profile'
 	}
 	// {
 	// 	label: 'History',

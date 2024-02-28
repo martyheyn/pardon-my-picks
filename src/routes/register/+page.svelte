@@ -8,7 +8,7 @@
 	const lastPage = $navigating?.from?.route.id;
 </script>
 
-<div class="w-full h-full flex justify-center overflow-hidden">
+<div class="w-full h-full flex justify-center">
 	<div
 		class="max-w-sm bg-slate-300 bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
 		in:fly={{

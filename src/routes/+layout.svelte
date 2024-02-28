@@ -84,7 +84,7 @@
 	<div class="min-h-screen dark:text-white">
 		<Topnav user={data.user} />
 
-		<Sidenav {scrollY} />
+		<Sidenav user={data.user} {scrollY} />
 
 		<div
 			class={`${
@@ -100,7 +100,7 @@
 					$page.route.id?.includes('register') || $page.route.id?.includes('login')
 						? 'p-4'
 						: 'p-4 sm:p-8'
-				} bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out`}
+				} bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out z-0`}
 				style="min-height: calc(100vh - 56px);"
 			>
 				<slot />

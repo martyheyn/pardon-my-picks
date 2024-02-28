@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import type { User } from 'lucia';
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
 	import { quintInOut } from 'svelte/easing';
@@ -8,6 +9,8 @@
 	import Icon from '../icon.svelte';
 	import { sideNavItems } from '$lib/utils/sidenav-tree';
 	import Tooltip from '../tooltip.svelte';
+
+	export let user: User | null;
 
 	// Retrieve user store from context
 	const sideNavCollasped: Writable<boolean> = getContext('sideNavCollasped');
@@ -52,7 +55,7 @@
 </script>
 
 <div
-	class={`fixed top-0 bottom-0 ${$sideNavCollasped ? '' : 'overflow-y-auto'} z-10 ${
+	class={`fixed top-0 bottom-0 ${$sideNavCollasped ? '' : 'overflow-y-auto'} z-50 ${
 		$sideNavCollasped
 			? 'w-14'
 			: sideNavHeight > $fullPageHeight - 60 && !mobile
@@ -62,7 +65,7 @@
 		mobile && $sideNavCollasped && scrollY > 50 ? 'bg-none' : 'bg-primary dark:bg-[#1f1f1f]'
 	} shadow-[0.063rem 0 1.25rem 0 #8690a3] transition-all duration-500 ease-in-out text-white ${
 		!mobile &&
-		'overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-primary dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
+		'scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-primary dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
 	}`}
 >
 	<div
@@ -118,7 +121,10 @@
 	>
 		{#each sideNavItems as navItem}
 			<li
-				class="w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative group flex justify-between items-center h-full font-header"
+				class={`${
+					navItem.label === 'Profile' && !user ? 'hidden' : 'block'
+				} w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative 
+				group flex justify-between items-center h-full font-header`}
 			>
 				{#if $sideNavCollasped}
 					<Tooltip text={navItem.label} placement="right" />
@@ -144,8 +150,10 @@
 
 					<div
 						class={`${
-							$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'
-						} transition-all duration-300 ease-in-out w-full`}
+							$sideNavCollasped
+								? 'opacity-0 delay-0'
+								: 'group-hover:opacity-100 group-hover:delay-300'
+						} transition-all duration-300 ease-in-out w-full z-[999]`}
 					>
 						<p class={`ml-6`}>
 							{navItem.label}
