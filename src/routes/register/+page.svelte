@@ -50,7 +50,7 @@
 					<input
 						id="confirmPassword"
 						name="confirmPassword"
-						type="confirmPassword"
+						type="password"
 						class="mt-[2px] py-2 indent-2 border focus:outline-none focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
 					/>
 				</label>
