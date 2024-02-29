@@ -9,7 +9,8 @@
 	let editting = false;
 	let infoDisplayed = false;
 	let disableSave = false;
-	let avatar, fileinput;
+	let avatar;
+	let fileinput: HTMLInputElement;
 
 	const handleEdit = () => {
 		disableSave = true;
@@ -25,13 +26,21 @@
 		}, 1000);
 	};
 
-	const onFileSelected = (e: any) => {
-		let image = e.target.files[0];
+	const onFileSelected = (e: Event) => {
+		console.log('file selected', e);
+		let image = (e.target as HTMLInputElement)?.files?.[0];
+		if (!image) return;
+
 		let reader = new FileReader();
 		reader.readAsDataURL(image);
 		reader.onload = (e) => {
-			avatar = e.target && e.target.result;
+			avatar = image;
 		};
+
+		// submit the form
+		if (fileinput.form) {
+			fileinput.form.submit();
+		}
 	};
 </script>
 
@@ -39,9 +48,15 @@
 	<div class="border border-black border-opacity-50 w-28 h-28 rounded-full group">
 		<!-- <img src="" alt=""> -->
 		<div class="w-full h-full rounded-full relative overflow-hidden">
-			<form method="post" use:enhance enctype="multipart/form-data" class="w-full h-full">
+			<form
+				method="POST"
+				action="?/uploadPic"
+				use:enhance
+				enctype="multipart/form-data"
+				class="w-full h-full"
+			>
 				<label
-					for="file"
+					for="avatar"
 					class="absolute -bottom-6 left-0 w-full h-1/2 bg-gray-300 bg-opacity-90 rounded-b-full
                     cursor-pointer opacity-0 group-hover:opacity-100 transition-all
                     duration-300 ease-in-out translate-y-4 group-hover:translate-y-0"
@@ -59,8 +74,8 @@
 				</label>
 				<input
 					style="display:none"
-					id="file"
-					name="fileToUpload"
+					id="avatar"
+					name="avatarToUpload"
 					disabled={editting}
 					type="file"
 					accept=".jpg, .jpeg, .png"

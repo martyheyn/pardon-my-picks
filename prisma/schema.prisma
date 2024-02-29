@@ -43,6 +43,7 @@ model User {
   id       String    @id
   username String    @unique
   email    String    @unique
+  avatar   String?
   hashed_password String
   sessions Session[]
 }

@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	updateUserData: async ({ request, locals }) => {
 		const { user, session } = locals;
 		if (!(user && session)) {
 			// TODO:: throw message to on next screen
@@ -50,5 +50,16 @@ export const actions: Actions = {
 				// avatar: avatar
 			}
 		});
+	},
+
+	uploadPic: async ({ request, locals }) => {
+		const { user, session } = locals;
+		if (!(user && session)) {
+			throw redirect(303, '/login');
+		}
+
+		const formData = await request.formData();
+		console.log('formData', formData);
+		const avatar = formData.get('avatar');
 	}
 };
