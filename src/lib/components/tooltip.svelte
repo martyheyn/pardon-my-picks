@@ -17,7 +17,7 @@
 			arrowPlacement = '-bottom-1 rotate-270';
 			break;
 		case 'bottom':
-			placement = 'bottom-0 -right-1/2';
+			placement = '-bottom-0 -right-1/2';
 			arrowPlacement = '-top-1 right-1/2 rotate-45';
 			break;
 	}

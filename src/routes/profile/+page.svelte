@@ -2,12 +2,14 @@
 	import { slide } from 'svelte/transition';
 	import Icon from '../../lib/components/icon.svelte';
 	import type { PageData } from './$types';
+	import { enhance } from '$app/forms';
 
 	export let data: PageData;
 
 	let editting = false;
 	let infoDisplayed = false;
 	let disableSave = false;
+	let avatar, fileinput;
 
 	const handleEdit = () => {
 		disableSave = true;
@@ -22,10 +24,52 @@
 			disableSave = false;
 		}, 1000);
 	};
+
+	const onFileSelected = (e: any) => {
+		let image = e.target.files[0];
+		let reader = new FileReader();
+		reader.readAsDataURL(image);
+		reader.onload = (e) => {
+			avatar = e.target && e.target.result;
+		};
+	};
 </script>
 
 <div class="flex flex-col gap-y-4">
-	<div class="border border-black border-opacity-50 w-28 h-28 rounded-full" />
+	<div class="border border-black border-opacity-50 w-28 h-28 rounded-full group">
+		<!-- <img src="" alt=""> -->
+		<div class="w-full h-full rounded-full relative overflow-hidden">
+			<form method="post" use:enhance enctype="multipart/form-data" class="w-full h-full">
+				<label
+					for="file"
+					class="absolute -bottom-6 left-0 w-full h-1/2 bg-gray-300 bg-opacity-90 rounded-b-full
+                    cursor-pointer opacity-0 group-hover:opacity-100 transition-all
+                    duration-300 ease-in-out translate-y-4 group-hover:translate-y-0"
+				>
+					<div class="w-full h-full flex justify-center mt-1">
+						<Icon
+							class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full ${
+								editting ? '' : 'hover:scale-110'
+							}`}
+							width="24px"
+							height="24px"
+							iconName="upload"
+						/>
+					</div>
+				</label>
+				<input
+					style="display:none"
+					id="file"
+					name="fileToUpload"
+					disabled={editting}
+					type="file"
+					accept=".jpg, .jpeg, .png"
+					on:change={(e) => onFileSelected(e)}
+					bind:this={fileinput}
+				/>
+			</form>
+		</div>
+	</div>
 
 	<div
 		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
