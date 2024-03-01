@@ -42,10 +42,12 @@ model Pick {
 model User {
   id       String    @id
   username String    @unique
-  email    String    @unique
-  avatar   String?
+  email    String?    @unique
   hashed_password String
+  avatar   Avatar?
   sessions Session[]
+
+
 }
 
 model Session {
@@ -55,6 +57,17 @@ model Session {
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Avatar {
+  id       Int      @default(autoincrement()) @id
+  size     Int
+  type     String
+  name     String
+  path     String
+  lastModified DateTime
+  user   User @relation(references: [id], fields: [userId])
+  userId String  @unique // relation scalar field (used in the `@relation` attribute above)
 }
 
 enum NflTeam {
