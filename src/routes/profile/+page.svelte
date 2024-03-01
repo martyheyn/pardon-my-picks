@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import Icon from '../../lib/components/icon.svelte';
-	import type { PageData } from './$types';
+	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
+	import Alert from '$lib/components/alert.svelte';
 
 	export let data: PageData;
+	export let form: ActionData;
 
 	$: ({ user } = data);
 
@@ -12,20 +14,20 @@
 	let infoDisplayed = false;
 	let disableSave = false;
 	let avatar;
+	let alert: {
+		text: string | undefined;
+		alertType: 'error' | 'success' | undefined;
+	};
 	let fileinput: HTMLInputElement;
 
 	const handleEdit = () => {
 		disableSave = true;
-		// Save changes if editting
-		if (editting) {
-			console.log(`save to db here`);
-		}
 
 		editting = !editting;
 
 		setTimeout(() => {
 			disableSave = false;
-		}, 1000);
+		}, 500);
 	};
 
 	const onFileSelected = (e: Event) => {
@@ -45,7 +47,24 @@
 		}
 	};
 
-	$: console.log('user', user);
+	// update alert based on form response
+	$: {
+		if (form) {
+			alert = {
+				text: form.message,
+				alertType: form.success ? 'success' : 'error'
+			};
+		}
+
+		// clear alert after 5 seconds
+		setTimeout(() => {
+			alert = { text: undefined, alertType: undefined };
+
+			// TODO:: clear form data on load
+		}, 3000);
+	}
+
+	$: console.log('formData', form);
 </script>
 
 <div class="flex flex-col gap-y-4">
@@ -94,11 +113,22 @@
 		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
 	>
 		<!-- add breadcrumb for when it saves correctly -->
+		{#if alert && alert.text}
+			<Alert text={alert.text} alertType={alert.alertType} />
+		{/if}
+
 		<div class="flex">
 			<h2 class="text-xl font-semibold">Profile Details</h2>
 		</div>
 
-		<form method="POST" action="?/updateUserData" use:enhance class="w-full h-full">
+		<form
+			method="POST"
+			action="?/updateUserData"
+			use:enhance={() => {
+				handleEdit();
+			}}
+			class="w-full h-full"
+		>
 			<div class="w-full flex flex-row gap-x-8">
 				<div class="flex-1">
 					<label for="username" class="block text-sm font-medium text-gray-600">
@@ -155,24 +185,28 @@
 				</div>
 			</div>
 
-			{#if !editting}
-				<button
-					on:click={handleEdit}
-					disabled={disableSave}
-					class={`mt-4 w-fit text-white ${
-						disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
-					} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
-					>Edit Profile</button
-				>
-			{:else}
-				<button
-					disabled={disableSave}
-					class={`mt-4 w-fit text-white ${
-						disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
-					} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
-					>Save Profile</button
-				>
-			{/if}
+			<div class={`flex ${editting ? 'justify-end' : 'justify-start'}`}>
+				{#if !editting}
+					<button
+						in:fly={{ x: -40, duration: 300, delay: 750 }}
+						on:click={handleEdit}
+						disabled={disableSave}
+						class={`mt-4 w-fit text-white ${
+							disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
+						} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
+						>Edit Profile</button
+					>
+				{:else}
+					<button
+						in:fly={{ x: 40, duration: 300, delay: 100 }}
+						disabled={disableSave}
+						class={`mt-4 w-fit text-white ${
+							disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
+						} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
+						>Save Profile</button
+					>
+				{/if}
+			</div>
 		</form>
 	</div>
 </div>

@@ -92,8 +92,6 @@ export const actions: Actions = {
 			}
 		});
 
-		console.log('here AFTER stuff is done');
-
 		if (!updatedUser) {
 			throw fail(500, {
 				error: true,
@@ -102,6 +100,7 @@ export const actions: Actions = {
 		}
 
 		return {
+			success: true,
 			message: 'User data updated'
 		};
 	},
