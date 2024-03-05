@@ -1,27 +1,34 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
-	import { linear, quadInOut } from 'svelte/easing';
+	import { quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
 	import { logo, personaImgPath, sortOrder, teamLink } from '$lib/utils/matching-format';
 	import type { PickByPerson } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
+	import { enhance } from '$app/forms';
 
 	import Icon from '$lib/components/icon.svelte';
 	import Race from '$lib/components/race.svelte';
 	import SpecialBet from '$lib/components/special-bet.svelte';
+	import AlertFlash from '$lib/components/alert.svelte';
+	import type { Alert } from '$lib/utils/alert';
+	import { callAlert } from '$lib/utils/alert';
 
 	export let data: PageData;
+	export let form: ActionData;
 
-	$: ({ picks } = data);
+	$: ({ picks, user } = data);
 
 	$: ({ year, week } = $page.params);
+
+	let alert: Alert;
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
 
-	$: picksByPerson = picks.reduce((acc: PickByPerson, pick) => {
+	$: picksByPerson = picks.reduce((acc: PickByPerson, pick: any) => {
 		const { person } = pick;
 		acc[person] = acc[person] || [];
 		acc[person].push(pick);
@@ -59,6 +66,19 @@
 	};
 
 	let btnsDivWidth: number = 0;
+
+	// $: console.log('form data: ', form);
+	// $: console.log('picks', picks);
+
+	// alerts
+	$: {
+		if (form) {
+			alert = callAlert(form.message, form.success);
+			setTimeout(() => {
+				alert = { text: undefined, alertType: undefined };
+			}, 3000);
+		}
+	}
 
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
@@ -232,43 +252,63 @@
 									{/if}
 								</div>
 
-								<div class="flex items-center gap-x-8 sm:gap-x-4 lg:gap-x-8">
-									<!-- <div class="flex flex-col items-center gap-y-2">
-								<p class="">Tail</p>
-								<form action="?/tailPick&id={pick.id}" method="POST">
-									<button type="submit">
-										<Icon
-											class={`transition-all duration-300 ease-in-out fill-none ${
-												$currWeek === parseInt(week) ? 'hover:fill-green-300 cursor-pointer' : ''
+								<div class="flex items-center px-4 gap-x-4 sm:gap-x-6 lg:gap-x-8">
+									<div class="h-full flex flex-col justify-center items-center gap-y-2">
+										<p class="">Tail</p>
+										<form
+											use:enhance
+											action={`${
+												$currWeek === parseInt(week) && user ? `?/tailPick&id=${pick.id}` : ''
 											}`}
-											width="24px"
-											height="24px"
-											iconName="thumbUp"
-										/>
-									</button>
-								</form>
-								<p>{pick.tail}</p>
-							</div>
+											method={`${$currWeek === parseInt(week) && user ? 'POST' : ''}`}
+										>
+											<button disabled={!user}>
+												<Icon
+													class={`transition-all duration-300 ease-in-out ${
+														$currWeek === parseInt(week)
+															? 'hover:fill-green-300 cursor-pointer'
+															: ''
+													} ${
+														pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
+															? 'fill-green-300 cursor-default'
+															: 'fill-none'
+													}
+													`}
+													width="24px"
+													height="24px"
+													iconName="thumbUp"
+												/>
+											</button>
+										</form>
+										<p>{pick.tail ? `${pick.tail.length}` : '0'}</p>
+									</div>
 
-							<div class="flex flex-col justify-center items-center gap-y-2">
-								<p class="">Fade</p>
-								<form
-									on:submit|preventDefault
-									action={`${$currWeek === parseInt(week) ? '?/fadePick&id={pick.id}' : ''}`}
-									method={`${$currWeek === parseInt(week) ? 'POST' : ''}`}
-								>
-									<Icon
-										class={`transition-all duration-300 ease-in-out fill-none ${
-											$currWeek === parseInt(week) ? 'hover:fill-red-300 cursor-pointer' : ''
-										}`}
-										width="24px"
-										height="24px"
-										iconName="thumbDown"
-									/>
-								</form>
-								<p>{pick.fade}</p>
-							</div> -->
+									<div class="h-full flex flex-col justify-center items-center gap-y-2">
+										<p class="">Fade</p>
+										<form
+											use:enhance
+											action={`${
+												$currWeek === parseInt(week) && user ? `?/fadePick&id=${pick.id}` : ''
+											}`}
+											method={`${$currWeek === parseInt(week) && user ? 'POST' : ''}`}
+										>
+											<button disabled={!user}>
+												<Icon
+													class={`transition-all duration-300 ease-in-out fill-none ${
+														$currWeek === parseInt(week) ? 'hover:fill-red-300 cursor-pointer' : ''
+													}`}
+													width="24px"
+													height="24px"
+													iconName="thumbDown"
+												/>
+											</button>
+										</form>
+										<p>{pick.fade ? `${pick.fade.length}` : '0'}</p>
+									</div>
 								</div>
+								{#if alert && alert.text}
+									<AlertFlash text={alert.text} alertType={alert.alertType} />
+								{/if}
 							</div>
 						{/key}
 					{/each}

@@ -19,6 +19,9 @@ model Pick {
   show            String    @db.VarChar(255)
   week            Int?      
   person          String    @db.VarChar(255)
+  user            User?      @relation(fields: [userId], references: [id])
+  userId          String?    @db.VarChar(255)
+  private         Boolean   @default(false)
   type            String    @db.VarChar(255)
   description     String    @db.VarChar(255)
   homeTeam        NflTeam 
@@ -34,9 +37,11 @@ model Pick {
   espnLink        String?    @db.VarChar(255)
   highlighLink    String?    @db.VarChar(255)
   specialBet      String    @db.VarChar(255)
-  fade            Int?      
-  tail            Int?      
+  fade            Fade[]    
+  tail            Tail[]    
   nerdNugget      String?    @db.VarChar(510)
+
+  @@index([userId])
 }
 
 model User {
@@ -45,9 +50,10 @@ model User {
   email    String?    @unique
   hashed_password String
   avatar   Avatar?
+  fades    Fade[]
+  tails    Tail[]
+  picks    Pick[]
   sessions Session[]
-
-
 }
 
 model Session {
@@ -68,6 +74,30 @@ model Avatar {
   lastModified DateTime
   user   User @relation(references: [id], fields: [userId])
   userId String  @unique // relation scalar field (used in the `@relation` attribute above)
+}
+
+model Fade {
+  id       Int      @default(autoincrement()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  pick     Pick     @relation(fields: [pickId], references: [id])
+  pickId   Int
+
+  @@index([pickId])
+}
+
+model Tail {
+  id       Int      @default(autoincrement()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  pick     Pick     @relation(fields: [pickId], references: [id])
+  pickId   Int
+
+  @@index([pickId])
 }
 
 enum NflTeam {

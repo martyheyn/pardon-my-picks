@@ -1,48 +1,95 @@
 import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
+import { Prisma } from '@prisma/client';
 
-export const load: PageServerLoad = async ({ params }) => {
+const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
+	include: {
+		tail: true,
+		fade: true
+	}
+});
+export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
+
+export const load: PageServerLoad = async ({ params, locals }) => {
+	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
+		where: {
+			week: parseInt(params.week),
+			year: parseInt(params.year)
+		},
+		include: {
+			tail: true,
+			fade: true
+		}
+	});
+
 	return {
-		picks: await prisma.pick.findMany({
-			where: {
-				week: parseInt(params.week),
-				year: parseInt(params.year)
-			}
-		})
+		picks,
+		user: locals.user
 	};
 };
 
 export const actions: Actions = {
-	fadePick: async ({ url }) => {
-		const id = url.searchParams.get('id');
-		if (!id) {
-			return fail(400, { message: 'Invalid request' });
-		}
-
-		await prisma.pick.update({
-			where: { id: parseInt(id) },
-			data: {
-				fade: {
-					increment: 1
-				}
-			}
-		});
+	fadePick: async ({ url, locals }) => {
+		// const id = url.searchParams.get('id');
+		// if (!id) {
+		// 	return fail(400, { message: 'Invalid request' });
+		// }
+		// await prisma.pick.update({
+		// 	where: { id: parseInt(id) },
+		// 	data: {
+		// 		fade: {
+		// 			increment: 1
+		// 		}
+		// 	}
+		// });
 	},
 
-	tailPick: async ({ url }) => {
-		const id = url.searchParams.get('id');
-		if (!id) {
-			return fail(400, { message: 'Invalid request' });
+	tailPick: async ({ url, locals }) => {
+		// throw error if user is not logged in
+		if (!locals.user) {
+			return fail(401, { message: 'Unauthorized', success: false });
 		}
 
-		await prisma.pick.update({
-			where: { id: parseInt(id) },
-			data: {
+		const id = url.searchParams.get('id');
+		if (!id) {
+			return fail(400, { message: 'Invalid request', success: false });
+		}
+
+		// check if user has already tailed this pick
+		const tail = await prisma.pick.findFirst({
+			where: {
+				id: parseInt(id),
 				tail: {
-					increment: 1
+					some: {
+						userId: locals.user.id
+					}
 				}
 			}
 		});
+
+		if (tail) {
+			return fail(400, { message: 'Already tailed', success: false });
+		}
+
+		try {
+			await prisma.tail.create({
+				data: {
+					userId: locals.user.id,
+					pickId: parseInt(id)
+				}
+			});
+		} catch (error) {
+			console.log('error', error);
+			return fail(500, { message: 'Error tailing pick', success: false });
+		}
+
+		return {
+			status: 200,
+			body: {
+				message: 'Tailed pick',
+				success: true
+			}
+		};
 	}
 };

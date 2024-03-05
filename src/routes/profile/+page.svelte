@@ -3,7 +3,9 @@
 	import Icon from '../../lib/components/icon.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
-	import Alert from '$lib/components/alert.svelte';
+	import AlertFlash from '$lib/components/alert.svelte';
+	import type { Alert } from '$lib/utils/alert';
+	import { callAlert } from '$lib/utils/alert';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -14,10 +16,7 @@
 	let infoDisplayed = false;
 	let disableSave = false;
 	let avatar;
-	let alert: {
-		text: string | undefined;
-		alertType: 'error' | 'success' | undefined;
-	};
+	let alert: Alert;
 	let fileinput: HTMLInputElement;
 
 	const handleEdit = () => {
@@ -48,20 +47,14 @@
 	};
 
 	// update alert based on form response
+	// TODO:: clean this up, maybe put it in a function somewhere else
 	$: {
 		if (form) {
-			alert = {
-				text: form.message,
-				alertType: form.success ? 'success' : 'error'
-			};
+			alert = callAlert(form.message, form.success);
+			setTimeout(() => {
+				alert = { text: undefined, alertType: undefined };
+			}, 3000);
 		}
-
-		// clear alert after 5 seconds
-		setTimeout(() => {
-			alert = { text: undefined, alertType: undefined };
-
-			// TODO:: clear form data on load
-		}, 3000);
 	}
 
 	$: console.log('formData', form);
@@ -114,7 +107,7 @@
 	>
 		<!-- add breadcrumb for when it saves correctly -->
 		{#if alert && alert.text}
-			<Alert text={alert.text} alertType={alert.alertType} />
+			<AlertFlash text={alert.text} alertType={alert.alertType} />
 		{/if}
 
 		<div class="flex">
