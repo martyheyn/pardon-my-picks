@@ -260,14 +260,8 @@
 								<div class="flex items-center px-4 gap-x-4 sm:gap-x-6 lg:gap-x-8">
 									<div class="h-full flex flex-col justify-center items-center gap-y-2">
 										<p class="">Tail</p>
-										<form
-											use:enhance
-											action={`${
-												$currWeek === parseInt(week) && user ? `?/tailPick&id=${pick.id}` : ''
-											}`}
-											method={`${$currWeek === parseInt(week) && user ? 'POST' : ''}`}
-										>
-											<button disabled={!user || alertBool}>
+										<form use:enhance action="?/tailPick&id={pick.id}" method="POST">
+											<button disabled={alertBool}>
 												<Icon
 													class={`transition-all duration-300 ease-in-out ${
 														$currWeek === parseInt(week) && !alertBool
@@ -289,14 +283,8 @@
 
 									<div class="h-full flex flex-col justify-center items-center gap-y-2">
 										<p class="">Fade</p>
-										<form
-											use:enhance
-											action={`${
-												$currWeek === parseInt(week) && user ? `?/fadePick&id=${pick.id}` : ''
-											}`}
-											method={`${$currWeek === parseInt(week) && user ? 'POST' : ''}`}
-										>
-											<button disabled={!user || alertBool}>
+										<form use:enhance action="?/fadePick&id={pick.id}" method="POST">
+											<button disabled={alertBool}>
 												<Icon
 													class={`transition-all duration-300 ease-in-out ${
 														$currWeek === parseInt(week) && !alertBool

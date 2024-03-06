@@ -31,18 +31,23 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	fadePick: async ({ url, locals }) => {
+		console.log('locals', locals);
 		// throw error if user is not logged in
 		if (!locals.user) {
-			return fail(401, { message: 'Unauthorized', success: false });
+			return fail(401, {
+				message: 'Unauthorized!! Gotta create an account to fade a pick buddy',
+				success: false
+			});
 		}
 
 		const id = url.searchParams.get('id');
+		console.log('id', id);
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
 		// check if user has already tailed this pick
-		const fade = await prisma.pick.findFirst({
+		const fade = await prisma.pick.findUnique({
 			where: {
 				id: parseInt(id),
 				fade: {
@@ -54,7 +59,7 @@ export const actions: Actions = {
 		});
 
 		if (fade) {
-			return fail(400, { message: 'Already faded', success: false });
+			return fail(400, { message: 'You have already faded this pick bruv', success: false });
 		}
 
 		try {
@@ -98,7 +103,10 @@ export const actions: Actions = {
 	tailPick: async ({ url, locals }) => {
 		// throw error if user is not logged in
 		if (!locals.user) {
-			return fail(401, { message: 'Unauthorized', success: false });
+			return fail(401, {
+				message: 'Unauthorized!! Gotta create an account to tail a pick big dawg',
+				success: false
+			});
 		}
 
 		const id = url.searchParams.get('id');
@@ -119,7 +127,7 @@ export const actions: Actions = {
 		});
 
 		if (tail) {
-			return fail(400, { message: 'Already tailed', success: false });
+			return fail(400, { message: 'You have already tailed this pick brohiem', success: false });
 		}
 
 		try {
