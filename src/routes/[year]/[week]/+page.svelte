@@ -255,53 +255,97 @@
 									{/if}
 								</div>
 
-								<div class="flex items-center px-4 gap-x-4 sm:gap-x-6 lg:gap-x-8">
-									<div class="h-full flex flex-col justify-center items-center gap-y-2">
-										<p class="">Tail</p>
-										<form use:enhance action="?/tailPick&id={pick.id}" method="POST">
-											<button disabled={alertBool}>
-												<Icon
-													class={`transition-all duration-300 ease-in-out ${
-														$currWeek === parseInt(week) && !alertBool
-															? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
-															: ''
-													} ${
-														pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
-															? 'fill-green-300 dark:fill-green-900 cursor-default'
-															: 'fill-none'
-													}`}
-													width="24px"
-													height="24px"
-													iconName="thumbUp"
-												/>
-											</button>
-										</form>
-										<p>{pick.tail ? `${pick.tail.length}` : '0'}</p>
-									</div>
+								<div
+									class="flex flex-col gap-y-2 px-4 py-3 bg-gray-200 bg-opacity-90 w-fit rounded-3xl"
+								>
+									<div class="flex justify-between items-center px-2 gap-x-4">
+										<div class="h-full flex flex-col justify-center items-center gap-y-2">
+											<p class="border-b border-black border-opacity-25">Tail</p>
+											<div class="flex flex-row justify-center items-center gap-x-2">
+												<form use:enhance action="?/tailPick&id={pick.id}" method="POST">
+													<button disabled={alertBool}>
+														<Icon
+															class={`transition-all duration-300 ease-in-out ${
+																$currWeek === parseInt(week) && !alertBool
+																	? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
+																	: ''
+															} ${
+																pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
+																	? 'fill-green-300 dark:fill-green-900 cursor-default'
+																	: 'fill-none'
+															}`}
+															width="24px"
+															height="24px"
+															iconName="thumbUp"
+														/>
+													</button>
+												</form>
+												<p>{pick.tail ? `${pick.tail.length}` : '0'}</p>
+											</div>
+										</div>
 
-									<div class="h-full flex flex-col justify-center items-center gap-y-2">
-										<p class="">Fade</p>
-										<form use:enhance action="?/fadePick&id={pick.id}" method="POST">
-											<button disabled={alertBool}>
-												<Icon
-													class={`transition-all duration-300 ease-in-out ${
-														$currWeek === parseInt(week) && !alertBool
-															? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
-															: ''
-													} ${
-														pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
-															? 'fill-red-300 dark:fill-red-900 cursor-default'
-															: 'fill-none'
-													}`}
-													width="24px"
-													height="24px"
-													iconName="thumbDown"
-												/>
-											</button>
-										</form>
-										<p>{pick.fade ? `${pick.fade.length}` : '0'}</p>
+										<div class="w-[.8px] h-full bg-black bg-opacity-10" />
+
+										<div class="h-full flex flex-col justify-center items-center gap-y-2">
+											<p class="border-b border-black border-opacity-25">Fade</p>
+
+											<div class="flex flex-row justify-center items-center gap-x-2">
+												<form use:enhance action="?/fadePick&id={pick.id}" method="POST">
+													<button disabled={alertBool}>
+														<Icon
+															class={`transition-all duration-300 ease-in-out ${
+																$currWeek === parseInt(week) && !alertBool
+																	? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
+																	: ''
+															} ${
+																pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
+																	? 'fill-red-300 dark:fill-red-900 cursor-default'
+																	: 'fill-none'
+															}`}
+															width="24px"
+															height="24px"
+															iconName="thumbDown"
+														/>
+													</button>
+												</form>
+												<p>{pick.fade ? `${pick.fade.length}` : '0'}</p>
+											</div>
+										</div>
+									</div>
+									<div class="w-full h-1 flex rounded-md">
+										<div
+											class={`h-full bg-green-300 bg-opacity-90
+											${
+												pick.tail &&
+												pick.fade &&
+												pick.tail.length / (pick.tail.length + pick.fade.length) === 1
+													? 'rounded-sm'
+													: 'rounded-l-sm'
+											}`}
+											style={`width: ${
+												pick.tail && pick.fade
+													? (pick.tail.length / (pick.tail.length + pick.fade.length)) * 100
+													: 100
+											}%`}
+										/>
+										<div
+											class={`h-full bg-red-300 bg-opacity-90 
+											${
+												pick.tail &&
+												pick.fade &&
+												pick.fade.length / (pick.tail.length + pick.fade.length) === 1
+													? 'rounded-sm'
+													: 'rounded-r-sm'
+											}`}
+											style={`width: ${
+												pick.tail && pick.fade
+													? (pick.fade.length / (pick.tail.length + pick.fade.length)) * 100
+													: 100
+											}%`}
+										/>
 									</div>
 								</div>
+
 								{#if alert && $alert.text}
 									<AlertFlash text={$alert.text} alertType={$alert.alertType} />
 								{/if}
