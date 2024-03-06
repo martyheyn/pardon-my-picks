@@ -23,8 +23,6 @@
 
 	$: ({ year, week } = $page.params);
 
-	// let alert: Alert;
-
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
 	const alert: Writable<Alert> = getContext('alert');

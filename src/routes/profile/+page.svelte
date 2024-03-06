@@ -6,17 +6,20 @@
 	import AlertFlash from '$lib/components/alert.svelte';
 	import type { Alert } from '$lib/utils/alert';
 	import { callAlert } from '$lib/utils/alert';
+	import type { Writable } from 'svelte/store';
+	import { getContext } from 'svelte';
 
 	export let data: PageData;
 	export let form: ActionData;
 
 	$: ({ user } = data);
 
+	const alert: Writable<Alert> = getContext('alert');
+
 	let editting = false;
 	let infoDisplayed = false;
 	let disableSave = false;
 	let avatar;
-	let alert: Alert;
 	let fileinput: HTMLInputElement;
 
 	const handleEdit = () => {
@@ -50,9 +53,9 @@
 	// TODO:: clean this up, maybe put it in a function somewhere else
 	$: {
 		if (form) {
-			alert = callAlert(form.message, form.success);
+			alert.set(callAlert(form.message, form.success));
 			setTimeout(() => {
-				alert = { text: undefined, alertType: undefined };
+				alert.set({ text: undefined, alertType: undefined });
 			}, 3000);
 		}
 	}
@@ -106,8 +109,8 @@
 		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
 	>
 		<!-- add breadcrumb for when it saves correctly -->
-		{#if alert && alert.text}
-			<AlertFlash text={alert.text} alertType={alert.alertType} />
+		{#if $alert && $alert.text}
+			<AlertFlash text={$alert.text} alertType={$alert.alertType} />
 		{/if}
 
 		<div class="flex">
