@@ -5,19 +5,24 @@
 
 	// create store
 	import { setContext } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
 	import { page } from '$app/stores';
 
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
+	import type { Alert } from '$lib/utils/alert';
 
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(18);
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);
+	const alert: Writable<Alert> = writable({
+		text: '',
+		alertType: undefined
+	});
 
 	$: if ($page.route) {
 		if ($page.route.id?.includes('week')) {
@@ -33,6 +38,7 @@
 	setContext('screenWidth', screenWidth);
 	setContext('active', active);
 	setContext('fullPageHeight', fullPageHeight);
+	setContext('alert', alert);
 
 	let scrollY: number;
 

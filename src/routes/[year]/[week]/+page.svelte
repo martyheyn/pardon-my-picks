@@ -23,10 +23,11 @@
 
 	$: ({ year, week } = $page.params);
 
-	let alert: Alert;
+	// let alert: Alert;
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
+	const alert: Writable<Alert> = getContext('alert');
 
 	$: picksByPerson = picks.reduce((acc: PickByPerson, pick: any) => {
 		const { person } = pick;
@@ -73,12 +74,14 @@
 	// alerts
 	$: {
 		if (form) {
-			alert = callAlert(form.message, form.success);
+			alert.set(callAlert(form.message, form.success));
 			setTimeout(() => {
-				alert = { text: undefined, alertType: undefined };
+				alert.set({ text: undefined, alertType: undefined });
 			}, 3000);
 		}
 	}
+
+	$: alertBool = $alert.text ? true : false;
 
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
@@ -118,7 +121,9 @@
 					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 						{#key week}
 							<div
-								class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col gap-y-4 font-paragraph relative"
+								class="rounded-md border border-black border-opacity-20 dark:border-white
+								 dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col
+								 gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out"
 								in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
 							>
 								<div class="">
@@ -262,18 +267,17 @@
 											}`}
 											method={`${$currWeek === parseInt(week) && user ? 'POST' : ''}`}
 										>
-											<button disabled={!user}>
+											<button disabled={!user || alertBool}>
 												<Icon
 													class={`transition-all duration-300 ease-in-out ${
-														$currWeek === parseInt(week)
-															? 'hover:fill-green-300 cursor-pointer'
+														$currWeek === parseInt(week) && !alertBool
+															? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
 															: ''
 													} ${
 														pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
-															? 'fill-green-300 cursor-default'
+															? 'fill-green-300 dark:fill-green-900 cursor-default'
 															: 'fill-none'
-													}
-													`}
+													}`}
 													width="24px"
 													height="24px"
 													iconName="thumbUp"
@@ -292,10 +296,16 @@
 											}`}
 											method={`${$currWeek === parseInt(week) && user ? 'POST' : ''}`}
 										>
-											<button disabled={!user}>
+											<button disabled={!user || alertBool}>
 												<Icon
-													class={`transition-all duration-300 ease-in-out fill-none ${
-														$currWeek === parseInt(week) ? 'hover:fill-red-300 cursor-pointer' : ''
+													class={`transition-all duration-300 ease-in-out ${
+														$currWeek === parseInt(week) && !alertBool
+															? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
+															: ''
+													} ${
+														pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
+															? 'fill-red-300 dark:fill-red-900 cursor-default'
+															: 'fill-none'
 													}`}
 													width="24px"
 													height="24px"
@@ -306,8 +316,8 @@
 										<p>{pick.fade ? `${pick.fade.length}` : '0'}</p>
 									</div>
 								</div>
-								{#if alert && alert.text}
-									<AlertFlash text={alert.text} alertType={alert.alertType} />
+								{#if alert && $alert.text}
+									<AlertFlash text={$alert.text} alertType={$alert.alertType} />
 								{/if}
 							</div>
 						{/key}

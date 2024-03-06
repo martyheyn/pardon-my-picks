@@ -31,18 +31,68 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	fadePick: async ({ url, locals }) => {
-		// const id = url.searchParams.get('id');
-		// if (!id) {
-		// 	return fail(400, { message: 'Invalid request' });
-		// }
-		// await prisma.pick.update({
-		// 	where: { id: parseInt(id) },
-		// 	data: {
-		// 		fade: {
-		// 			increment: 1
-		// 		}
-		// 	}
-		// });
+		// throw error if user is not logged in
+		if (!locals.user) {
+			return fail(401, { message: 'Unauthorized', success: false });
+		}
+
+		const id = url.searchParams.get('id');
+		if (!id) {
+			return fail(400, { message: 'Invalid request', success: false });
+		}
+
+		// check if user has already tailed this pick
+		const fade = await prisma.pick.findFirst({
+			where: {
+				id: parseInt(id),
+				fade: {
+					some: {
+						userId: locals.user.id
+					}
+				}
+			}
+		});
+
+		if (fade) {
+			return fail(400, { message: 'Already faded', success: false });
+		}
+
+		try {
+			// check if the user has already tailed this pick
+			const tail = await prisma.pick.findUnique({
+				where: {
+					id: parseInt(id),
+					tail: {
+						some: {
+							userId: locals.user.id
+						}
+					}
+				}
+			});
+			if (tail) {
+				await prisma.tail.delete({
+					where: {
+						userId: locals.user.id,
+						pickId: parseInt(id)
+					}
+				});
+			}
+
+			await prisma.fade.create({
+				data: {
+					userId: locals.user.id,
+					pickId: parseInt(id)
+				}
+			});
+		} catch (error) {
+			console.log('error', error);
+			return fail(500, { message: 'Error fading pick', success: false });
+		}
+
+		return {
+			message: 'Faded! You faded this pick',
+			success: true
+		};
 	},
 
 	tailPick: async ({ url, locals }) => {
@@ -73,6 +123,26 @@ export const actions: Actions = {
 		}
 
 		try {
+			// check if the user has already tailed this pick
+			const fade = await prisma.pick.findUnique({
+				where: {
+					id: parseInt(id),
+					fade: {
+						some: {
+							userId: locals.user.id
+						}
+					}
+				}
+			});
+			if (fade) {
+				await prisma.fade.delete({
+					where: {
+						userId: locals.user.id,
+						pickId: parseInt(id)
+					}
+				});
+			}
+
 			await prisma.tail.create({
 				data: {
 					userId: locals.user.id,
@@ -85,11 +155,8 @@ export const actions: Actions = {
 		}
 
 		return {
-			status: 200,
-			body: {
-				message: 'Tailed pick',
-				success: true
-			}
+			message: 'Tailed pick',
+			success: true
 		};
 	}
 };
