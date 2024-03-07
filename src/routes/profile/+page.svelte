@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fly, slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import Icon from '../../lib/components/icon.svelte';
 	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
@@ -8,11 +8,14 @@
 	import { callAlert } from '$lib/utils/alert';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
+	import { linear, quadInOut } from 'svelte/easing';
 
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: ({ user } = data);
+	$: ({ user, stats } = data);
+
+	$: console.log('stats', stats);
 
 	const alert: Writable<Alert> = getContext('alert');
 
@@ -59,11 +62,13 @@
 			}, 3000);
 		}
 	}
-
-	$: console.log('formData', form);
 </script>
 
-<div class="flex flex-col gap-y-4">
+<div
+	class="flex flex-col gap-y-4"
+	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
+	out:fade={{ duration: 150, easing: linear }}
+>
 	<div class="border border-black border-opacity-50 w-28 h-28 rounded-full group">
 		<!-- <img src="" alt=""> -->
 		<div class="w-full h-full rounded-full relative overflow-hidden">
@@ -204,5 +209,71 @@
 				{/if}
 			</div>
 		</form>
+	</div>
+
+	<div
+		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
+	>
+		<div class="flex">
+			<h2 class="text-xl font-semibold">Stats</h2>
+		</div>
+
+		<div class="flex flex-row items-center gap-x-20">
+			<div class="flex flex-col gap-y-2">
+				<h2 class="text-lg mb-1 border-b border-black border-opacity-25">Tailed Picks</h2>
+
+				<p class="text-[16px] leading-4">
+					Total Tailed: <span class="text-lg font-semibold ml-2 leading-4">
+						{stats?.tails.total}
+					</span>
+				</p>
+				<p class="text-[16px] leading-4">
+					Tail Record: <span class="text-lg font-semibold ml-2 leading-4">
+						{stats?.tails.wins} - {stats?.tails.losses}
+					</span>
+				</p>
+				<p class="text-[16px] leading-4">
+					Tail Hit Rate: <span
+						class={`text-lg font-semibold ml-2 leading-4 ${
+							(stats?.tails.wins / stats.tails.total) * 100 > 50
+								? 'text-green-500 dark:text-green-300'
+								: (stats?.tails.wins / stats.tails.total) * 100 < 50
+								? 'text-red-500 dark:text-red-300'
+								: 'text-yellow-500 dark:text-yellow-300'
+						}`}
+					>
+						{stats?.tails.total ? `${(stats?.tails.wins / stats.tails.total) * 100} %` : 'NA'}
+					</span>
+				</p>
+			</div>
+
+			<div class="flex flex-col gap-y-2">
+				<h2 class="text-lg mb-1 border-b border-black border-opacity-25">Faded Picks</h2>
+
+				<p class="text-[16px] leading-4">
+					Total Faded: <span class="text-lg font-semibold ml-2 leading-4">
+						{stats?.fades.total}
+					</span>
+				</p>
+				<p class="text-[16px] leading-4">
+					Fade Record: <span class="text-lg font-semibold ml-2 leading-4">
+						{stats?.fades.wins} - {stats?.fades.losses}
+					</span>
+				</p>
+				<p class="text-[16px] leading-4">
+					Fade Hit Rate: <span
+						class={`text-lg font-semibold ml-2 leading-4 ${
+							(stats?.fades.wins / stats.fades.total) * 100 > 50
+								? 'text-green-500 dark:text-green-300'
+								: (stats?.fades.wins / stats.fades.total) * 100 < 50
+								? 'text-red-500 dark:text-red-300'
+								: 'text-yellow-500 dark:text-yellow-300'
+						}`}
+					>
+						{stats?.fades.total ? `${(stats?.fades.wins / stats.fades.total) * 100} %` : 'NA'}
+					</span>
+				</p>
+			</div>
+		</div>
 	</div>
 </div>

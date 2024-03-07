@@ -31,7 +31,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	fadePick: async ({ url, locals }) => {
-		console.log('locals', locals);
 		// throw error if user is not logged in
 		if (!locals.user) {
 			return fail(401, {
@@ -41,7 +40,6 @@ export const actions: Actions = {
 		}
 
 		const id = url.searchParams.get('id');
-		console.log('id', id);
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -90,7 +88,7 @@ export const actions: Actions = {
 				}
 			});
 		} catch (error) {
-			console.log('error', error);
+			console.error('error', error);
 			return fail(500, { message: 'Error fading pick', success: false });
 		}
 
@@ -158,7 +156,7 @@ export const actions: Actions = {
 				}
 			});
 		} catch (error) {
-			console.log('error', error);
+			console.error('error', error);
 			return fail(500, { message: 'Error tailing pick', success: false });
 		}
 

@@ -43,8 +43,6 @@
 		_sum: {
 			winner: number | null;
 			push: number | null;
-			fade: number | null;
-			tail: number | null;
 		};
 		_count: {
 			winner: number;
@@ -157,14 +155,14 @@
 						>
 					</p>
 
-					<p class=" text-[16px] leading-4">
+					<p class="text-[16px] leading-4">
 						Spread:
 						<span class="text-lg font-semibold ml-2 leading-4"
 							>{getBetTypeStats(persona.person, 'spread')}</span
 						>
 					</p>
 
-					<p class=" text-[16px] leading-4">
+					<p class="text-[16px] leading-4">
 						Totals:
 						<span class="text-lg font-semibold ml-2 leading-4"
 							>{getBetTypeStats(persona.person, 'totals')}</span

@@ -1,14 +1,13 @@
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
+
 export const load: PageServerLoad = async () => {
 	return {
 		personas: await prisma.pick.groupBy({
 			by: ['person'],
 			_sum: {
 				winner: true,
-				push: true,
-				fade: true,
-				tail: true
+				push: true
 			},
 			_count: {
 				winner: true

@@ -84,6 +84,8 @@ model Fade {
   userId    String   @unique
   pick     Pick     @relation(fields: [pickId], references: [id])
   pickId   Int
+  winner   Boolean?
+  push     Boolean?
 
   @@index([pickId])
 }
@@ -96,6 +98,8 @@ model Tail {
   userId    String   @unique
   pick     Pick     @relation(fields: [pickId], references: [id])
   pickId   Int
+  winner   Boolean?
+  push     Boolean?
 
   @@index([pickId])
 }

@@ -1,7 +1,5 @@
-import { lucia } from '$lib/server/lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
-import { Argon2id } from 'oslo/password';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -14,6 +12,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const existingUser = await prisma.user.findUnique({
 		where: {
 			id: locals.user.id
+		},
+		include: {
+			fades: true,
+			tails: true
 		}
 	});
 
@@ -21,8 +23,26 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw redirect(303, '/login');
 	}
 
+	// get the statsssss
+	const tails = existingUser.tails;
+	const fades = existingUser.fades;
+
 	return {
-		user: locals.user
+		user: locals.user,
+		stats: {
+			tails: {
+				total: tails.length,
+				wins: tails.filter((tail) => tail.winner).length,
+				pushes: tails.filter((tail) => tail.push).length,
+				losses: tails.length > 0 ? tails.filter((tail) => !tail.winner && !tail.push).length : 0
+			},
+			fades: {
+				total: fades.length,
+				wins: fades.filter((fade) => fade.winner).length,
+				pushes: fades.filter((fade) => fade.push).length,
+				losses: fades.length > 0 ? fades.filter((fade) => !fade.winner && !fade.push).length : 0
+			}
+		}
 	};
 };
 
