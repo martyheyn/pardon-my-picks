@@ -64,7 +64,9 @@ export const actions: Actions = {
 
 		if (email === user.email && username === user.username) {
 			return {
-				message: 'No changes were made'
+				success: false,
+				// no need to send a message here
+				message: ''
 			};
 		}
 

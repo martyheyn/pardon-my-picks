@@ -7,8 +7,6 @@
 	export let fillRule: 'inherit' | 'nonzero' | 'evenodd' | null | undefined = null;
 	export let clipRule: 'inherit' | 'nonzero' | 'evenodd' | null | undefined = null;
 
-	// TODO: make it possible to change stroke / fill of svg and path
-
 	let icons: { [key: string]: { box: number; box2?: number; svg: string } } = {
 		stats: {
 			box: 32,

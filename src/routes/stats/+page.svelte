@@ -16,8 +16,6 @@
 
 	$: ({ typeBets, specialBets, personData } = data);
 
-	$: console.log('personData', personData);
-
 	$: personData.sort((a, b) => {
 		return (
 			sortOrder[a.person as keyof typeof sortOrder] - sortOrder[b.person as keyof typeof sortOrder]
@@ -25,6 +23,8 @@
 	});
 
 	// TODO:: indexing would be more efficeint
+	// format
+	// { "Big Cat": { spread: '11 - 5 -3', total: '11 - 6' } }
 	const getBetTypeStats = (persona: string, type: string) => {
 		const betTypeStats = typeBets.filter(
 			(spread) => spread.person === persona && spread.type === type

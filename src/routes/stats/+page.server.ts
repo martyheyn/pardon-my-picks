@@ -69,6 +69,7 @@ export const load: PageServerLoad = async () => {
 		});
 	});
 
+	// TODO: rawSQL query to find fades and tails and % by bet type
 	// get type bet  data
 	const typeBetData: BetData[] = [];
 	const typeBet = await prisma.pick.groupBy({

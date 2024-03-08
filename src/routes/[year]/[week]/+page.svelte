@@ -34,7 +34,6 @@
 		return acc;
 	}, {});
 
-	// TODO: find better way to organize data and make it reactive
 	$: picksArr = [picksByPerson];
 	$: for (const x in picksByPerson) {
 		picksArr.push({ [x]: picksByPerson[x] });
