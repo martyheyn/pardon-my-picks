@@ -16,6 +16,8 @@
 
 	$: ({ typeBets, specialBets, personData } = data);
 
+	$: console.log('personData', personData);
+
 	$: personData.sort((a, b) => {
 		return (
 			sortOrder[a.person as keyof typeof sortOrder] - sortOrder[b.person as keyof typeof sortOrder]
@@ -191,16 +193,47 @@
 						{/each}
 					{/if}
 
-					<!-- <div class="flex gap-x-4">
-						<p class=" text-[16px] leading-4">
-							Tailed:
-							<span class="text-lg font-semibold ml-2 leading-4">{persona._sum.tail}</span>
-						</p>
-						<p class=" text-[16px] leading-4">
-							Faded:
-							<span class="text-lg font-semibold ml-2 leading-4">{persona._sum.fade}</span>
-						</p>
-					</div> -->
+					{#if parseInt(persona.total_tails) > 0}
+						<div class="flex gap-x-4">
+							<p class=" text-[16px] leading-4">
+								# of times Tailed:
+								<span class="text-lg font-semibold ml-2 leading-4">{persona.total_tails}</span>
+							</p>
+							<p class=" text-[16px] leading-4">
+								Tail win %:
+								<span
+									class={`text-lg font-semibold ml-2 leading-4 ${
+										parseInt(persona.tails_pct) > 50
+											? 'text-green-500 dark:text-green-300'
+											: parseInt(persona.tails_pct) < 50
+											? 'text-red-500 dark:text-red-300'
+											: 'text-yellow-500 dark:text-yellow-300'
+									}`}>{persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</span
+								>
+							</p>
+						</div>
+					{/if}
+
+					{#if parseInt(persona.total_fades) > 0}
+						<div class="flex gap-x-4">
+							<p class=" text-[16px] leading-4">
+								# of times Faded:
+								<span class="text-lg font-semibold ml-2 leading-4">{persona.total_fades}</span>
+							</p>
+							<p class=" text-[16px] leading-4">
+								Fade win %:
+								<span
+									class={`text-lg font-semibold ml-2 leading-4 ${
+										parseInt(persona.fades_pct) > 50
+											? 'text-green-500 dark:text-green-300'
+											: parseInt(persona.fades_pct) < 50
+											? 'text-red-500 dark:text-red-300'
+											: 'text-yellow-500 dark:text-yellow-300'
+									}`}>{persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}</span
+								>
+							</p>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/each}
