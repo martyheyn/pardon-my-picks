@@ -14,51 +14,26 @@
 
 	export let data: PageData;
 
-	$: ({ personas, spreads, specialBets, personData } = data);
+	$: ({ typeBets, specialBets, personData } = data);
 
-	$: console.log(personData);
-
-	$: personas.sort((a, b) => {
+	$: personData.sort((a, b) => {
 		return (
 			sortOrder[a.person as keyof typeof sortOrder] - sortOrder[b.person as keyof typeof sortOrder]
 		);
 	});
 
-	// click in to get weekly stats
+	// TODO:: indexing would be more efficeint
 	const getBetTypeStats = (persona: string, type: string) => {
-		const betTypeStats = spreads.filter(
+		const betTypeStats = typeBets.filter(
 			(spread) => spread.person === persona && spread.type === type
 		)[0];
 
-		return `${betTypeStats._sum.winner} - ${
-			betTypeStats._sum.winner && betTypeStats._count.winner - betTypeStats._sum.winner
-		} - ${betTypeStats._sum.push}
-		`;
+		return betTypeStats.record;
 	};
 
 	// get specialBet by person
 	const getSpecialBets = (persona: string) => {
 		return specialBets.filter((bet) => bet.person === persona);
-	};
-
-	const getRecordPct = (persona: {
-		_sum: {
-			winner: number | null;
-			push: number | null;
-		};
-		_count: {
-			winner: number;
-		};
-	}) => {
-		return parseFloat(
-			`${
-				persona._sum.winner && persona._sum.push
-					? (persona._sum.winner / (persona._count.winner - persona._sum.push)) * 100
-					: persona._sum.winner
-					? (persona._sum.winner / persona._count.winner) * 100
-					: ''
-			}`
-		);
 	};
 
 	let showSpecialBetDetials: { person: string; indx: number } | undefined;
@@ -107,7 +82,7 @@
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl my-6 font-paragraph">
-		{#each personas as persona}
+		{#each personData as persona}
 			<div
 				class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg p-6 flex flex-col gap-y-2"
 				id={personasLabelToslug(persona.person)}
@@ -136,25 +111,18 @@
 				<div class="flex flex-col gap-y-[10px]">
 					<p
 						class={`text-4xl [text-shadow:1px_1px_1px_gray] dark:[text-shadow:1px_1px_1px_white] mb-1 ${
-							getRecordPct(persona) > 50
+							parseFloat(persona.record_pct) > 50
 								? 'text-green-500 dark:text-green-300'
-								: getRecordPct(persona) < 50
+								: parseFloat(persona.record_pct) < 50
 								? 'text-red-500 dark:text-red-300'
 								: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
-						{getRecordPct(persona).toFixed(1)}%
+						{parseFloat(persona.record_pct).toFixed(1)}%
 					</p>
 					<p class=" text-[16px] leading-4">
 						2023 NFL Season:
-						<span class="text-lg font-semibold ml-2 leading-4"
-							>{persona._sum.winner} - {persona._sum.winner && persona._sum.push
-								? persona._count.winner - persona._sum.winner - persona._sum.push
-								: persona._sum.winner !== null
-								? persona._count.winner - persona._sum.winner
-								: ''}
-							{persona._sum.push ? ` - ${persona._sum.push}` : ''}</span
-						>
+						<span class="text-lg font-semibold ml-2 leading-4">{persona.record}</span>
 					</p>
 
 					<p class="text-[16px] leading-4">

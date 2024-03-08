@@ -12,15 +12,28 @@ type RawPersonData = {
 	fade_wins: number;
 };
 
-type personData = {
+type PersonData = {
 	person: string;
 	wins: string;
 	pushes: string;
 	record: string;
+	record_pct: string;
 	total_tails: string;
 	tails_pct: string;
 	total_fades: string;
 	fades_pct: string;
+};
+
+type BetData = {
+	person: string;
+	type: string;
+	wins: string;
+	pushes: string;
+	record: string;
+};
+
+const getRecordPct = (total_picks: number, wins: number, pushes: number) => {
+	return parseFloat(`${(wins / (Number(total_picks) - pushes)) * 100}`);
 };
 
 export const load: PageServerLoad = async () => {
@@ -39,15 +52,16 @@ export const load: PageServerLoad = async () => {
 	`;
 
 	// console.log('rawPersonData', rawPersonData);
-	const personData: personData[] = [];
+	const personData: PersonData[] = [];
 	rawPersonData.map((person) => {
 		personData.push({
 			person: person.person,
 			wins: person.wins.toString(),
 			pushes: person.pushes.toString(),
-			record: `${person.wins}-${Number(person.total_picks) - person.wins - person.pushes}-${
+			record: `${person.wins} - ${Number(person.total_picks) - person.wins - person.pushes} - ${
 				person.pushes
 			}`,
+			record_pct: getRecordPct(person.total_picks, person.wins, person.pushes).toString(),
 			total_tails: person.total_tails.toString(),
 			tails_pct: ((person.tail_wins / Number(person.total_tails)) * 100).toString(),
 			total_fades: person.total_fades.toString(),
@@ -55,30 +69,34 @@ export const load: PageServerLoad = async () => {
 		});
 	});
 
-	console.log('personData', personData);
+	// get type bet  data
+	const typeBetData: BetData[] = [];
+	const typeBet = await prisma.pick.groupBy({
+		by: ['person', 'type'],
+		_sum: {
+			winner: true,
+			push: true
+		},
+		_count: {
+			winner: true
+		}
+	});
+
+	typeBet.map((bet) => {
+		let winCount = bet._sum.winner ? bet._sum.winner : 0;
+		let pushCount = bet._sum.push ? bet._sum.push : 0;
+		typeBetData.push({
+			person: bet.person,
+			type: bet.type,
+			wins: winCount ? winCount.toString() : '0',
+			pushes: pushCount ? pushCount.toString() : '0',
+			record: `${bet._sum.winner} - ${bet._count.winner - winCount - pushCount} - ${bet._sum.push}`
+		});
+	});
 
 	return {
-		personas: await prisma.pick.groupBy({
-			by: ['person'],
-			_sum: {
-				winner: true,
-				push: true
-			},
-			_count: {
-				winner: true
-			}
-		}),
-
-		spreads: await prisma.pick.groupBy({
-			by: ['person', 'type'],
-			_sum: {
-				winner: true,
-				push: true
-			},
-			_count: {
-				winner: true
-			}
-		}),
+		personData: personData,
+		typeBets: typeBetData,
 
 		specialBets: await prisma.pick.groupBy({
 			by: ['person', 'specialBet'],
@@ -94,8 +112,6 @@ export const load: PageServerLoad = async () => {
 					not: undefined || ''
 				}
 			}
-		}),
-
-		personData: personData
+		})
 	};
 };
