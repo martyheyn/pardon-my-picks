@@ -311,9 +311,11 @@
 											</div>
 										</div>
 									</div>
-									<div class="w-full h-1 flex rounded-md">
-										<div
-											class={`h-full bg-green-300 bg-opacity-90
+
+									{#if (pick.tail && pick.tail.length > 0) || (pick.fade && pick.fade.length > 0)}
+										<div class={`w-full h-1 flex rounded-md`}>
+											<div
+												class={`h-full bg-green-300 bg-opacity-90
 											${
 												pick.tail &&
 												pick.fade &&
@@ -321,14 +323,14 @@
 													? 'rounded-sm'
 													: 'rounded-l-sm'
 											}`}
-											style={`width: ${
-												pick.tail && pick.fade
-													? (pick.tail.length / (pick.tail.length + pick.fade.length)) * 100
-													: 100
-											}%`}
-										/>
-										<div
-											class={`h-full bg-red-300 bg-opacity-90 
+												style={`width: ${
+													pick.tail && pick.fade
+														? (pick.tail.length / (pick.tail.length + pick.fade.length)) * 100
+														: 100
+												}%`}
+											/>
+											<div
+												class={`h-full bg-red-300 bg-opacity-90 
 											${
 												pick.tail &&
 												pick.fade &&
@@ -336,13 +338,14 @@
 													? 'rounded-sm'
 													: 'rounded-r-sm'
 											}`}
-											style={`width: ${
-												pick.tail && pick.fade
-													? (pick.fade.length / (pick.tail.length + pick.fade.length)) * 100
-													: 100
-											}%`}
-										/>
-									</div>
+												style={`width: ${
+													pick.tail && pick.fade
+														? (pick.fade.length / (pick.tail.length + pick.fade.length)) * 100
+														: 100
+												}%`}
+											/>
+										</div>
+									{/if}
 								</div>
 
 								{#if alert && $alert.text}
