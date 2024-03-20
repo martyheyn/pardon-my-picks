@@ -49,9 +49,6 @@
 			sideNavCollasped.set(true);
 		}
 	};
-
-	$: console.log('sideNavHeight', sideNavHeight);
-	$: console.log('fullPageHeight', $fullPageHeight);
 </script>
 
 <div
