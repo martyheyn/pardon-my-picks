@@ -69,13 +69,11 @@
 	// $: console.log('picks', picks);
 
 	// alerts
-	$: {
-		if (form) {
-			alert.set(callAlert(form.message, form.success));
-			setTimeout(() => {
-				alert.set({ text: undefined, alertType: undefined });
-			}, 3000);
-		}
+	$: if (form) {
+		alert.set({
+			text: form.message,
+			alertType: form.success ? 'success' : 'error'
+		});
 	}
 
 	$: alertBool = $alert.text ? true : false;
@@ -348,9 +346,7 @@
 									{/if}
 								</div>
 
-								{#if alert && $alert.text}
-									<AlertFlash text={$alert.text} alertType={$alert.alertType} />
-								{/if}
+								<AlertFlash />
 							</div>
 						{/key}
 					{/each}

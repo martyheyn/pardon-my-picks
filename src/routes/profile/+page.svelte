@@ -15,8 +15,6 @@
 
 	$: ({ user, stats } = data);
 
-	$: console.log('stats', stats);
-
 	const alert: Writable<Alert> = getContext('alert');
 
 	let editting = false;
@@ -54,13 +52,11 @@
 
 	// update alert based on form response
 	// TODO:: clean this up, maybe put it in a function somewhere else
-	$: {
-		if (form) {
-			alert.set(callAlert(form.message, form.success));
-			setTimeout(() => {
-				alert.set({ text: undefined, alertType: undefined });
-			}, 3000);
-		}
+	$: if (form) {
+		alert.set({
+			text: form.message,
+			alertType: form.success ? 'success' : 'error'
+		});
 	}
 </script>
 
@@ -114,9 +110,7 @@
 		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
 	>
 		<!-- add breadcrumb for when it saves correctly -->
-		{#if $alert && $alert.text}
-			<AlertFlash text={$alert.text} alertType={$alert.alertType} />
-		{/if}
+		<AlertFlash />
 
 		<div class="flex">
 			<h2 class="text-xl font-semibold">Profile Details</h2>
