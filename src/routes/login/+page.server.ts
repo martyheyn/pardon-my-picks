@@ -2,32 +2,38 @@ import { lucia } from '$lib/server/lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from 'oslo/password';
+import { setError, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { message } from 'sveltekit-superforms';
+import { z } from 'zod';
 
 import type { Actions, PageServerLoad } from './$types';
+
+const LoginFormSchema = z.object({
+	username: z.string().min(6),
+	password: z.string().min(6)
+});
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
 		throw redirect(303, '/');
 	}
+
+	// initialize form
+	const form = await superValidate(zod(LoginFormSchema));
+
+	return { form };
 };
 
 export const actions: Actions = {
 	default: async (event: any) => {
-		const formData = await event.request.formData();
-		const username = formData.get('username');
-		const password = formData.get('password');
+		const form = await superValidate(event, zod(LoginFormSchema));
 
-		// username must be between 4 ~ 31 characters
-		// keep in mind some database (e.g. mysql) are case insensitive
-		if (typeof username !== 'string' || username.length < 3 || username.length > 31) {
-			return fail(400, {
-				message: 'Invalid username'
-			});
-		}
-		if (typeof password !== 'string' || password.length < 6 || password.length > 99) {
-			return fail(400, {
-				message: 'Invalid password'
-			});
+		const { username, password } = form.data;
+
+		if (!form.valid) {
+			// Again, return { form } and things will just work.
+			return fail(400, { form });
 		}
 
 		// check if user in the database
@@ -46,16 +52,14 @@ export const actions: Actions = {
 			// Since protecting against this is none-trivial,
 			// it is crucial your implementation is protected against brute-force attacks with login throttling etc.
 			// If usernames are public, you may outright tell the user that the username is invalid.
-			return fail(400, {
-				message: 'Incorrect username or password'
-			});
+			return fail(400, { form });
 		}
 
 		const validPassword = await new Argon2id().verify(existingUser.hashed_password, password);
 		if (!validPassword) {
-			return fail(400, {
-				message: 'Incorrect username or password'
-			});
+			console.log('no user, or wrong credentials');
+
+			return setError(form, 'Incorrect username or password');
 		}
 
 		const session = await lucia.createSession(existingUser.id, {});
@@ -65,7 +69,10 @@ export const actions: Actions = {
 			...sessionCookie.attributes
 		});
 
-		// redirect to the last page you were at or the default page
-		throw redirect(303, '/');
+		// Execute both return and redirect asynchronously
+		await Promise.all([
+			{ form },
+			redirect(303, '/') // Redirect to the desired page
+		]);
 	}
 };
