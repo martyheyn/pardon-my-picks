@@ -4,7 +4,6 @@ import { fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { message } from 'sveltekit-superforms';
 import { z } from 'zod';
 
 import type { Actions, PageServerLoad } from './$types';

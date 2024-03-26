@@ -3,48 +3,52 @@ import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
 import { generateId } from 'lucia';
 import { Argon2id } from 'oslo/password';
+import { setError, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
 
 import type { Actions, PageServerLoad } from './$types';
+
+const RegisterFormSchema = z.object({
+	username: z.string().min(6),
+	password: z.string().min(6),
+	confirmPassword: z.string().min(6)
+});
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
 		throw redirect(303, '/');
 	}
+
+	// initialize form
+	const form = await superValidate(zod(RegisterFormSchema));
+
+	return { form };
 };
 
 export const actions: Actions = {
 	default: async (event: any) => {
-		const formData = await event.request.formData();
-		const username = formData.get('username');
-		const password = formData.get('password');
-		const confirmPassword = formData.get('confirmPassword');
+		const form = await superValidate(event, zod(RegisterFormSchema));
 
-		// username must be between 4 ~ 31 characters
-		// keep in mind some database (e.g. mysql) are case insensitive
-		if (typeof username !== 'string' || username.length < 3 || username.length > 31) {
-			return fail(400, {
-				message: 'Invalid username'
-			});
+		const { username, password, confirmPassword } = form.data;
+
+		if (!form.valid) {
+			// Again, return { form } and things will just work.
+			return fail(400, { form });
 		}
+
 		const user = await prisma.user.findUnique({
 			where: {
 				username
 			}
 		});
+
 		if (user) {
-			return fail(400, {
-				message: 'Username is already taken'
-			});
+			return setError(form, 'Username is already taken');
 		}
-		if (typeof password !== 'string' || password.length < 6 || password.length > 99) {
-			return fail(400, {
-				message: 'Invalid password'
-			});
-		}
+
 		if (password !== confirmPassword) {
-			return fail(400, {
-				message: 'Password does not match'
-			});
+			return setError(form, 'Password does not match');
 		}
 
 		const userId = generateId(15);
@@ -68,6 +72,9 @@ export const actions: Actions = {
 		});
 
 		// redirect to the login page
-		throw redirect(302, '/login');
+		await Promise.all([
+			{ form },
+			redirect(303, '/') // Redirect to the desired page
+		]);
 	}
 };

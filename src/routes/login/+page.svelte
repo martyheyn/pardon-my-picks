@@ -5,10 +5,10 @@
 	import { superForm } from 'sveltekit-superforms';
 	import AlertFlash from '$lib/components/alert.svelte';
 	import type { Alert } from '$lib/utils/alert';
-
-	import { navigating } from '$app/stores';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
+
+	import { navigating } from '$app/stores';
 
 	export let data;
 
@@ -46,7 +46,7 @@
 				<AlertFlash />
 			</div>
 
-			<form class="flex flex-col gap-y-3 mt-3" method="post" use:enhance>
+			<form class="flex flex-col gap-y-2 mt-2" method="post" use:enhance>
 				<label for="username" class="block text-sm font-medium text-gray-600"
 					><span class="pl-[2px]">Username</span>
 					<input
