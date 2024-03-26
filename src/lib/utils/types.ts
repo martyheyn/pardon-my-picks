@@ -34,3 +34,8 @@ type Pick = {
 export type PickByPerson = {
 	[key: string]: Pick[];
 };
+
+export type Alert = {
+	text: string | undefined;
+	alertType: 'error' | 'success' | undefined;
+};

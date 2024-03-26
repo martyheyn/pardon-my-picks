@@ -4,7 +4,7 @@
 	import { fly, slide } from 'svelte/transition';
 	import { superForm } from 'sveltekit-superforms';
 	import AlertFlash from '$lib/components/alert.svelte';
-	import type { Alert } from '$lib/utils/alert';
+	import type { Alert } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 

@@ -2,7 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import type { Writable } from 'svelte/store';
 	import { getContext, onDestroy } from 'svelte';
-	import type { Alert } from '$lib/utils/alert';
+	import type { Alert } from '$lib/utils/types';
 
 	const alert: Writable<Alert> = getContext('alert');
 

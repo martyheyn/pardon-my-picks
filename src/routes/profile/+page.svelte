@@ -4,8 +4,7 @@
 	import type { PageData, ActionData } from './$types';
 	import { enhance } from '$app/forms';
 	import AlertFlash from '$lib/components/alert.svelte';
-	import type { Alert } from '$lib/utils/alert';
-	import { callAlert } from '$lib/utils/alert';
+	import type { Alert } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 	import { linear, quadInOut } from 'svelte/easing';

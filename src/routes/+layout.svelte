@@ -12,7 +12,7 @@
 
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
-	import type { Alert } from '$lib/utils/alert';
+	import type { Alert } from '$lib/utils/types';
 
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(18);

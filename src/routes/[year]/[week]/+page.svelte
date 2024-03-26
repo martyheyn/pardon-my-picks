@@ -13,8 +13,7 @@
 	import Race from '$lib/components/race.svelte';
 	import SpecialBet from '$lib/components/special-bet.svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
-	import type { Alert } from '$lib/utils/alert';
-	import { callAlert } from '$lib/utils/alert';
+	import type { Alert } from '$lib/utils/types';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -46,7 +45,6 @@
 			sortOrder[Object.keys(b)[0] as keyof typeof sortOrder]
 		);
 	});
-	// $: console.log('picksArr', picksArr);
 
 	// set height on pick description element to max-h of row
 
