@@ -31,7 +31,11 @@
 			visible = false;
 		} else {
 			visible = true; // show alert
-			if (ms > 0) timeout = window.setTimeout(() => (visible = false), ms); // and hide it after ms milliseconds
+			if (ms > 0)
+				timeout = window.setTimeout(() => {
+					alert.set({ text: undefined, alertType: undefined });
+					visible = false;
+				}, ms); // and hide it after ms milliseconds
 		}
 	};
 
