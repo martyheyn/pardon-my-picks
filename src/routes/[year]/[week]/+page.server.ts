@@ -44,10 +44,18 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
+		let pickId;
+		// santize id
+		try {
+			pickId = parseInt(id);
+		} catch (error) {
+			return fail(400, { message: 'Invalid request', success: false });
+		}
+
 		// check if user has already tailed this pick
 		const fade = await prisma.pick.findUnique({
 			where: {
-				id: parseInt(id),
+				id: pickId,
 				fade: {
 					some: {
 						userId: locals.user.id
@@ -64,7 +72,7 @@ export const actions: Actions = {
 			// check if the user has already tailed this pick
 			const tail = await prisma.pick.findUnique({
 				where: {
-					id: parseInt(id),
+					id: pickId,
 					tail: {
 						some: {
 							userId: locals.user.id
@@ -76,7 +84,7 @@ export const actions: Actions = {
 				await prisma.tail.delete({
 					where: {
 						userId: locals.user.id,
-						pickId: parseInt(id)
+						pickId: pickId
 					}
 				});
 			}
@@ -84,7 +92,7 @@ export const actions: Actions = {
 			await prisma.fade.create({
 				data: {
 					userId: locals.user.id,
-					pickId: parseInt(id)
+					pickId: pickId
 				}
 			});
 		} catch (error) {
@@ -112,10 +120,18 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
+		let pickId;
+		// santize id
+		try {
+			pickId = parseInt(id);
+		} catch (error) {
+			return fail(400, { message: 'Invalid request', success: false });
+		}
+
 		// check if user has already tailed this pick
 		const tail = await prisma.pick.findFirst({
 			where: {
-				id: parseInt(id),
+				id: pickId,
 				tail: {
 					some: {
 						userId: locals.user.id
@@ -132,7 +148,7 @@ export const actions: Actions = {
 			// check if the user has already tailed this pick
 			const fade = await prisma.pick.findUnique({
 				where: {
-					id: parseInt(id),
+					id: pickId,
 					fade: {
 						some: {
 							userId: locals.user.id
@@ -144,7 +160,7 @@ export const actions: Actions = {
 				await prisma.fade.delete({
 					where: {
 						userId: locals.user.id,
-						pickId: parseInt(id)
+						pickId: pickId
 					}
 				});
 			}
@@ -152,7 +168,7 @@ export const actions: Actions = {
 			await prisma.tail.create({
 				data: {
 					userId: locals.user.id,
-					pickId: parseInt(id)
+					pickId: pickId
 				}
 			});
 		} catch (error) {

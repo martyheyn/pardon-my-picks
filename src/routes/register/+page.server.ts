@@ -6,8 +6,22 @@ import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
+import { RateLimiter } from 'sveltekit-rate-limiter/server';
 
 import type { Actions, PageServerLoad } from './$types';
+
+const limiter = new RateLimiter({
+	// A rate is defined as [number, unit]
+	IP: [10, 'm'], // IP address limiter
+	IPUA: [10, 'm'], // IP + User Agent limiter
+	cookie: {
+		// Cookie limiter
+		name: 'limiterid', // Unique cookie name for this limiter
+		secret: 'SECRETKEY-SERVER-ONLY', // Use $env/static/private
+		rate: [10, 'm'],
+		preflight: true // Require preflight call (see load function)
+	}
+});
 
 const RegisterFormSchema = z.object({
 	username: z.string().min(6),
@@ -15,10 +29,12 @@ const RegisterFormSchema = z.object({
 	confirmPassword: z.string().min(6)
 });
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user) {
+export const load: PageServerLoad = async (event) => {
+	if (event.locals.user) {
 		throw redirect(303, '/');
 	}
+
+	await limiter.cookieLimiter?.preflight(event);
 
 	// initialize form
 	const form = await superValidate(zod(RegisterFormSchema));
@@ -29,6 +45,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async (event: any) => {
 		const form = await superValidate(event, zod(RegisterFormSchema));
+
+		// rate limiter: Every call to isLimited counts as a hit towards the rate limit for the event.
+		if (await limiter.isLimited(event)) {
+			return setError(form, 'You hit your rate limit. Try again later bud.');
+		}
 
 		const { username, password, confirmPassword } = form.data;
 

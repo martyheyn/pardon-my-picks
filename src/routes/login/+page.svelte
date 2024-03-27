@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { cubicOut } from 'svelte/easing';
 	import { fly, slide } from 'svelte/transition';
 	import { superForm } from 'sveltekit-superforms';
@@ -14,7 +13,9 @@
 
 	const alert: Writable<Alert> = getContext('alert');
 
-	const { form, errors } = superForm(data.form);
+	const { form, enhance, errors } = superForm(data.form, {
+		multipleSubmits: 'prevent'
+	});
 
 	$: if ($errors && $errors._errors) {
 		alert.set({

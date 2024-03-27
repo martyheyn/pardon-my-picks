@@ -78,6 +78,8 @@
 
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
+	// TODO: look deeper into if there is a more secure way to fade/tail picks,
+	// not sure if passing arguments through the url is the best way to do it
 </script>
 
 <svelte:head>
