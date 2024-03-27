@@ -23,6 +23,14 @@
 		});
 	}
 
+	let disableSubmit = false;
+	$: if ($errors && $errors._errors && $errors._errors[0].includes('rate limit')) {
+		disableSubmit = true;
+		setTimeout(() => {
+			disableSubmit = false;
+		}, 60000);
+	}
+
 	const lastPage = $navigating?.from?.route.id;
 </script>
 
@@ -102,9 +110,20 @@
 				</label>
 
 				<button
-					class="bg-primary dark:bg-[#1f1f1f] text-white py-2 mt-1 rounded-md hover:bg-primaryHover transition-all duration-200 ease-in-out"
-					type="submit">Sign Up</button
+					class={`${
+						!disableSubmit
+							? 'bg-primary hover:bg-primaryHover cursor-pointer'
+							: 'bg-gray-600 cursor-not-allowed'
+					} dark:bg-[#1f1f1f] text-white
+					 py-2 mt-1 rounded-md transition-all duration-200 ease-in-out`}
+					type="submit"
+					disabled={disableSubmit}>Sign Up</button
 				>
+				{#if disableSubmit}
+					<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
+						You have reached the maximum login attempts. Please try again in 1 minute.
+					</p>
+				{/if}
 
 				<p class="text-xs text-gray-500 flex gap-x-2">
 					Got an account already?
