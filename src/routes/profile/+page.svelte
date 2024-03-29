@@ -9,6 +9,8 @@
 	import { getContext } from 'svelte';
 	import { linear, quadInOut } from 'svelte/easing';
 
+	import blankAvatar from '$lib/assets/blank_avatar.png';
+
 	export let data: PageData;
 	export let form: ActionData;
 
@@ -67,6 +69,7 @@
 	<div class="border border-black border-opacity-50 w-28 h-28 rounded-full group">
 		<!-- <img src="" alt=""> -->
 		<div class="w-full h-full rounded-full relative overflow-hidden">
+			<img src={blankAvatar} alt="profile pic" class="w-full h-full opacity-70 z-0" />
 			<form
 				method="POST"
 				action="?/uploadPic"
@@ -78,7 +81,7 @@
 					for="avatar"
 					class="absolute -bottom-6 left-0 w-full h-1/2 bg-gray-300 bg-opacity-90 rounded-b-full
                     cursor-pointer opacity-0 group-hover:opacity-100 transition-all
-                    duration-300 ease-in-out translate-y-4 group-hover:translate-y-0"
+                    duration-300 ease-in-out translate-y-4 group-hover:translate-y-0 z-20"
 				>
 					<div class="w-full h-full flex justify-center mt-1">
 						<Icon
@@ -145,7 +148,7 @@
 					<label for="email" class="block text-sm font-medium text-gray-600">
 						<div class="flex justify-between items-center pr-2">
 							<span class="pl-1">Email</span>
-							<button on:click={() => (infoDisplayed = !infoDisplayed)}>
+							<button on:click={() => (infoDisplayed = !infoDisplayed)} type="button">
 								<Icon
 									class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full  hover:scale-110 `}
 									fillRule="evenodd"

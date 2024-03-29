@@ -89,8 +89,13 @@ export const actions: Actions = {
 			return setError(form, 'Incorrect username or password');
 		}
 
+		// secure flag for security duh
+		console.log('security', event.request.secure);
+
 		const session = await lucia.createSession(existingUser.id, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
+		sessionCookie.attributes.secure = true;
+		console.log('sessionCookie', sessionCookie);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.',
 			...sessionCookie.attributes
