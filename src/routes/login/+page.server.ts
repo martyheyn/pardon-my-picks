@@ -79,7 +79,7 @@ export const actions: Actions = {
 			// Since protecting against this is none-trivial,
 			// it is crucial your implementation is protected against brute-force attacks with login throttling etc.
 			// If usernames are public, you may outright tell the user that the username is invalid.
-			return fail(400, { form });
+			return setError(form, 'Incorrect username or password');
 		}
 
 		const validPassword = await new Argon2id().verify(existingUser.hashed_password, password);

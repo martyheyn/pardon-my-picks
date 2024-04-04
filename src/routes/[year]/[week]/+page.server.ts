@@ -13,6 +13,7 @@ const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
 export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
 
 export const load: PageServerLoad = async ({ params, locals }) => {
+	console.log('locals', locals);
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
 			week: parseInt(params.week),

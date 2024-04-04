@@ -22,8 +22,6 @@
 
 	$: ({ year, week } = $page.params);
 
-	$: console.log(picks);
-
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
 	const alert: Writable<Alert> = getContext('alert');
@@ -269,7 +267,7 @@
 																	? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
 																	: ''
 															} ${
-																pick.tail && pick.tail.some((obj) => obj.user_id === user?.id)
+																pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
 																	? 'fill-green-300 dark:fill-green-900 cursor-default'
 																	: 'fill-none'
 															}`}
@@ -297,7 +295,7 @@
 																	? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
 																	: ''
 															} ${
-																pick.fade && pick.fade.some((obj) => obj.user_id === user?.id)
+																pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
 																	? 'fill-red-300 dark:fill-red-900 cursor-default'
 																	: 'fill-none'
 															}`}

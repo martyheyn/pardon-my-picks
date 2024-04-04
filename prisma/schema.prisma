@@ -46,7 +46,8 @@ model User {
   createdAt       DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
   updatedAt       DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
   role            String   @default("user") @db.VarChar(191)
-  avatar          Avatar?
+  avatar          Avatar?  
+  session        Session[]
   tail            Tail[]
   fade            Fade[]
   picks           Pick[]
@@ -54,7 +55,8 @@ model User {
 
 model Session {
   id        String   @id @db.VarChar(191)
-  userId    String   @db.VarChar(191) @map("user_id")
+  user     User   @relation(fields: [userId], references: [id])
+  userId    String   @unique @db.VarChar(191) @map("user_id")
   expiresAt DateTime @db.Timestamptz(6) @map("expires_at")
 }
 

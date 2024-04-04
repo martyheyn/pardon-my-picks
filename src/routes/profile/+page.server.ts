@@ -14,8 +14,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 			id: locals.user.id
 		},
 		include: {
-			fades: true,
-			tails: true
+			fade: true,
+			tail: true
 		}
 	});
 
@@ -24,8 +24,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	// get the statsssss
-	const tails = existingUser.tails;
-	const fades = existingUser.fades;
+	const tails = existingUser.tail;
+	const fades = existingUser.fade;
 
 	return {
 		user: locals.user,

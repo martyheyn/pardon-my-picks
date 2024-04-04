@@ -48,8 +48,8 @@ export const load: PageServerLoad = async () => {
        COUNT(f.id) as total_fades,
        SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
 	   FROM "Pick" as p
-	   LEFT JOIN "Tail" as t ON p.id = t."pickId"
-	   LEFT JOIN "Fade" as f ON p.id = f."pickId"
+	   LEFT JOIN "Tail" as t ON p.id = t.pick_id
+	   LEFT JOIN "Fade" as f ON p.id = f.pick_id
 	   GROUP BY p.person;
 	`;
 
