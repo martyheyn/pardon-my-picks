@@ -1,4 +1,6 @@
-export const logo = {
+import type { $Enums } from '@prisma/client';
+
+export const logo: { [key: string]: string } = {
 	cardinals: '/nfl-team-logos/cardinals.png',
 	falcons: '/nfl-team-logos/falcons.png',
 	ravens: '/nfl-team-logos/ravens.png',
@@ -33,7 +35,7 @@ export const logo = {
 	commanders: '/nfl-team-logos/commanders.png'
 };
 
-export const teamLink = {
+export const teamLink: { [key: string]: string } = {
 	cardinals: 'https://www.espn.com/nfl/team/_/name/ari/arizona-cardinals',
 	falcons: 'https://www.espn.com/nfl/team/_/name/atl/atlanta-falcons',
 	ravens: 'https://www.espn.com/nfl/team/_/name/bal/baltimore-ravens',

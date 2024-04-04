@@ -15,8 +15,8 @@ type Pick = {
 	private: boolean;
 	type: string;
 	description: string;
-	homeTeam: $Enums.NflTeam;
-	awayTeam: $Enums.NflTeam;
+	homeTeam: $Enums.NFLTeam;
+	awayTeam: $Enums.NFLTeam;
 	homeTeamScore: number | null;
 	awayTeamScore: number | null;
 	winner: number | null;

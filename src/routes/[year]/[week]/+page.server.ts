@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
+import { generateId } from 'lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import { Prisma } from '@prisma/client';
@@ -47,7 +48,7 @@ export const actions: Actions = {
 		let pickId;
 		// santize id
 		try {
-			pickId = parseInt(id);
+			pickId = id;
 		} catch (error) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -91,6 +92,7 @@ export const actions: Actions = {
 
 			await prisma.fade.create({
 				data: {
+					id: generateId(15),
 					userId: locals.user.id,
 					pickId: pickId
 				}
@@ -123,7 +125,7 @@ export const actions: Actions = {
 		let pickId;
 		// santize id
 		try {
-			pickId = parseInt(id);
+			pickId = id;
 		} catch (error) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -167,6 +169,7 @@ export const actions: Actions = {
 
 			await prisma.tail.create({
 				data: {
+					id: generateId(15),
 					userId: locals.user.id,
 					pickId: pickId
 				}

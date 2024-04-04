@@ -1,109 +1,99 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Pick {
-  id              Int       @default(autoincrement()) @id
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  year            Int       @default(0)
-  show            String    @db.VarChar(255)
-  week            Int?      
-  person          String    @db.VarChar(255)
-  user            User?      @relation(fields: [userId], references: [id])
-  userId          String?    @db.VarChar(255)
-  private         Boolean   @default(false)
-  type            String    @db.VarChar(255)
-  description     String    @db.VarChar(255)
-  homeTeam        NflTeam 
-  awayTeam        NflTeam 
-  homeTeamScore   Int?
-  awayTeamScore   Int?
-  winner          Int?
-  push            Int?
-  gameDate        DateTime?
-  result          String?    @db.VarChar(255)
-  league          String    @db.VarChar(255)
-  betLink         String?    @db.VarChar(255)
-  espnLink        String?    @db.VarChar(255)
-  highlighLink    String?    @db.VarChar(255)
-  specialBet      String    @db.VarChar(255)
-  fade            Fade[]    
-  tail            Tail[]    
-  nerdNugget      String?    @db.VarChar(510)
-
-  @@index([userId])
+  id            String        @id @db.VarChar(191)
+  createdAt     DateTime?     @default(now()) @db.Timestamptz(6) @map("created_at")
+  updatedAt     DateTime?     @updatedAt @db.Timestamptz(6) @map("updated_at")
+  year          Int           @default(0)
+  show          String        @db.VarChar(191)
+  week          Int?
+  person        String        @db.VarChar(191)
+  type          String        @db.VarChar(191)
+  description   String        @db.VarChar(191)
+  homeTeam      NFLTeam       @map("home_team")
+  awayTeam      NFLTeam       @map("away_team")
+  homeTeamScore Int?          @map("home_team_score")
+  awayTeamScore Int?          @map("away_team_score")
+  winner        Int?
+  gameDate      DateTime?     @db.Timestamptz(6) @map("game_date")
+  result        String?       @db.VarChar(191)
+  league        String        @db.VarChar(191)
+  specialBet    String?       @db.VarChar(191) @map("special_bet")
+  nerdNugget    String?       @db.VarChar(510) @map("nerd_nugget")
+  push          Int?
+  betLink       String?       @db.VarChar(191) @map("bet_link")
+  espnLink      String?       @db.VarChar(191) @map("espn_link")
+  highlighLink  String?       @db.VarChar(191) @map("highlight_link")
+  private       Boolean       @default(false)
+  user          User?          @relation(fields: [userId], references: [id])
+  userId        String?        @db.VarChar(191) @unique @map("user_id")
+  fade          Fade[]
+  tail          Tail[]
 }
 
 model User {
-  id       String    @id
-  username String    @unique
-  email    String?    @unique
-  hashed_password String
-  avatar   Avatar?
-  fades    Fade[]
-  tails    Tail[]
-  picks    Pick[]
-  sessions Session[]
+  id              String   @id @db.VarChar(191)
+  username        String   @unique @db.VarChar(191)
+  hashed_password String   @db.VarChar(191)
+  email           String?  @unique @db.VarChar(191)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  updatedAt       DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
+  role            String   @default("user") @db.VarChar(191)
+  avatar          Avatar?
+  tail            Tail[]
+  fade            Fade[]
+  picks           Pick[]
 }
 
 model Session {
-  id        String   @id
-  userId    String
-  expiresAt DateTime
-  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
-
-  @@index([userId])
+  id        String   @id @db.VarChar(191)
+  userId    String   @db.VarChar(191) @map("user_id")
+  expiresAt DateTime @db.Timestamptz(6) @map("expires_at")
 }
 
 model Avatar {
-  id       Int      @default(autoincrement()) @id
-  size     Int
-  type     String
-  name     String
-  path     String
-  lastModified DateTime
-  user   User @relation(references: [id], fields: [userId])
-  userId String  @unique // relation scalar field (used in the `@relation` attribute above)
+  id           String   @id @db.VarChar(191)
+  size         Int
+  type         String   @db.VarChar(191)
+  name         String   @db.VarChar(191)
+  path         String   @db.VarChar(191)
+  lastModified DateTime @db.Timestamptz(6) @map("last_modified")
+  user         User   @relation(fields: [userId], references: [id])
+  userId       String   @unique @db.VarChar(191) @map("user_id")
 }
 
 model Fade {
-  id       Int      @default(autoincrement()) @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  pick     Pick     @relation(fields: [pickId], references: [id])
-  pickId   Int
-  winner   Boolean?
-  push     Boolean?
-
-  @@index([pickId])
+  id        String   @id @db.VarChar(191)
+  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  updatedAt DateTime @updatedAt @db.Timestamptz(6) @map("updated_at")
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String   @unique @db.VarChar(191) @map("user_id")
+  pick      Pick   @relation(fields: [pickId], references: [id])
+  pickId    String  @unique @db.VarChar(191) @map("pick_id")
+  winner    Boolean?
+  push      Boolean?
 }
 
 model Tail {
-  id       Int      @default(autoincrement()) @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique
-  pick     Pick     @relation(fields: [pickId], references: [id])
-  pickId   Int
-  winner   Boolean?
-  push     Boolean?
-
-  @@index([pickId])
+  id        String   @id @db.VarChar(191)
+  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+  updatedAt DateTime @updatedAt @db.Timestamptz(6) @map("updated_at")
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String   @unique @db.VarChar(191) @map("user_id")
+  pick      Pick   @relation(fields: [pickId], references: [id])
+  pickId    String @unique @db.VarChar(191) @map("pick_id")
+  winner    Boolean?
+  push      Boolean?
 }
 
-enum NflTeam {
+enum NFLTeam {
   cardinals
   falcons
   ravens
@@ -137,3 +127,4 @@ enum NflTeam {
   titans
   commanders
 }
+

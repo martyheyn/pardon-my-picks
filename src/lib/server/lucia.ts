@@ -1,4 +1,4 @@
-import { Lucia } from 'lucia';
+import { Lucia, TimeSpan } from 'lucia';
 import { dev } from '$app/environment';
 import { PrismaAdapter } from '@lucia-auth/adapter-prisma';
 import { prisma } from '$lib/server/prisma';
@@ -6,6 +6,7 @@ import { prisma } from '$lib/server/prisma';
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
+	sessionExpiresIn: new TimeSpan(60, 'd'),
 	sessionCookie: {
 		attributes: {
 			secure: !dev
