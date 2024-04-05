@@ -38,8 +38,8 @@
 	<div
 		class="max-w-sm bg-slate-300 bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
 		in:fly={{
-			x: lastPage === '/login' ? -100 : 0,
-			y: lastPage !== '/login' ? 50 : 0,
+			x: lastPage === '/login' || lastPage === '/reset-password' ? -100 : 0,
+			y: lastPage === '/login' || lastPage === '/reset-password' ? 0 : 50,
 			duration: 500,
 			delay: lastPage ? 100 : 500,
 			easing: cubicOut

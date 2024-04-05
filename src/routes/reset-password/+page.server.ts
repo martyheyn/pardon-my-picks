@@ -1,7 +1,6 @@
 import { lucia } from '$lib/server/lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
-import { generateId } from 'lucia';
 import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -23,10 +22,8 @@ const limiter = new RateLimiter({
 	}
 });
 
-const RegisterFormSchema = z.object({
-	username: z.string().min(6),
-	password: z.string().min(6),
-	confirmPassword: z.string().min(6)
+const ResetFormSchema = z.object({
+	email: z.string().email()
 });
 
 export const load: PageServerLoad = async (event) => {
@@ -37,67 +34,37 @@ export const load: PageServerLoad = async (event) => {
 	await limiter.cookieLimiter?.preflight(event);
 
 	// initialize form
-	const form = await superValidate(zod(RegisterFormSchema));
+	const form = await superValidate(zod(ResetFormSchema));
 
 	return { form };
 };
 
 export const actions: Actions = {
 	default: async (event: any) => {
-		const form = await superValidate(event, zod(RegisterFormSchema));
-
-		// check if the form is tries to manipulate the role
-		if ((form.data as any).role) {
-			return setError(form, 'Nope. Nice try. Blocking your IP brah.');
-		}
+		const form = await superValidate(event, zod(ResetFormSchema));
 
 		// rate limiter: Every call to isLimited counts as a hit towards the rate limit for the event.
 		if (await limiter.isLimited(event)) {
 			return setError(form, 'You hit your rate limit. Try again later bud.');
 		}
 
-		const { username, password, confirmPassword } = form.data;
+		const { email } = form.data;
 
 		if (!form.valid) {
 			// Again, return { form } and things will just work.
 			return fail(400, { form });
 		}
 
+		// check if user in the database
 		const user = await prisma.user.findUnique({
-			where: {
-				username
-			}
+			where: { email }
 		});
 
-		if (user) {
-			return setError(form, 'Username is already taken');
+		if (!user) {
+			return setError(form, 'Email not found');
 		}
 
-		if (password !== confirmPassword) {
-			return setError(form, 'Password does not match');
-		}
-
-		const userId = generateId(15);
-		const passwordHash = await new Argon2id().hash(password);
-
-		const userData = {
-			id: userId,
-			username: username,
-			hashed_password: passwordHash
-		};
-
-		await prisma.user.create({
-			data: userData
-		});
-
-		const session = await lucia.createSession(userId, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
-		});
-
-		// redirect to the login page
+		// Execute both return and redirect asynchronously
 		await Promise.all([
 			{ form },
 			redirect(303, '/') // Redirect to the desired page

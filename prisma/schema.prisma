@@ -53,6 +53,13 @@ model User {
   picks           Pick[]
 }
 
+// model PasswordRest {
+//   token_hash String   @unique @db.VarChar(191)
+//   user       User     @relation(fields: [userId], references: [id])
+//   userId     String   @db.VarChar(191) @map("user_id")
+//   expiresAt  DateTime @db.Timestamptz(6) @map("expires_at")
+// }
+
 model Session {
   id        String   @id @db.VarChar(191)
   user     User   @relation(fields: [userId], references: [id])

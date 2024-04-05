@@ -32,6 +32,7 @@
 		}, 60000);
 	}
 
+	// const { form, errors } = superForm(data.form);
 	const lastPage = $navigating?.from?.route.id;
 </script>
 
@@ -39,56 +40,39 @@
 	<div
 		class="max-w-sm bg-slate-300 bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
 		in:fly={{
-			x: lastPage === '/register' || lastPage === '/reset-password' ? 100 : 0,
-			y: lastPage === '/register' || lastPage === '/reset-password' ? 0 : 50,
+			x: lastPage === '/login' || lastPage === '/reset-password' ? -100 : 0,
+			y: 0,
 			duration: 500,
 			delay: lastPage ? 100 : 500,
 			easing: cubicOut
 		}}
 	>
-		<h2 class="text-xl font-header">Log In</h2>
+		<h2 class="text-xl font-header">Reset Password</h2>
 
 		<div class="font-paragraph mt-2">
-			<p class="text-sm">Log in to do stuff.</p>
+			<p class="text-sm">
+				If you entered your email into profile, enter it below to reset your password
+			</p>
 
 			<div class="pt-2">
 				<AlertFlash />
 			</div>
 
 			<form class="flex flex-col gap-y-2 mt-2" method="post" use:enhance>
-				<label for="username" class="block text-sm font-medium text-gray-600"
-					><span class="pl-[2px]">Username</span>
+				<label for="email" class="block text-sm font-medium text-gray-600"
+					><span class="pl-[2px]">Email</span>
 					<input
-						id="username"
-						name="username"
+						id="email"
+						name="email"
 						type="text"
 						class="mt-[2px] py-2 indent-2 border focus:outline-none
 						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
-						aria-invalid={$errors.username ? 'true' : undefined}
-						bind:value={$form.username}
+						aria-invalid={$errors.email ? 'true' : undefined}
+						bind:value={$form.email}
 					/>
-					{#if $errors.username}
+					{#if $errors.email}
 						<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
-							{$errors.username}
-						</p>
-					{/if}
-				</label>
-
-				<label for="password" class="block text-sm font-medium text-gray-600"
-					><span class="pl-[2px]">Password</span>
-					<input
-						id="password"
-						name="password"
-						type="password"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none
-						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out
-						"
-						aria-invalid={$errors.password ? 'true' : undefined}
-						bind:value={$form.password}
-					/>
-					{#if $errors.password}
-						<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
-							{$errors.password}
+							{$errors.email}
 						</p>
 					{/if}
 				</label>
@@ -101,11 +85,11 @@
 					} dark:bg-[#1f1f1f] text-white
 					 py-2 mt-1 rounded-md transition-all duration-200 ease-in-out`}
 					type="submit"
-					disabled={disableSubmit}>Log In</button
+					disabled={disableSubmit}>Send Reset Link</button
 				>
 				{#if disableSubmit}
 					<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
-						You have reached the maximum login attempts. Please try again in 1 minute.
+						You have reached the maximum attempts. Please try again in 1 minute.
 					</p>
 				{/if}
 
@@ -116,8 +100,8 @@
 					</p>
 
 					<p class="text-xs text-gray-500 flex gap-x-2">
-						Forgot your password?
-						<a href="/reset-password" class=""> <p class="text-blue-500">Reset Password</p></a>
+						Got an Account?
+						<a href="/login" class=""> <p class="text-blue-500">Log In</p></a>
 					</p>
 				</div>
 			</form>
