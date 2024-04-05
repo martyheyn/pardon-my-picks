@@ -13,7 +13,6 @@ const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
 export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	console.log('locals', locals);
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
 			week: parseInt(params.week),
@@ -33,20 +32,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 export const actions: Actions = {
 	fadePick: async ({ url, locals }) => {
-		// throw error if user is not logged in
-		if (!locals.user) {
-			return fail(401, {
-				message: 'Unauthorized!! Gotta create an account to fade a pick buddy',
-				success: false
-			});
-		}
-
 		const id = url.searchParams.get('id');
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let pickId;
+		let pickId: string;
 		// santize id
 		try {
 			pickId = id;
@@ -54,39 +45,46 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		// check if user has already tailed this pick
-		const fade = await prisma.pick.findUnique({
+		// throw error if user is not logged in
+		if (!locals.user) {
+			return fail(401, {
+				message: 'Unauthorized!! Gotta create an account to fade a pick buddy',
+				success: false,
+				pickId
+			});
+		}
+
+		// check if user has already faded this pick
+		const fade = await prisma.fade.findMany({
 			where: {
-				id: pickId,
-				fade: {
-					some: {
-						userId: locals.user.id
-					}
-				}
+				pickId: pickId,
+				userId: locals.user.id
 			}
 		});
 
-		if (fade) {
-			return fail(400, { message: 'You have already faded this pick bruv', success: false });
+		// unfade the pick if the user has already faded it
+		if (fade.length > 0) {
+			await prisma.fade.delete({
+				where: {
+					id: fade[0].id
+				}
+			});
+			return { pickId };
 		}
 
 		try {
 			// check if the user has already tailed this pick
-			const tail = await prisma.pick.findUnique({
+			// find the tailId using the pickId and userId
+			const tail = await prisma.tail.findMany({
 				where: {
-					id: pickId,
-					tail: {
-						some: {
-							userId: locals.user.id
-						}
-					}
+					pickId: pickId,
+					userId: locals.user.id
 				}
 			});
-			if (tail) {
+			if (tail.length > 0) {
 				await prisma.tail.delete({
 					where: {
-						userId: locals.user.id,
-						pickId: pickId
+						id: tail[0].id
 					}
 				});
 			}
@@ -100,30 +98,23 @@ export const actions: Actions = {
 			});
 		} catch (error) {
 			console.error('error', error);
-			return fail(500, { message: 'Error fading pick', success: false });
+			return fail(500, { message: 'Error fading pick', success: false, pickId });
 		}
 
 		return {
 			message: 'Faded! You faded this pick',
-			success: true
+			success: true,
+			pickId
 		};
 	},
 
 	tailPick: async ({ url, locals }) => {
-		// throw error if user is not logged in
-		if (!locals.user) {
-			return fail(401, {
-				message: 'Unauthorized!! Gotta create an account to tail a pick big dawg',
-				success: false
-			});
-		}
-
 		const id = url.searchParams.get('id');
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let pickId;
+		let pickId: string;
 		// santize id
 		try {
 			pickId = id;
@@ -131,39 +122,46 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
+		// throw error if user is not logged in
+		if (!locals.user) {
+			return fail(401, {
+				message: 'Unauthorized!! Gotta create an account to tail a pick big dawg',
+				success: false,
+				pickId
+			});
+		}
+
 		// check if user has already tailed this pick
-		const tail = await prisma.pick.findFirst({
+		const tail = await prisma.tail.findMany({
 			where: {
-				id: pickId,
-				tail: {
-					some: {
-						userId: locals.user.id
-					}
-				}
+				pickId: pickId,
+				userId: locals.user.id
 			}
 		});
 
-		if (tail) {
-			return fail(400, { message: 'You have already tailed this pick brohiem', success: false });
+		// untail the pick if the user has already tailed it
+		if (tail.length > 0) {
+			await prisma.tail.delete({
+				where: {
+					id: tail[0].id
+				}
+			});
+			return { pickId };
 		}
 
 		try {
-			// check if the user has already tailed this pick
-			const fade = await prisma.pick.findUnique({
+			// check if the user has already fadeed this pick
+			// find the fadeId using the pickId and userId
+			const fade = await prisma.fade.findMany({
 				where: {
-					id: pickId,
-					fade: {
-						some: {
-							userId: locals.user.id
-						}
-					}
+					pickId: pickId,
+					userId: locals.user.id
 				}
 			});
-			if (fade) {
+			if (fade.length > 0) {
 				await prisma.fade.delete({
 					where: {
-						userId: locals.user.id,
-						pickId: pickId
+						id: fade[0].id
 					}
 				});
 			}
@@ -177,12 +175,13 @@ export const actions: Actions = {
 			});
 		} catch (error) {
 			console.error('error', error);
-			return fail(500, { message: 'Error tailing pick', success: false });
+			return fail(500, { message: 'Error tailing pick', success: false, pickId });
 		}
 
 		return {
 			message: 'Tailed pick',
-			success: true
+			success: true,
+			pickId
 		};
 	}
 };

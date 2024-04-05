@@ -4,7 +4,7 @@ type Pick = {
 	tail?: Tail[] | null;
 	fade?: Fade[] | null;
 } & {
-	id: number;
+	id: string;
 	createdAt: Date;
 	updatedAt: Date;
 	year: number;

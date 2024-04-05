@@ -6,7 +6,7 @@ import { prisma } from '$lib/server/prisma';
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
-	// sessionExpiresIn: new TimeSpan(60, 'd'),
+	sessionExpiresIn: new TimeSpan(60, 'd'),
 	sessionCookie: {
 		attributes: {
 			secure: !dev
