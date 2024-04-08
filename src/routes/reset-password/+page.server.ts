@@ -1,8 +1,10 @@
 import { lucia } from '$lib/server/lucia';
-import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from 'oslo/password';
+import { TimeSpan, createDate } from 'oslo';
+import { generateId } from 'lucia';
 import { setError, superValidate } from 'sveltekit-superforms';
+import { prisma } from '$lib/server/prisma';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
@@ -55,13 +57,24 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		// check if user in the database
-		const user = await prisma.user.findUnique({
-			where: { email }
-		});
-
+		// Check if the user exists by email
+		const user = await prisma.user.findUnique({ where: { email } });
 		if (!user) {
-			return setError(form, 'Email not found');
+			return setError(form, 'No user found with that email.');
+		}
+
+		try {
+			console.log('reset password');
+			// optionally invalidate all existing tokens
+			const tokenId = generateId(40);
+			const tokenHash = await new Argon2id().hash(tokenId);
+			await prisma.user.update({
+				where: { email },
+				data: { resetToken: tokenHash, expiresAt: createDate(new TimeSpan(1, 'h')) }
+			});
+		} catch (error) {
+			console.error(error);
+			return setError(form, 'Something went wrong. Try again later.');
 		}
 
 		// Execute both return and redirect asynchronously

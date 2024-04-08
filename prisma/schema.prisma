@@ -46,6 +46,8 @@ model User {
   createdAt       DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
   updatedAt       DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
   role            String   @default("user") @db.VarChar(191)
+  resetToken      String?  @unique @db.VarChar(191) @map("reset_token")
+  expiresAt       DateTime? @db.Timestamptz(6) @map("expires_at")
   avatar          Avatar?  
   session        Session[]
   tail            Tail[]

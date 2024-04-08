@@ -24,6 +24,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	});
 
+	console.log('locals', locals);
+
 	return {
 		picks,
 		user: locals.user
