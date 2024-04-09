@@ -8,6 +8,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext } from 'svelte';
 	import { linear, quadInOut } from 'svelte/easing';
+	import { PUBLIC_AWS_CLOUDFRONT_DISTRO } from '$env/static/public';
 
 	import blankAvatar from '$lib/assets/blank_avatar.png';
 
@@ -21,8 +22,10 @@
 	let editting = false;
 	let infoDisplayed = false;
 	let disableSave = false;
-	let avatar;
-	let fileinput: HTMLInputElement;
+	let photoKey: string | undefined;
+	$: photoKey = user.avatar;
+
+	let avatar: File | undefined;
 
 	const handleEdit = () => {
 		disableSave = true;
@@ -34,21 +37,15 @@
 		}, 500);
 	};
 
-	const onFileSelected = (e: Event) => {
+	const onFileSelected = async (e: Event) => {
 		console.log('file selected', e);
 		let image = (e.target as HTMLInputElement)?.files?.[0];
 		if (!image) return;
+		avatar = image;
+	};
 
-		let reader = new FileReader();
-		reader.readAsDataURL(image);
-		reader.onload = (e) => {
-			avatar = image;
-		};
-
-		// submit the form
-		if (fileinput.form) {
-			fileinput.form.submit();
-		}
+	const updateProfilePic = () => {
+		avatar = undefined;
 	};
 
 	// update alert based on form response
@@ -66,66 +63,91 @@
 	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
 	out:fade={{ duration: 150, easing: linear }}
 >
-	<div class="border border-black border-opacity-50 w-28 h-28 rounded-full group">
+	<div class="flex flex-col gap-y-4">
 		<!-- <img src="" alt=""> -->
-		<div class="w-full h-full rounded-full relative overflow-hidden">
-			<img src={blankAvatar} alt="profile pic" class="w-full h-full opacity-70 z-0" />
-			<form
-				method="POST"
-				action="?/uploadPic"
-				use:enhance
-				enctype="multipart/form-data"
-				class="w-full h-full"
-			>
-				<label
-					for="avatar"
-					class="absolute -bottom-6 left-0 w-full h-1/2 bg-gray-300 bg-opacity-90 rounded-b-full
+		<form
+			method="POST"
+			action={`?/uploadPic`}
+			enctype="multipart/form-data"
+			use:enhance={updateProfilePic}
+			class="w-full h-full"
+		>
+			<div class="border border-black border-opacity-50 w-28 h-28 rounded-full group">
+				<div class="w-full h-full rounded-full relative overflow-hidden">
+					{#if photoKey}
+						<img
+							src={`${PUBLIC_AWS_CLOUDFRONT_DISTRO}${photoKey}`}
+							alt="profile picture"
+							class="w-full h-full object-cover z-10"
+							aria-hidden="true"
+						/>
+					{:else}
+						<img src={blankAvatar} alt="blank avatar" class="w-full h-full opacity-70 z-0" />
+					{/if}
+
+					<label
+						for="avatar"
+						class="absolute -bottom-6 left-0 w-full h-1/2 bg-gray-300 bg-opacity-90 rounded-b-full
                     cursor-pointer opacity-0 group-hover:opacity-100 transition-all
                     duration-300 ease-in-out translate-y-4 group-hover:translate-y-0 z-20"
+					>
+						<div class="w-full h-full flex justify-center mt-1">
+							<Icon
+								class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full ${
+									editting ? '' : 'hover:scale-110'
+								}`}
+								width="24px"
+								height="24px"
+								iconName="upload"
+							/>
+						</div>
+					</label>
+					<input
+						style="display:none"
+						id="avatar"
+						name="avatar"
+						disabled={editting}
+						type="file"
+						accept=".jpg, .jpeg, .png"
+						on:change={(e) => onFileSelected(e)}
+					/>
+					<input type="hidden" name="photoKey" id="photoKey" bind:value={photoKey} />
+				</div>
+			</div>
+
+			{#if avatar}
+				<button
+					in:fly={{ x: -40, duration: 300, delay: 100 }}
+					disabled={disableSave}
+					class={`mt-4 w-fit text-white z-20  ${
+						disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
+					} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
+					>Save Avatar</button
 				>
-					<div class="w-full h-full flex justify-center mt-1">
-						<Icon
-							class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full ${
-								editting ? '' : 'hover:scale-110'
-							}`}
-							width="24px"
-							height="24px"
-							iconName="upload"
-						/>
-					</div>
-				</label>
-				<input
-					style="display:none"
-					id="avatar"
-					name="avatar"
-					disabled={editting}
-					type="file"
-					accept=".jpg, .jpeg, .png"
-					on:change={(e) => onFileSelected(e)}
-					bind:this={fileinput}
-				/>
-			</form>
-		</div>
+			{/if}
+		</form>
 	</div>
+
+	{#if form?.uploadPic}
+		<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+			<AlertFlash />
+		</div>
+	{/if}
 
 	<div
 		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
 	>
-		<!-- add breadcrumb for when it saves correctly -->
-		<AlertFlash />
+		{#if !form?.uploadPic}
+			<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+				<AlertFlash />
+			</div>
+		{/if}
 
 		<div class="flex">
 			<h2 class="text-xl font-semibold">Profile Details</h2>
 		</div>
 
-		<form
-			method="POST"
-			action="?/updateUserData"
-			use:enhance={() => {
-				handleEdit();
-			}}
-			class="w-full h-full"
-		>
+		<form method="POST" action="?/updateUserData" use:enhance={handleEdit} class="w-full h-full">
 			<div class="w-full flex flex-row gap-x-8">
 				<div class="flex-1">
 					<label for="username" class="block text-sm font-medium text-gray-600">

@@ -48,7 +48,7 @@ model User {
   role            String   @default("user") @db.VarChar(191)
   resetToken      String?  @unique @db.VarChar(191) @map("reset_token")
   expiresAt       DateTime? @db.Timestamptz(6) @map("expires_at")
-  avatar          Avatar?  
+  avatar          String?  @db.VarChar(191)
   session        Session[]
   tail            Tail[]
   fade            Fade[]
@@ -67,17 +67,6 @@ model Session {
   user     User   @relation(fields: [userId], references: [id])
   userId    String   @unique @db.VarChar(191) @map("user_id")
   expiresAt DateTime @db.Timestamptz(6) @map("expires_at")
-}
-
-model Avatar {
-  id           String   @id @db.VarChar(191)
-  size         Int
-  type         String   @db.VarChar(191)
-  name         String   @db.VarChar(191)
-  path         String   @db.VarChar(191)
-  lastModified DateTime @db.Timestamptz(6) @map("last_modified")
-  user         User   @relation(fields: [userId], references: [id])
-  userId       String   @unique @db.VarChar(191) @map("user_id")
 }
 
 model Fade {
