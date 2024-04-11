@@ -179,11 +179,12 @@
 			</li>
 
 			<!-- Submenu -->
-			{#if navItem.subItemsOpen}
+			{#if navItem.subItemsOpen && navItem.subItems}
 				<div class="pt-.5 pl-2 w-full" transition:slide={{ duration: 400, easing: quintInOut }}>
 					{#each navItem.subItems as subItem}
 						<li
-							class={`w-full py-2 hover:text-yellow-400 transition-all duration-100 ease-linear relative font-paragraph ${
+							class={`w-full py-2 hover:text-yellow-400 flex justify-between items-center
+							transition-all duration-100 ease-linear relative font-paragraph ${
 								subItem.route === `/${$page.params.year}/${$page.params.week}`
 									? 'text-yellow-300'
 									: ''
@@ -200,7 +201,56 @@
 									</p>
 								</div>
 							</a>
+
+							{#if subItem.subItems}
+								<button
+									on:click={() => (subItem.subItemsOpen = !subItem.subItemsOpen)}
+									class={`${
+										$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'
+									} pr-3`}
+								>
+									<Icon
+										class={`${
+											subItem.subItemsOpen ? 'rotate-[270deg]' : 'rotate-90'
+										} transition-all duration-300 ease-in-out fill-none`}
+										width="20px"
+										height="20px"
+										iconName="arrow"
+									/>
+								</button>
+							{/if}
 						</li>
+
+						<!-- Submenu -->
+						{#if subItem.subItemsOpen && subItem.subItems}
+							<div
+								class="pt-.5 pl-2 w-full"
+								transition:slide={{ duration: 400, easing: quintInOut }}
+							>
+								{#each subItem.subItems as subSubItem}
+									<li
+										class={`w-full py-2 hover:text-yellow-400 flex justify-between items-center
+										transition-all duration-100 ease-linear relative font-paragraph ${
+											subSubItem.route === `/${$page.params.year}/${$page.params.week}`
+												? 'text-yellow-300'
+												: ''
+										}`}
+									>
+										<a
+											class={`w-full flex items-center justify-center no-underline transition-all duration-300 ease-in-out relative`}
+											href={subSubItem.route}
+											on:click={() => handleItemClick(navItem.label)}
+										>
+											<div class={`w-full flex items-cente lg:justify-between h-full pl-6`}>
+												<p class={``}>
+													<span class="px-3">-</span>{subSubItem.label}
+												</p>
+											</div>
+										</a>
+									</li>
+								{/each}
+							</div>
+						{/if}
 					{/each}
 				</div>
 			{/if}

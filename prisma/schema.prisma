@@ -8,89 +8,82 @@ datasource db {
 }
 
 model Pick {
-  id            String        @id @db.VarChar(191)
-  createdAt     DateTime?     @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt     DateTime?     @updatedAt @db.Timestamptz(6) @map("updated_at")
-  year          Int           @default(0)
-  show          String        @db.VarChar(191)
+  id            String    @id @db.VarChar(191)
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+  year          Int       @default(0)
+  show          String    @db.VarChar(191)
   week          Int?
-  person        String        @db.VarChar(191)
-  type          String        @db.VarChar(191)
-  description   String        @db.VarChar(191)
-  homeTeam      NFLTeam       @map("home_team")
-  awayTeam      NFLTeam       @map("away_team")
-  homeTeamScore Int?          @map("home_team_score")
-  awayTeamScore Int?          @map("away_team_score")
+  person        String    @db.VarChar(191)
+  type          String    @db.VarChar(191)
+  description   String    @db.VarChar(191)
+  homeTeam      NFLTeam   @map("home_team")
+  awayTeam      NFLTeam   @map("away_team")
+  homeTeamScore Int?      @map("home_team_score")
+  awayTeamScore Int?      @map("away_team_score")
   winner        Int?
-  gameDate      DateTime?     @db.Timestamptz(6) @map("game_date")
-  result        String?       @db.VarChar(191)
-  league        String        @db.VarChar(191)
-  specialBet    String?       @db.VarChar(191) @map("special_bet")
-  nerdNugget    String?       @db.VarChar(510) @map("nerd_nugget")
+  gameDate      DateTime? @map("game_date") @db.Timestamptz(6)
+  result        String?   @db.VarChar(191)
+  league        String    @db.VarChar(191)
+  specialBet    String?   @map("special_bet") @db.VarChar(191)
+  nerdNugget    String?   @map("nerd_nugget") @db.VarChar(510)
   push          Int?
-  betLink       String?       @db.VarChar(191) @map("bet_link")
-  espnLink      String?       @db.VarChar(191) @map("espn_link")
-  highlighLink  String?       @db.VarChar(191) @map("highlight_link")
-  private       Boolean       @default(false)
-  user          User?          @relation(fields: [userId], references: [id])
-  userId        String?        @db.VarChar(191) @unique @map("user_id")
+  betLink       String?   @map("bet_link") @db.VarChar(191)
+  espnLink      String?   @map("espn_link") @db.VarChar(191)
+  highlighLink  String?   @map("highlight_link") @db.VarChar(191)
+  private       Boolean   @default(false)
+  userId        String?   @unique @map("user_id") @db.VarChar(191)
   fade          Fade[]
+  user          User?     @relation(fields: [userId], references: [id])
   tail          Tail[]
 }
 
 model User {
-  id              String   @id @db.VarChar(191)
-  username        String   @unique @db.VarChar(191)
-  hashed_password String   @db.VarChar(191)
-  email           String?  @unique @db.VarChar(191)
-  createdAt       DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt       DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
-  role            String   @default("user") @db.VarChar(191)
-  resetToken      String?  @unique @db.VarChar(191) @map("reset_token")
-  expiresAt       DateTime? @db.Timestamptz(6) @map("expires_at")
-  avatar          String?  @db.VarChar(191)
-  session        Session[]
-  tail            Tail[]
+  id              String    @id @db.VarChar(191)
+  username        String    @unique @db.VarChar(191)
+  hashed_password String    @db.VarChar(191)
+  email           String?   @unique @db.VarChar(191)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  role            String    @default("user") @db.VarChar(191)
+  resetToken      String?   @unique @map("reset_token") @db.VarChar(191)
+  expiresAt       DateTime? @map("expires_at") @db.Timestamptz(6)
+  avatar          String?   @db.VarChar(191)
   fade            Fade[]
-  picks           Pick[]
+  picks           Pick?
+  session         Session?
+  tail            Tail[]
 }
-
-// model PasswordRest {
-//   token_hash String   @unique @db.VarChar(191)
-//   user       User     @relation(fields: [userId], references: [id])
-//   userId     String   @db.VarChar(191) @map("user_id")
-//   expiresAt  DateTime @db.Timestamptz(6) @map("expires_at")
-// }
 
 model Session {
   id        String   @id @db.VarChar(191)
-  user     User   @relation(fields: [userId], references: [id])
-  userId    String   @unique @db.VarChar(191) @map("user_id")
-  expiresAt DateTime @db.Timestamptz(6) @map("expires_at")
+  userId    String   @unique @map("user_id") @db.VarChar(191)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Fade {
   id        String   @id @db.VarChar(191)
-  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt DateTime @updatedAt @db.Timestamptz(6) @map("updated_at")
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.VarChar(191) @map("user_id")
-  pick      Pick     @relation(fields: [pickId], references: [id])
-  pickId    String   @db.VarChar(191) @map("pick_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  userId    String   @map("user_id") @db.VarChar(191)
+  pickId    String   @map("pick_id") @db.VarChar(191)
   winner    Boolean?
   push      Boolean?
+  pick      Pick     @relation(fields: [pickId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Tail {
   id        String   @id @db.VarChar(191)
-  createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt DateTime @updatedAt @db.Timestamptz(6) @map("updated_at")
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.VarChar(191) @map("user_id")
-  pick      Pick     @relation(fields: [pickId], references: [id])
-  pickId    String   @db.VarChar(191) @map("pick_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  userId    String   @map("user_id") @db.VarChar(191)
+  pickId    String   @map("pick_id") @db.VarChar(191)
   winner    Boolean?
   push      Boolean?
+  pick      Pick     @relation(fields: [pickId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 enum NFLTeam {
@@ -127,4 +120,3 @@ enum NFLTeam {
   titans
   commanders
 }
-
