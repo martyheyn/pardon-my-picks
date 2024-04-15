@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from './[year]/[week]/$types';
+import type { Actions, PageServerLoad } from './$types';
 import { generateId } from 'lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';

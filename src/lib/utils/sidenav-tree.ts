@@ -70,13 +70,6 @@ export const sideNavItems: sideNavItems = [
 				route: `/2023/1`,
 				subItems: yearRoute(2023),
 				subItemsOpen: false
-			},
-			{
-				label: '2022',
-				icon: 'calendar',
-				route: `/2022/1`,
-				subItems: yearRoute(2022),
-				subItemsOpen: false
 			}
 		],
 		subItemsOpen: false

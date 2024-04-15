@@ -63,9 +63,6 @@
 
 	let btnsDivWidth: number = 0;
 
-	// $: console.log('form data: ', form);
-	// $: console.log('picks', picks);
-
 	// alerts
 	$: if (form) {
 		alert.set({

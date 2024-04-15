@@ -11,10 +11,14 @@
 	import { fade, slide } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
 	import Icon from '$lib/components/icon.svelte';
+	import { enhance } from '$app/forms';
 
 	export let data: PageData;
+	export let form;
 
-	$: ({ typeBets, specialBets, personData } = data);
+	$: ({ typeBets, specialBets, personData } = form || data);
+
+	$: console.log('formData', form);
 
 	$: personData.sort((a, b) => {
 		return (
@@ -66,6 +70,20 @@
 	// modal
 	let showModal = false;
 	let profilePic = '';
+
+	// dropdown selector for stat aggregation
+	enum StatHeaders {
+		CURR_YEAR = '2023 NFL Season Stats',
+		ALLTIME = 'All Time Stats',
+		PREV_2023 = '2022 NFL Season Stats'
+	}
+	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
+	const selectStatHeaders: StatHeaders[] = [
+		StatHeaders.CURR_YEAR,
+		StatHeaders.ALLTIME,
+		StatHeaders.PREV_2023
+	];
+	let dropdownOpen = false;
 </script>
 
 <svelte:head>
@@ -83,7 +101,52 @@
 		<h1 class="font-header">Sabermetrics</h1>
 	</div>
 
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl my-6 font-paragraph">
+	<div
+		class="mt-2 text-lg rounded-md border border-black border-opacity-20
+		dark:border-white dark:border-opacity-100 shadow-lg w-fit
+		transition-all duration-300 ease-in-out"
+	>
+		<button
+			class={`w-full transition-all duration-300 ease-in-out py-2 pl-4 pr-2 flex gap-x-3 
+			justify-between border border-black border-opacity-20 group cursor-auto`}
+		>
+			<h2 class="">{selectedStat}</h2>
+			<button
+				class={`transition-all duration-300 ease-in-out opacity-0 -translate-y-2 
+				group-hover:opacity-100 group-hover:translate-y-0 cursor-pointer`}
+				on:click={() => (dropdownOpen = !dropdownOpen)}
+			>
+				<Icon
+					class={`${
+						dropdownOpen ? 'rotate-[270deg]' : 'rotate-90'
+					} transition-all duration-300 ease-in-out`}
+					width="28px"
+					height="28px"
+					iconName="arrow"
+				/>
+			</button>
+		</button>
+		{#if dropdownOpen}
+			<div
+				class={`transition-all duration-300 ease-in-out	flex flex-col text-left`}
+				transition:slide={{ duration: 300 }}
+			>
+				{#each selectStatHeaders.filter((stat) => stat !== selectedStat) as stat}
+					<form action="" method="POST" use:enhance class="w-full">
+						<button
+							class="w-full text-left py-2 px-4 border border-black border-opacity-20
+							hover:bg-gray-200 transition-all duration-300 ease-in-out"
+							type="submit"
+							on:click={() => (selectedStat = stat)}>{stat}</button
+						>
+						<input type="hidden" name="year" id="year" value={selectedStat} />
+					</form>
+				{/each}
+			</div>
+		{/if}
+	</div>
+
+	<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-4 mb-6 font-paragraph">
 		{#each personData as persona}
 			<div
 				class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg p-6 flex flex-col gap-y-2"
@@ -145,7 +208,7 @@
 						{#each getSpecialBets(persona.person) as bet, i}
 							<div class="flex flex-row gap-4 items-center">
 								<p class="text-[16px] leading-4">
-									{specialBetsLabel(bet.specialBet)}:
+									{specialBetsLabel(bet.specialBet || '')}:
 									<span class="text-lg font-semibold ml-2 leading-4"
 										>{bet._sum.winner} - {bet._sum.winner && bet._sum.push
 											? bet._count.winner - bet._sum.winner - bet._sum.push
@@ -157,7 +220,7 @@
 								</p>
 								<button
 									class=""
-									on:click={() => getSpecialBetDetails(bet.person, bet.specialBet, i)}
+									on:click={() => getSpecialBetDetails(bet.person, bet.specialBet || '', i)}
 								>
 									<Icon
 										class={`transition-all duration-300 ease-in-out fill-black cursor-pointer mt-[1px] ${
