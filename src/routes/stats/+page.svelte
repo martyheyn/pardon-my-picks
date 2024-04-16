@@ -18,13 +18,13 @@
 
 	$: ({ typeBets, specialBets, personData } = form || data);
 
-	$: console.log('formData', form);
-
 	$: personData.sort((a, b) => {
 		return (
 			sortOrder[a.person as keyof typeof sortOrder] - sortOrder[b.person as keyof typeof sortOrder]
 		);
 	});
+
+	const tableHeaders = ['2023 NFL Season', 'Spread', 'Totals'];
 
 	// TODO:: indexing would be more efficeint
 	// format
@@ -37,31 +37,46 @@
 		return betTypeStats.record;
 	};
 
-	// get specialBet by person
-	const getSpecialBets = (persona: string) => {
-		return specialBets.filter((bet) => bet.person === persona);
+	let specialBetOpen: string | undefined = undefined;
+	type SpecialBet = {
+		[person: string]: {
+			specialBet: string;
+			wins: number;
+			pushes: number;
+			totalGames: number;
+		}[];
 	};
 
-	let showSpecialBetDetials: { person: string; indx: number } | undefined;
-	let specialBetDetails: any;
+	// want this indexed so it can be easily accessed in the loop for jsx
+	$: specialBetsData = specialBets.reduce((acc: SpecialBet, bet: any) => {
+		const { person } = bet;
+		acc[person] = acc[person] || [];
+		const betData = {
+			specialBet: bet.specialBet,
+			wins: bet._sum.winner,
+			pushes: bet._sum.push,
+			totalGames: bet._count.winner
+		};
+		acc[person].push(betData);
+		return acc;
+	}, {});
 
-	const getSpecialBetDetails = async (person: string, specialBet: string, indx: number) => {
-		if (
-			showSpecialBetDetials &&
-			showSpecialBetDetials.person === person &&
-			showSpecialBetDetials.indx === indx
-		) {
-			showSpecialBetDetials = undefined;
-			return;
-		}
+	$: console.log(specialBetsData);
 
+	const getSpecialBetDetails = async (person: string, specialBet: string) => {
+		console.log(person, specialBet);
 		try {
 			const res = await fetch(`/api/special-bet-details?person=${person}&specialBet=${specialBet}`);
-			const data = await res.json();
+			const data: {
+				description: string;
+				person: string;
+				result: string;
+				week: number;
+			}[] = await res.json();
 
-			showSpecialBetDetials = { person, indx };
+			console.log(data);
 
-			specialBetDetails = data;
+			return data;
 		} catch (err) {
 			console.error(err);
 		}
@@ -185,76 +200,139 @@
 					>
 						{parseFloat(persona.record_pct).toFixed(1)}%
 					</p>
-					<p class=" text-[16px] leading-4">
-						2023 NFL Season:
-						<span class="text-lg font-semibold ml-2 leading-4">{persona.record}</span>
-					</p>
 
-					<p class="text-[16px] leading-4">
-						Spread:
-						<span class="text-lg font-semibold ml-2 leading-4"
-							>{getBetTypeStats(persona.person, 'spread')}</span
+					<div class="w-full overflow-x-auto rounded-md">
+						<table
+							class="w-full text-sm text-left rtl:text-right text-gray-600
+						dark:text-gray-300"
 						>
-					</p>
-
-					<p class="text-[16px] leading-4">
-						Totals:
-						<span class="text-lg font-semibold ml-2 leading-4"
-							>{getBetTypeStats(persona.person, 'totals')}</span
-						>
-					</p>
-
-					{#if getSpecialBets(persona.person)}
-						{#each getSpecialBets(persona.person) as bet, i}
-							<div class="flex flex-row gap-4 items-center">
-								<p class="text-[16px] leading-4">
-									{specialBetsLabel(bet.specialBet || '')}:
-									<span class="text-lg font-semibold ml-2 leading-4"
-										>{bet._sum.winner} - {bet._sum.winner && bet._sum.push
-											? bet._count.winner - bet._sum.winner - bet._sum.push
-											: bet._sum.winner !== null
-											? bet._count.winner - bet._sum.winner
-											: ''}
-										{bet._sum.push ? ` - ${bet._sum.push}` : ''}</span
-									>
-								</p>
-								<button
-									class=""
-									on:click={() => getSpecialBetDetails(bet.person, bet.specialBet || '', i)}
-								>
-									<Icon
-										class={`transition-all duration-300 ease-in-out fill-black cursor-pointer mt-[1px] ${
-											showSpecialBetDetials &&
-											showSpecialBetDetials.person === bet.person &&
-											showSpecialBetDetials.indx === i
-												? 'rotate-[270deg]'
-												: 'rotate-[90deg]'
-										}`}
-										width="16px"
-										height="16px"
-										iconName="arrow"
-									/>
-								</button>
-							</div>
-
-							{#if showSpecialBetDetials && showSpecialBetDetials.person === bet.person && showSpecialBetDetials.indx === i && specialBetDetails}
-								<div
-									class="flex flex-col gap-y-2 ml-2"
-									transition:slide={{ duration: 300, easing: quadInOut }}
-								>
-									{#each specialBetDetails as betDetail}
-										<a href={`/2023/${betDetail.week}`}>
-											<div class="flex flex-row gap-x-2">
-												<p class="font-semibold mr-1">Week {betDetail.week}:</p>
-												<p class="mr-1">{betDetail.description},</p>
-												<p class="">{betDetail.result}</p>
-											</div>
-										</a>
+							<thead
+								class="text-xs text-gray-700 uppercase bg-gray-200
+								dark:bg-gray-700 dark:text-gray-400"
+							>
+								<tr>
+									{#each tableHeaders as header}
+										<th scope="col" class="font-extrabold px-4 py-3">{header}</th>
 									{/each}
-								</div>
-							{/if}
-						{/each}
+									{#if specialBetsData[persona.person]}
+										<th scope="col" class="font-extrabold px-4 py-3">Special Bets</th>
+									{/if}
+									{#if parseInt(persona.total_tails) > 0}
+										<th scope="col" class="font-extrabold px-4 py-3">Tails</th>
+									{/if}
+									{#if parseInt(persona.total_fades) > 0}
+										<th scope="col" class="font-extrabold px-4 py-3">Fades</th>
+									{/if}
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-200
+							 	even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+								>
+									<th
+										scope="row"
+										class="min-w-[82px] px-4 py-3 font-medium text-black
+										whitespace-nowrap dark:text-white border">{persona.record}</th
+									>
+									<td class="min-w-[82px] px-4 py-3 border"
+										>{getBetTypeStats(persona.person, 'spread')}</td
+									>
+									<td class="min-w-[82px] px-4 py-3 border"
+										>{getBetTypeStats(persona.person, 'totals')}</td
+									>
+									{#if specialBetsData[persona.person]}
+										<td
+											class="min-w-[82px] px-4 py-3 cursor-pointer hover:bg-gray-100 hover:text-gray-700
+											dark:hover:bg-gray-700 transition-all duration-300 ease-in-out border"
+											on:click={() => (specialBetOpen = persona.person)}
+										>
+											{specialBetsData[persona.person].reduce((acc, obj) => acc + obj.wins, 0)} -
+											{specialBetsData[persona.person].reduce(
+												(acc, obj) => acc + obj.totalGames,
+												0
+											) -
+												specialBetsData[persona.person].reduce((acc, obj) => acc + obj.wins, 0) -
+												specialBetsData[persona.person].reduce((acc, obj) => acc + obj.pushes, 0)}
+											{specialBetsData[persona.person].reduce((acc, obj) => acc + obj.pushes, 0)
+												? ` - ${specialBetsData[persona.person].reduce(
+														(acc, obj) => acc + obj.pushes,
+														0
+												  )}`
+												: ''}
+										</td>
+									{/if}
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					{#if specialBetOpen === persona.person}
+						<div transition:slide={{ duration: 300 }}>
+							<div class="flex flex-row justify-between mt-2 px-1">
+								<h2 class="text-md">Special Bets</h2>
+								<button class="pr-3" on:click={() => (specialBetOpen = undefined)}>I</button>
+							</div>
+							<div class="w-full overflow-x-auto rounded-md">
+								<table
+									class="w-full text-sm text-left rtl:text-right text-gray-600
+							dark:text-gray-300"
+								>
+									<thead
+										class="text-xs text-gray-700 uppercase bg-gray-200
+								dark:bg-gray-700 dark:text-gray-400"
+									>
+										<th scope="col" class="font-extrabold px-4 py-3">Special Bet</th>
+										<th scope="col" class="font-extrabold px-4 py-3">Record</th>
+										<th scope="col" class="font-extrabold px-4 py-3">Results</th>
+									</thead>
+									<tbody>
+										{#each specialBetsData[persona.person] as bet}
+											<tr
+												class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
+							 				even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+											>
+												<th
+													scope="row"
+													class="min-w-[82px] px-4 py-3 font-medium text-black
+										whitespace-nowrap dark:text-white border">{bet.specialBet}</th
+												>
+												<td class="min-w-[82px] px-4 py-3 border font-semibold"
+													>{bet.wins} -
+													{bet.totalGames - bet.wins - bet.pushes}
+													{bet.pushes ? `- ${bet.pushes}` : ''}</td
+												>
+												<td class="min-w-[82px] px-4 py-3 border">
+													{#await getSpecialBetDetails(persona.person, bet.specialBet)}
+														<p>...Loading</p>
+													{:then data}
+														{#if data}
+															<div class="flex flex-col gap-y-4">
+																{#each data as betDetail}
+																	<div
+																		class="w-full flex justify-between items-center gap-x-4 text-xs"
+																	>
+																		<p class="w-1/3 font-semibold">{betDetail.description}</p>
+																		<p class="w-2/3">
+																			Week {betDetail.week}: {betDetail.result}
+																		</p>
+																	</div>
+																{/each}
+															</div>
+														{/if}
+													{:catch error}
+														<p>Error: {error.message}</p>
+													{/await}
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						</div>
 					{/if}
+
+					<!-- 
 
 					{#if parseInt(persona.total_tails) > 0}
 						<div class="flex gap-x-4">
@@ -297,6 +375,7 @@
 							</p>
 						</div>
 					{/if}
+					-->
 				</div>
 			</div>
 		{/each}

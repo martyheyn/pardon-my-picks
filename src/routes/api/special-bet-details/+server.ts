@@ -23,7 +23,6 @@ export async function GET({ url }: { url: URL }) {
 				person: person
 			}
 		});
-
 		return new Response(JSON.stringify(bets));
 	} catch (error) {
 		console.error(error);

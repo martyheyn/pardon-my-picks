@@ -87,6 +87,9 @@ export const load: PageServerLoad = async () => {
 		},
 		_count: {
 			winner: true
+		},
+		where: {
+			year: 2023
 		}
 	});
 
@@ -118,7 +121,8 @@ export const load: PageServerLoad = async () => {
 			where: {
 				specialBet: {
 					not: undefined || ''
-				}
+				},
+				year: 2023
 			}
 		})
 	};
