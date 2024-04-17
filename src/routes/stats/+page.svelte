@@ -374,15 +374,15 @@
 												>
 													<th
 														scope="row"
-														class="min-w-[82px] px-4 py-3 font-medium text-black
+														class="px-4 py-3 font-medium text-black
 										whitespace-nowrap dark:text-white border">{specialBetsLabelMap[bet.specialBet]}</th
 													>
-													<td class="min-w-[82px] px-4 py-3 border font-semibold"
+													<td class="px-4 py-3 border font-semibold"
 														>{bet.wins} -
 														{bet.totalGames - bet.wins - bet.pushes}
 														{bet.pushes ? `- ${bet.pushes}` : ''}</td
 													>
-													<td class="min-w-[82px] px-4 py-3 border">
+													<td class="min-w-[320px] px-4 py-3 border">
 														{#await getSpecialBetDetails(persona.person, bet.specialBet)}
 															<p>...Loading</p>
 														{:then data}
