@@ -4,8 +4,9 @@
 		personasLabelToslug,
 		personaAvatarPath,
 		sortOrder,
-		specialBetsLabel
+		specialBetsLabelMap
 	} from '$lib/utils/matching-format';
+	import type { SpecialBetKey } from '$lib/utils/matching-format';
 	import Race from '$lib/components/race.svelte';
 	import AvatarModal from '$lib/components/avatar-modal.svelte';
 	import { fade, slide } from 'svelte/transition';
@@ -26,9 +27,8 @@
 
 	const tableHeaders = ['2023 NFL Season', 'Spread', 'Totals'];
 
-	// TODO:: indexing would be more efficeint
-	// format
-	// { "Big Cat": { spread: '11 - 5 -3', total: '11 - 6' } }
+	// TODO:: indexing would be more efficeint format
+	// { "Big Cat": { spread: '11 - 5 -3', total: '11 - 6' } } on the server side
 	const getBetTypeStats = (persona: string, type: string) => {
 		const betTypeStats = typeBets.filter(
 			(spread) => spread.person === persona && spread.type === type
@@ -38,9 +38,12 @@
 	};
 
 	let specialBetOpen: string | undefined = undefined;
+	const handleSpecialBetOpen = (person: string) => {
+		specialBetOpen = specialBetOpen === person ? undefined : person;
+	};
 	type SpecialBet = {
 		[person: string]: {
-			specialBet: string;
+			specialBet: SpecialBetKey;
 			wins: number;
 			pushes: number;
 			totalGames: number;
@@ -61,10 +64,23 @@
 		return acc;
 	}, {});
 
-	$: console.log(specialBetsData);
+	const getSpecialBetRecord = (person: string) => {
+		const betRecord = specialBetsData[person].reduce(
+			(acc, bet) => {
+				acc.wins += bet.wins;
+				acc.pushes += bet.pushes;
+				acc.totalGames += bet.totalGames;
+				return acc;
+			},
+			{ wins: 0, pushes: 0, totalGames: 0 }
+		);
+
+		return `${betRecord.wins} -${betRecord.totalGames - betRecord.wins - betRecord.pushes} ${
+			betRecord.pushes ? `- ${betRecord.pushes}` : ''
+		}`;
+	};
 
 	const getSpecialBetDetails = async (person: string, specialBet: string) => {
-		console.log(person, specialBet);
 		try {
 			const res = await fetch(`/api/special-bet-details?person=${person}&specialBet=${specialBet}`);
 			const data: {
@@ -73,8 +89,6 @@
 				result: string;
 				week: number;
 			}[] = await res.json();
-
-			console.log(data);
 
 			return data;
 		} catch (err) {
@@ -152,7 +166,10 @@
 							class="w-full text-left py-2 px-4 border border-black border-opacity-20
 							hover:bg-gray-200 transition-all duration-300 ease-in-out"
 							type="submit"
-							on:click={() => (selectedStat = stat)}>{stat}</button
+							on:click={() => {
+								selectedStat = stat;
+								dropdownOpen = false;
+							}}>{stat}</button
 						>
 						<input type="hidden" name="year" id="year" value={selectedStat} />
 					</form>
@@ -214,9 +231,6 @@
 									{#each tableHeaders as header}
 										<th scope="col" class="font-extrabold px-4 py-3">{header}</th>
 									{/each}
-									{#if specialBetsData[persona.person]}
-										<th scope="col" class="font-extrabold px-4 py-3">Special Bets</th>
-									{/if}
 									{#if parseInt(persona.total_tails) > 0}
 										<th scope="col" class="font-extrabold px-4 py-3">Tails</th>
 									{/if}
@@ -241,141 +255,163 @@
 									<td class="min-w-[82px] px-4 py-3 border"
 										>{getBetTypeStats(persona.person, 'totals')}</td
 									>
-									{#if specialBetsData[persona.person]}
-										<td
-											class="min-w-[82px] px-4 py-3 cursor-pointer hover:bg-gray-100 hover:text-gray-700
-											dark:hover:bg-gray-700 transition-all duration-300 ease-in-out border"
-											on:click={() => (specialBetOpen = persona.person)}
-										>
-											{specialBetsData[persona.person].reduce((acc, obj) => acc + obj.wins, 0)} -
-											{specialBetsData[persona.person].reduce(
-												(acc, obj) => acc + obj.totalGames,
-												0
-											) -
-												specialBetsData[persona.person].reduce((acc, obj) => acc + obj.wins, 0) -
-												specialBetsData[persona.person].reduce((acc, obj) => acc + obj.pushes, 0)}
-											{specialBetsData[persona.person].reduce((acc, obj) => acc + obj.pushes, 0)
-												? ` - ${specialBetsData[persona.person].reduce(
-														(acc, obj) => acc + obj.pushes,
-														0
-												  )}`
-												: ''}
-										</td>
-									{/if}
 								</tr>
 							</tbody>
 						</table>
 					</div>
 
-					{#if specialBetOpen === persona.person}
+					{#if parseInt(persona.total_tails) > 0 || parseInt(persona.total_fades) > 0}
+						<div class="flex flex-row justify-start gap-x-3 mt-2 px-1">
+							<h2 class="text-md pl-1">Tail / Fade</h2>
+							<button class="pr-3">
+								<Icon
+									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[270deg]
+							 hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit`}
+									width="24px"
+									height="24px"
+									iconName="arrow"
+								/>
+							</button>
+						</div>
+						<!-- {#if specialBetOpen === persona.person} -->
 						<div transition:slide={{ duration: 300 }}>
-							<div class="flex flex-row justify-between mt-2 px-1">
-								<h2 class="text-md">Special Bets</h2>
-								<button class="pr-3" on:click={() => (specialBetOpen = undefined)}>I</button>
-							</div>
 							<div class="w-full overflow-x-auto rounded-md">
 								<table
 									class="w-full text-sm text-left rtl:text-right text-gray-600
-							dark:text-gray-300"
+										dark:text-gray-300"
 								>
 									<thead
 										class="text-xs text-gray-700 uppercase bg-gray-200
-								dark:bg-gray-700 dark:text-gray-400"
+										dark:bg-gray-700 dark:text-gray-400"
 									>
-										<th scope="col" class="font-extrabold px-4 py-3">Special Bet</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Record</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Results</th>
+										<th scope="col" class="font-extrabold px-4 py-3"># of times Tailed:</th>
+										<th scope="col" class="font-extrabold px-4 py-3">Tail win %:</th>
+										<th scope="col" class="font-extrabold px-4 py-3"># of times Faded</th>
+										<th scope="col" class="font-extrabold px-4 py-3">Fade win %:</th>
 									</thead>
 									<tbody>
-										{#each specialBetsData[persona.person] as bet}
-											<tr
-												class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
+										<tr
+											class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
 							 				even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+										>
+											<th
+												scope="row"
+												class="min-w-[82px] px-4 py-3 font-medium text-black
+										whitespace-nowrap dark:text-white border">{persona.total_tails}</th
 											>
-												<th
-													scope="row"
-													class="min-w-[82px] px-4 py-3 font-medium text-black
-										whitespace-nowrap dark:text-white border">{bet.specialBet}</th
+											<td class="min-w-[82px] px-4 py-3 border font-semibold"
+												><span
+													class={`text-lg font-semibold ml-2 leading-4 ${
+														parseInt(persona.tails_pct) > 50
+															? 'text-green-500 dark:text-green-300'
+															: parseInt(persona.tails_pct) < 50
+															? 'text-red-500 dark:text-red-300'
+															: 'text-yellow-500 dark:text-yellow-300'
+													}`}
+													>{persona.fades_pct === 'NaN'
+														? 'NA'
+														: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}</span
+												></td
+											>
+											<td class="min-w-[82px] px-4 py-3 border">{persona.total_fades}</td>
+											<td class="min-w-[82px] px-4 py-3 border">
+												<span
+													class={`text-lg font-semibold ml-2 leading-4 ${
+														parseInt(persona.fades_pct) > 50
+															? 'text-green-500 dark:text-green-300'
+															: parseInt(persona.fades_pct) < 50
+															? 'text-red-500 dark:text-red-300'
+															: 'text-yellow-500 dark:text-yellow-300'
+													}`}
+													>{persona.fades_pct === 'NaN'
+														? 'NA'
+														: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}</span
 												>
-												<td class="min-w-[82px] px-4 py-3 border font-semibold"
-													>{bet.wins} -
-													{bet.totalGames - bet.wins - bet.pushes}
-													{bet.pushes ? `- ${bet.pushes}` : ''}</td
-												>
-												<td class="min-w-[82px] px-4 py-3 border">
-													{#await getSpecialBetDetails(persona.person, bet.specialBet)}
-														<p>...Loading</p>
-													{:then data}
-														{#if data}
-															<div class="flex flex-col gap-y-4">
-																{#each data as betDetail}
-																	<div
-																		class="w-full flex justify-between items-center gap-x-4 text-xs"
-																	>
-																		<p class="w-1/3 font-semibold">{betDetail.description}</p>
-																		<p class="w-2/3">
-																			Week {betDetail.week}: {betDetail.result}
-																		</p>
-																	</div>
-																{/each}
-															</div>
-														{/if}
-													{:catch error}
-														<p>Error: {error.message}</p>
-													{/await}
-												</td>
-											</tr>
-										{/each}
+											</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>
 						</div>
+						<!-- {/if} -->
 					{/if}
 
-					<!-- 
-
-					{#if parseInt(persona.total_tails) > 0}
-						<div class="flex gap-x-4">
-							<p class=" text-[16px] leading-4">
-								# of times Tailed:
-								<span class="text-lg font-semibold ml-2 leading-4">{persona.total_tails}</span>
-							</p>
-							<p class=" text-[16px] leading-4">
-								Tail win %:
-								<span
-									class={`text-lg font-semibold ml-2 leading-4 ${
-										parseInt(persona.tails_pct) > 50
-											? 'text-green-500 dark:text-green-300'
-											: parseInt(persona.tails_pct) < 50
-											? 'text-red-500 dark:text-red-300'
-											: 'text-yellow-500 dark:text-yellow-300'
-									}`}>{persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</span
-								>
-							</p>
+					{#if specialBetsData[persona.person]}
+						<div class="flex flex-row justify-start gap-x-3 mt-2 px-1">
+							<h2 class="text-md pl-1">Special Bets</h2>
+							<p class="">{getSpecialBetRecord(persona.person)}</p>
+							<button class="pr-3" on:click={() => handleSpecialBetOpen(persona.person)}>
+								<Icon
+									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer
+							 	hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit
+								${specialBetOpen === persona.person ? 'rotate-[270deg]' : 'rotate-90'}`}
+									width="24px"
+									height="24px"
+									iconName="arrow"
+								/>
+							</button>
 						</div>
+						{#if specialBetOpen === persona.person}
+							<div transition:slide={{ duration: 300 }}>
+								<div class="w-full overflow-x-auto rounded-md">
+									<table
+										class="w-full text-sm text-left rtl:text-right text-gray-600
+										dark:text-gray-300"
+									>
+										<thead
+											class="text-xs text-gray-700 uppercase bg-gray-200
+										dark:bg-gray-700 dark:text-gray-400"
+										>
+											<th scope="col" class="font-extrabold px-4 py-3">Special Bet</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Record</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Results</th>
+										</thead>
+										<tbody>
+											{#each specialBetsData[persona.person] as bet}
+												<tr
+													class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
+							 				even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+												>
+													<th
+														scope="row"
+														class="min-w-[82px] px-4 py-3 font-medium text-black
+										whitespace-nowrap dark:text-white border">{specialBetsLabelMap[bet.specialBet]}</th
+													>
+													<td class="min-w-[82px] px-4 py-3 border font-semibold"
+														>{bet.wins} -
+														{bet.totalGames - bet.wins - bet.pushes}
+														{bet.pushes ? `- ${bet.pushes}` : ''}</td
+													>
+													<td class="min-w-[82px] px-4 py-3 border">
+														{#await getSpecialBetDetails(persona.person, bet.specialBet)}
+															<p>...Loading</p>
+														{:then data}
+															{#if data}
+																<div class="flex flex-col gap-y-4">
+																	{#each data as betDetail}
+																		<div
+																			class="w-full flex justify-between items-center gap-x-6 text-xs"
+																		>
+																			<p class="w-1/3 font-semibold">{betDetail.description}</p>
+																			<p class="w-2/3">
+																				Week {betDetail.week}: {betDetail.result}
+																			</p>
+																		</div>
+																	{/each}
+																</div>
+															{/if}
+														{:catch error}
+															<p>Error: {error.message}</p>
+														{/await}
+													</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						{/if}
 					{/if}
-
-					{#if parseInt(persona.total_fades) > 0}
-						<div class="flex gap-x-4">
-							<p class=" text-[16px] leading-4">
-								# of times Faded:
-								<span class="text-lg font-semibold ml-2 leading-4">{persona.total_fades}</span>
-							</p>
-							<p class=" text-[16px] leading-4">
-								Fade win %:
-								<span
-									class={`text-lg font-semibold ml-2 leading-4 ${
-										parseInt(persona.fades_pct) > 50
-											? 'text-green-500 dark:text-green-300'
-											: parseInt(persona.fades_pct) < 50
-											? 'text-red-500 dark:text-red-300'
-											: 'text-yellow-500 dark:text-yellow-300'
-									}`}>{persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}</span
-								>
-							</p>
-						</div>
-					{/if}
-					-->
 				</div>
 			</div>
 		{/each}

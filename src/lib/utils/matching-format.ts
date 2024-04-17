@@ -1,5 +1,3 @@
-import type { $Enums } from '@prisma/client';
-
 export const logo: { [key: string]: string } = {
 	cardinals: '/nfl-team-logos/cardinals.png',
 	falcons: '/nfl-team-logos/falcons.png',
@@ -193,21 +191,23 @@ export const sortOrder = {
 	Memes: 6
 };
 
-export const specialBetsLabel = (specialBet: string) => {
-	switch (specialBet) {
-		case 'lunder':
-			return "L'Under";
-		case 'timezone':
-			return 'Timezone';
-		case 'gameOfTheYear':
-			return 'Game of the Year';
-		case 'huh':
-			return 'Huh?';
-		case 'thanksgiving':
-			return 'Thanksgiving';
-		case 'holiday':
-			return 'Holiday';
-		default:
-			return "L'Under";
-	}
+export type SpecialBetKey =
+	| 'lunder'
+	| 'timezone'
+	| 'gameOfTheYear'
+	| 'huh'
+	| 'thanksgiving'
+	| 'holiday';
+
+type SpecialBetsLabelMap = {
+	[key in SpecialBetKey]: string;
+};
+
+export const specialBetsLabelMap: SpecialBetsLabelMap = {
+	lunder: "L'Under",
+	timezone: 'Timezone',
+	gameOfTheYear: 'Game of the Year',
+	huh: 'Huh?',
+	thanksgiving: 'Thanksgiving',
+	holiday: 'Holiday'
 };
