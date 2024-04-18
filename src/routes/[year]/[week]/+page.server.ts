@@ -24,7 +24,34 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	});
 
-	console.log('locals', locals);
+	// can only bet games for the next 4 days
+
+	// if the games have not started yet, get the odds
+	const date = new Date();
+
+	// this will be the end of Friday or early Sunday
+	// should it be hardcoded, it is not used anywhere else
+	// use 6 hours ahead to account for GMT time
+	const gamesStart = new Date('2024-04-20T06:00:00Z');
+
+	if (date < gamesStart) {
+		const commenceTimeTo =
+			new Date(date.setDate(date.getDate() + 3)).toISOString().split('.')[0] + 'Z';
+
+		// DO I want only draft kings? To start yes
+		// const odds = await fetch(
+		// 	`https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3&regions=us&markets=spreads,totals&oddsFormat=american&commenceTimeTo=${commenceTimeTo}`
+		// );
+		// const oddsData = await odds.json();
+		// console.log(oddsData);
+	} else {
+		// get live scores if the games have already started (americanfootball_nfl)
+		// const scores = await fetch(
+		// 	'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
+		// );
+		// const scoresData = await scores.json();
+		// console.log(scoresData);
+	}
 
 	return {
 		picks,
@@ -39,11 +66,8 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let pickId: string;
-		// santize id
-		try {
-			pickId = id;
-		} catch (error) {
+		let pickId: string = id;
+		if (!pickId) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
@@ -91,11 +115,20 @@ export const actions: Actions = {
 				});
 			}
 
+			// just for now, get the pick to fill in if its a winner or not
+			const pick = await prisma.pick.findUnique({
+				where: {
+					id: pickId
+				}
+			});
+
 			await prisma.fade.create({
 				data: {
 					id: generateId(15),
 					userId: locals.user.id,
-					pickId: pickId
+					pickId: pickId,
+					winner: pick?.winner ? false : true,
+					push: pick?.push && pick?.push === 1 ? true : false
 				}
 			});
 		} catch (error) {
@@ -116,11 +149,8 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let pickId: string;
-		// santize id
-		try {
-			pickId = id;
-		} catch (error) {
+		let pickId: string = id;
+		if (!pickId) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
@@ -168,11 +198,21 @@ export const actions: Actions = {
 				});
 			}
 
+			// just for now, get the pick to fill in if its a winner or not
+			const pick = await prisma.pick.findUnique({
+				where: {
+					id: pickId
+				}
+			});
+
+			// TODO:: make a function to go back and update the tail winner if the pick wins
 			await prisma.tail.create({
 				data: {
 					id: generateId(15),
 					userId: locals.user.id,
-					pickId: pickId
+					pickId: pickId,
+					winner: pick?.winner && pick?.winner === 1 ? true : false,
+					push: pick?.push && pick?.push === 1 ? true : false
 				}
 			});
 		} catch (error) {

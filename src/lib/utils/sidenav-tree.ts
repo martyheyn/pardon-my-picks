@@ -55,11 +55,6 @@ export const sideNavItems: sideNavItems = [
 		route: '/stats'
 	},
 	{
-		label: 'Profile',
-		icon: 'user',
-		route: '/profile'
-	},
-	{
 		label: 'History',
 		icon: 'history',
 		route: '/archive',
@@ -73,5 +68,10 @@ export const sideNavItems: sideNavItems = [
 			}
 		],
 		subItemsOpen: false
+	},
+	{
+		label: 'Profile',
+		icon: 'user',
+		route: '/profile'
 	}
 ];

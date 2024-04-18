@@ -178,7 +178,7 @@
 		{/if}
 	</div>
 
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-4 mb-6 font-paragraph">
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-4 mb-6 font-paragraph">
 		{#each personData as persona}
 			<div
 				class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg p-6 flex flex-col gap-y-2"
@@ -231,12 +231,6 @@
 									{#each tableHeaders as header}
 										<th scope="col" class="font-extrabold px-4 py-3">{header}</th>
 									{/each}
-									{#if parseInt(persona.total_tails) > 0}
-										<th scope="col" class="font-extrabold px-4 py-3">Tails</th>
-									{/if}
-									{#if parseInt(persona.total_fades) > 0}
-										<th scope="col" class="font-extrabold px-4 py-3">Fades</th>
-									{/if}
 								</tr>
 							</thead>
 							<tbody>
@@ -284,10 +278,10 @@
 										class="text-xs text-gray-700 uppercase bg-gray-200
 										dark:bg-gray-700 dark:text-gray-400"
 									>
-										<th scope="col" class="font-extrabold px-4 py-3"># of times Tailed:</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Tail win %:</th>
-										<th scope="col" class="font-extrabold px-4 py-3"># of times Faded</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Fade win %:</th>
+										<th scope="col" class="font-extrabold px-4 py-3"># Tailed</th>
+										<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
+										<th scope="col" class="font-extrabold px-4 py-3"># Faded</th>
+										<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
 									</thead>
 									<tbody>
 										<tr
@@ -296,37 +290,34 @@
 										>
 											<th
 												scope="row"
-												class="min-w-[82px] px-4 py-3 font-medium text-black
+												class="px-4 py-3 font-medium text-black
 										whitespace-nowrap dark:text-white border">{persona.total_tails}</th
 											>
-											<td class="min-w-[82px] px-4 py-3 border font-semibold"
-												><span
-													class={`text-lg font-semibold ml-2 leading-4 ${
-														parseInt(persona.tails_pct) > 50
-															? 'text-green-500 dark:text-green-300'
-															: parseInt(persona.tails_pct) < 50
-															? 'text-red-500 dark:text-red-300'
-															: 'text-yellow-500 dark:text-yellow-300'
-													}`}
-													>{persona.fades_pct === 'NaN'
-														? 'NA'
-														: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}</span
-												></td
+											<td
+												class={`text-sm font-semibold leading-4 ${
+													parseInt(persona.tails_pct) > 50
+														? 'text-green-500 dark:text-green-300'
+														: parseInt(persona.tails_pct) < 50
+														? 'text-red-500 dark:text-red-300'
+														: 'text-yellow-500 dark:text-yellow-300'
+												} px-4 py-3 border`}
+												>{persona.tails_pct === 'NaN'
+													? 'NA'
+													: persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</td
 											>
-											<td class="min-w-[82px] px-4 py-3 border">{persona.total_fades}</td>
-											<td class="min-w-[82px] px-4 py-3 border">
-												<span
-													class={`text-lg font-semibold ml-2 leading-4 ${
-														parseInt(persona.fades_pct) > 50
-															? 'text-green-500 dark:text-green-300'
-															: parseInt(persona.fades_pct) < 50
-															? 'text-red-500 dark:text-red-300'
-															: 'text-yellow-500 dark:text-yellow-300'
-													}`}
-													>{persona.fades_pct === 'NaN'
-														? 'NA'
-														: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}</span
-												>
+											<td class="px-4 py-3 border">{persona.total_fades}</td>
+											<td
+												class={`text-sm font-semibold leading-4 ${
+													parseInt(persona.fades_pct) > 50
+														? 'text-green-500 dark:text-green-300'
+														: parseInt(persona.fades_pct) < 50
+														? 'text-red-500 dark:text-red-300'
+														: 'text-yellow-500 dark:text-yellow-300'
+												} px-4 py-3 border`}
+											>
+												{persona.fades_pct === 'NaN'
+													? 'NA'
+													: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}
 											</td>
 										</tr>
 									</tbody>

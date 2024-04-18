@@ -272,7 +272,7 @@
 																		: ''
 																} ${
 																	pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
-																		? 'fill-green-300 dark:fill-green-900 cursor-default'
+																		? 'fill-green-300 dark:fill-green-900'
 																		: 'fill-none'
 																}`}
 																width="24px"
@@ -298,7 +298,7 @@
 																		: ''
 																} ${
 																	pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
-																		? 'fill-red-300 dark:fill-red-900 cursor-default'
+																		? 'fill-red-300 dark:fill-red-900'
 																		: 'fill-none'
 																}`}
 																width="24px"
