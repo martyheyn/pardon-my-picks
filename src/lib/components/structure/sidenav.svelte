@@ -122,7 +122,7 @@
 		{#each sideNavItems as navItem}
 			<li
 				class={`${
-					navItem.label === 'Profile' && !user ? 'hidden' : 'block'
+					(navItem.label === 'Profile' || navItem.label === 'PickEm') && !user ? 'hidden' : 'block'
 				} w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative 
 				group flex justify-between items-center h-full font-header`}
 			>
@@ -142,8 +142,12 @@
 					/>
 
 					<Icon
-						class="text-base w-8 min-w-[2rem] my-2 text-center cursor-pointer fill-none"
+						class={`text-base w-8 min-w-[2rem] my-2 text-center cursor-pointer ${
+							navItem.label === 'PickEm' ? 'fill-white' : 'fill-none'
+						}`}
 						iconName={navItem.icon}
+						fillRule="evenodd"
+						clipRule="evenodd"
 						width="32px"
 						height="32px"
 					/>

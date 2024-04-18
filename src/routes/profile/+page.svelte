@@ -210,18 +210,13 @@
 						in:fly={{ x: -40, duration: 300, delay: 750 }}
 						on:click={handleEdit}
 						disabled={disableSave}
-						class={`mt-4 w-fit text-white ${
-							disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
-						} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
-						>Edit Profile</button
+						class={`mt-4 ${disableSave && 'bg-gray-400'} btn-primary`}>Edit Profile</button
 					>
 				{:else}
 					<button
 						in:fly={{ x: 40, duration: 300, delay: 100 }}
 						disabled={disableSave}
-						class={`mt-4 w-fit text-white ${
-							disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
-						} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
+						class={`mt-4 w-fit text-white ${disableSave && 'bg-gray-400'} btn-primary`}
 						>Save Profile</button
 					>
 				{/if}

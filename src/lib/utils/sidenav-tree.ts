@@ -50,6 +50,11 @@ export const sideNavItems: sideNavItems = [
 		subItemsOpen: false
 	},
 	{
+		label: 'PickEm',
+		icon: 'football',
+		route: '/pickem'
+	},
+	{
 		label: 'Stats',
 		icon: 'stats',
 		route: '/stats'

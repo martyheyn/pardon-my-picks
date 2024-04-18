@@ -85,10 +85,13 @@
 
 <div class="" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
-		class="flex justify-start items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
+		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
 	>
 		<h1 class="font-header">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
+		{#if user}
+			<a href="/picks" class="btn-primary">Make your picks</a>
+		{/if}
 	</div>
 
 	{#if form && !form.pickId}
@@ -116,12 +119,7 @@
 				>
 					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 						{#key week}
-							<div
-								class="rounded-md border border-black border-opacity-20 dark:border-white
-								 dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col
-								 gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out"
-								in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
-							>
+							<div class="card" in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}>
 								<div class="">
 									<h4
 										class={`min-h-[56px] text-lg shadow-lg dark:text-white ${

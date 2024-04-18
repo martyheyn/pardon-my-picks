@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+	.card {
+		@apply rounded-md border border-black border-opacity-20 dark:border-white 
+		dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col
+		gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out;
+	}
+
+	.btn-primary {
+		@apply bg-primary hover:bg-primaryHover w-fit text-white text-base border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out;
+	}
+}
+
 @layer utilities {
 	/* Hide scrollbar for Chrome, Safari and Opera */
 	.no-scrollbar::-webkit-scrollbar {
