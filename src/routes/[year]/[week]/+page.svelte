@@ -18,7 +18,7 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: ({ picks, user } = data);
+	$: ({ picks, user, scores } = data);
 
 	$: ({ year, week } = $page.params);
 
@@ -46,11 +46,6 @@
 		);
 	});
 
-	// set height on pick description element to max-h of row
-
-	// get todays datetime to compare to game datetime
-	const now = new Date();
-
 	let showNerdNug: { person: string; indx: number } | undefined;
 
 	const toggleNerdNug = (person: string, indx: number) => {
@@ -63,13 +58,38 @@
 
 	let btnsDivWidth: number = 0;
 
+	// call live-scores api server every minute to get the latest scores, only call if gametime
+	// only call if the current time is after the current gameTime
+	// TODO:: stop calling once the game is over
+	// this can come from the winner function I will have to create, this will be called at the end of a game,
+	//  maybe based off the response from the odds api
+
+	// what if an attacker updates the time so that this function is called a billion times
+	const updateScore = () => {
+		setInterval(async () => {
+			const res = await fetch('/api/live-scores');
+			const data = await res.json();
+			console.log(data);
+		}, 30000);
+
+		// if final then call serverside to declare winner
+		// would get alot of calls from client, only need 1
+		// if(pick.winner === null) {fetch('/api/declare-winner')}
+	};
+
+	$: console.log('scores', scores);
+
+	const updateAlert = () => {
+		if (form) {
+			alert.set({
+				text: form.message,
+				alertType: form.success ? 'success' : 'error'
+			});
+		}
+		return;
+	};
 	// alerts
-	$: if (form) {
-		alert.set({
-			text: form.message,
-			alertType: form.success ? 'success' : 'error'
-		});
-	}
+	$: form, updateAlert();
 
 	$: alertBool = $alert.text ? true : false;
 
@@ -77,6 +97,7 @@
 	// TODO: clean up logic making data reactive
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
 	// not sure if passing arguments through the url is the best way to do it
+	// do it as a form so it can have a zod schema
 </script>
 
 <svelte:head>

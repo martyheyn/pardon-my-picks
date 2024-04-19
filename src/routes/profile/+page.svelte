@@ -50,12 +50,17 @@
 
 	// update alert based on form response
 	// TODO:: clean this up, maybe put it in a function somewhere else
-	$: if (form) {
-		alert.set({
-			text: form.message,
-			alertType: form.success ? 'success' : 'error'
-		});
-	}
+	const updateAlert = () => {
+		if (form) {
+			alert.set({
+				text: form.message,
+				alertType: form.success ? 'success' : 'error'
+			});
+		}
+		return;
+	};
+	// alerts
+	$: form, updateAlert();
 </script>
 
 <div

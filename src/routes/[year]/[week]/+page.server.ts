@@ -32,30 +32,33 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const gamesStart = new Date('2024-04-20T06:00:00Z');
+	const gamesStart = new Date('2024-04-17T22:00:00Z');
 
-	if (date < gamesStart) {
-		const commenceTimeTo =
-			new Date(date.setDate(date.getDate() + 3)).toISOString().split('.')[0] + 'Z';
+	// TODO: get scores type
+	let scoresData: any;
+	// const commenceTimeTo =
+	// 	new Date(date.setDate(date.getDate() + 3)).toISOString().split('.')[0] + 'Z';
 
-		// DO I want only draft kings? To start yes
-		// const odds = await fetch(
-		// 	`https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3&regions=us&markets=spreads,totals&oddsFormat=american&commenceTimeTo=${commenceTimeTo}`
-		// );
-		// const oddsData = await odds.json();
-		// console.log(oddsData);
-	} else {
+	// DO I want only draft kings? To start yes
+	// const odds = await fetch(
+	// 	`https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3&regions=us&markets=spreads,totals&oddsFormat=american&commenceTimeTo=${commenceTimeTo}`
+	// );
+	// const oddsData = await odds.json();
+	// console.log(oddsData);
+
+	// odds data will be called on another page
+	if (gamesStart < date) {
 		// get live scores if the games have already started (americanfootball_nfl)
 		// const scores = await fetch(
 		// 	'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
 		// );
-		// const scoresData = await scores.json();
-		// console.log(scoresData);
+		// scoresData = await scores.json();
 	}
 
 	return {
 		picks,
-		user: locals.user
+		user: locals.user,
+		scores: scoresData
 	};
 };
 
