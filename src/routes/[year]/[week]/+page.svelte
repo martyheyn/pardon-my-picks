@@ -60,13 +60,12 @@
 
 	let btnsDivWidth: number = 0;
 
-	// call live-scores api server every minute to get the latest scores, only call if gametime
-	// only call if the current time is after the current gameTime
-	// TODO:: stop calling once the game is over
+	// call live-scores api server every minute to get the latest scores, only call if is live
+	// pick is only called when the game is live
 	// this can come from the winner function I will have to create, this will be called at the end of a game,
 	//  maybe based off the response from the odds api
 
-	// what if an attacker updates the time so that this function is called a billion times
+	// check security to make sure this function is not called a billion times
 	const updateScore = (pickid: string, homeAway: 'home' | 'away') => {
 		console.log('Updating the score!');
 		// only call this if the game is currently happening, aka score is not null
@@ -86,7 +85,6 @@
 
 		// if final then call serverside to declare winner
 		// would get alot of calls from client, only need 1
-		// if(pick.winner === null) {fetch('/api/declare-winner')}
 	};
 
 	const updateAlert = () => {

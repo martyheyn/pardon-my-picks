@@ -9,7 +9,6 @@ import type { Scores } from '$lib/utils/types';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }: { request: Request }) {
-	console.log('request', request);
 	const { pickId, homeAway } = await request.json();
 
 	// if pick add homeScore and awayScore to pick
@@ -40,6 +39,8 @@ export async function POST({ request }: { request: Request }) {
 			pick.homeTeam ===
 			game.home_team.split(' ')[game.home_team.split(' ').length - 1].toLowerCase()
 		) {
+			console.log('game', game);
+
 			const homeTeamLiveScore =
 				game.scores?.find(
 					(score) =>
@@ -59,7 +60,9 @@ export async function POST({ request }: { request: Request }) {
 					},
 					data: {
 						homeTeamScore: parseInt(homeTeamLiveScore || pick.homeTeamScore!.toString()),
-						awayTeamScore: parseInt(awayTeamLiveScore || pick.awayTeamScore!.toString())
+						awayTeamScore: parseInt(awayTeamLiveScore || pick.awayTeamScore!.toString()),
+						// check if game is still live to stop function
+						isLive: game.completed ? false : true
 					}
 				});
 			} catch (error) {
