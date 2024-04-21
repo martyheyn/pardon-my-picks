@@ -3,6 +3,7 @@ import { generateId } from 'lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
+import { ODDS_API_KEY } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
@@ -30,7 +31,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	if (date > gameStart && date < gameEnd) {
 		// get live scores if the games have already started (americanfootball_nfl)
 		const scores = await fetch(
-			'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
+			`https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
 		);
 		const scoresDataRaw: Scores[] = await scores.json();
 		console.log('scoresDataRaw', scoresDataRaw);
