@@ -2,15 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { generateId } from 'lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
-import { Prisma } from '@prisma/client';
-
-const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
-	include: {
-		tail: true,
-		fade: true
-	}
-});
-export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
+import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
@@ -32,33 +24,39 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const gamesStart = new Date('2024-04-17T22:00:00Z');
+	const gameStart = new Date('2024-04-20T22:00:00Z');
+	const gameEnd = new Date('2024-04-22T22:00:00Z');
 
-	// TODO: get scores type
-	let scoresData: any;
-	// const commenceTimeTo =
-	// 	new Date(date.setDate(date.getDate() + 3)).toISOString().split('.')[0] + 'Z';
-
-	// DO I want only draft kings? To start yes
-	// const odds = await fetch(
-	// 	`https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3&regions=us&markets=spreads,totals&oddsFormat=american&commenceTimeTo=${commenceTimeTo}`
-	// );
-	// const oddsData = await odds.json();
-	// console.log(oddsData);
-
-	// odds data will be called on another page
-	if (gamesStart < date) {
+	if (date > gameStart && date < gameEnd) {
 		// get live scores if the games have already started (americanfootball_nfl)
-		// const scores = await fetch(
-		// 	'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
-		// );
-		// scoresData = await scores.json();
+		const scores = await fetch(
+			'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
+		);
+		const scoresDataRaw: Scores[] = await scores.json();
+		console.log('scoresDataRaw', scoresDataRaw);
+
+		// only pull games that are currently being played
+		const scoresLive: Scores[] = scoresDataRaw.filter(
+			(game: Scores) => game.scores !== null && game.completed === false
+		);
+		console.log('scoresLive', scoresLive);
+
+		// console.log('scoresNonNull', scoresLive);
+		scoresLive.map((game: Scores) => {
+			picks.map((pick) => {
+				if (
+					pick.homeTeam ===
+					game.home_team.split(' ')[game.home_team.split(' ').length - 1].toLowerCase()
+				) {
+					pick.isLive = true;
+				}
+			});
+		});
 	}
 
 	return {
 		picks,
-		user: locals.user,
-		scores: scoresData
+		user: locals.user
 	};
 };
 

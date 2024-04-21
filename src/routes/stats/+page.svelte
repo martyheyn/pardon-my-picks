@@ -180,10 +180,7 @@
 
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-4 mb-6 font-paragraph">
 		{#each personData as persona}
-			<div
-				class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg p-6 flex flex-col gap-y-2"
-				id={personasLabelToslug(persona.person)}
-			>
+			<div class="card" id={personasLabelToslug(persona.person)}>
 				<div class="flex justify-between items-start">
 					<a
 						href="/stats/{personasLabelToslug(persona.person)}"

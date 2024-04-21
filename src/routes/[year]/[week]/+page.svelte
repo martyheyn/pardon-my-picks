@@ -18,7 +18,9 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: ({ picks, user, scores } = data);
+	$: ({ picks, user } = data);
+	$: console.log('picks', picks);
+	// change back to packers home, bears away
 
 	$: ({ year, week } = $page.params);
 
@@ -65,19 +67,27 @@
 	//  maybe based off the response from the odds api
 
 	// what if an attacker updates the time so that this function is called a billion times
-	const updateScore = () => {
+	const updateScore = (pickid: string, homeAway: 'home' | 'away') => {
+		console.log('Updating the score!');
+		// only call this if the game is currently happening, aka score is not null
 		setInterval(async () => {
-			const res = await fetch('/api/live-scores');
+			const res = await fetch('/api/live-scores', {
+				method: 'POST',
+				body: JSON.stringify({ pickid, homeAway }),
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
 			const data = await res.json();
-			console.log(data);
-		}, 30000);
+
+			console.log('data', data);
+			return data;
+		}, 10000);
 
 		// if final then call serverside to declare winner
 		// would get alot of calls from client, only need 1
 		// if(pick.winner === null) {fetch('/api/declare-winner')}
 	};
-
-	$: console.log('scores', scores);
 
 	const updateAlert = () => {
 		if (form) {
@@ -111,7 +121,7 @@
 		<h1 class="font-header">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
 		{#if user}
-			<a href="/picks" class="btn-primary">Make your picks</a>
+			<a href="/pickem" class="btn-primary">Make your picks</a>
 		{/if}
 	</div>
 
@@ -176,7 +186,17 @@
 													pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
 												} text-lg`}
 											>
-												{pick.awayTeamScore}
+												{#if pick.isLive}
+													{#await updateScore(pick.id, 'away')}
+														<p>...Loading</p>
+													{:then data}
+														{data}
+													{:catch error}
+														<p>error</p>
+													{/await}
+												{:else}
+													{pick.awayTeamScore}
+												{/if}
 											</p>
 										{/if}
 									</div>

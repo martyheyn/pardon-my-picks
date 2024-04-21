@@ -139,9 +139,7 @@
 		</div>
 	{/if}
 
-	<div
-		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
-	>
+	<div class="max-w-2xl card">
 		{#if !form?.uploadPic}
 			<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 				<AlertFlash />
@@ -229,9 +227,7 @@
 		</form>
 	</div>
 
-	<div
-		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
-	>
+	<div class="max-w-2xl card">
 		<div class="flex">
 			<h2 class="text-xl font-semibold">Stats</h2>
 		</div>
