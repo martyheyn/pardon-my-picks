@@ -75,7 +75,7 @@ export type Odds = {
 		markets: {
 			key: string;
 			last_update: string;
-			outcomes: { name: string; price: number; point: number }[];
+			outcomes: { name: string; price: number; point: number; sorted?: number }[];
 		}[];
 		title: string;
 	}[];
