@@ -126,4 +126,6 @@ enum NFLTeam {
   nuggets
   pacers
   bucks
+  cavaliers
+  magic
 }

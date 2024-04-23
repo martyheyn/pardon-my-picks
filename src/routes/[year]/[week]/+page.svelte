@@ -64,28 +64,50 @@
 	// pick is only called when the game is live
 	// this can come from the winner function I will have to create, this will be called at the end of a game,
 	//  maybe based off the response from the odds api
+	$: liveScores = picks
+		.filter((pick) => pick.isLive)
+		.reduce(
+			(
+				acc: { [key: string]: { homeLiveScore: number | null; awayLiveScore: number | null } },
+				pick
+			) => {
+				acc[pick.id] = {
+					homeLiveScore: pick.homeTeamScore,
+					awayLiveScore: pick.awayTeamScore
+				};
+				return acc;
+			},
+			{}
+		);
 
 	// check security to make sure this function is not called a billion times
-	const updateScore = (pickid: string, homeAway: 'home' | 'away') => {
+	const updateScore = (pickId: string) => {
 		console.log('Updating the score!');
 		// only call this if the game is currently happening, aka score is not null
 		setInterval(async () => {
 			const res = await fetch('/api/live-scores', {
 				method: 'POST',
-				body: JSON.stringify({ pickid, homeAway }),
+				body: JSON.stringify({ pickId }),
 				headers: {
 					'content-type': 'application/json'
 				}
 			});
 			const data = await res.json();
-
 			console.log('data', data);
-			return data;
-		}, 10000);
 
-		// if final then call serverside to declare winner
-		// would get alot of calls from client, only need 1
+			liveScores[pickId] = {
+				homeLiveScore: data.homeLiveScore,
+				awayLiveScore: data.awayLiveScore
+			};
+		}, 60000);
 	};
+
+	// run updateScore function for all live games
+	$: picks.forEach((pick) => {
+		if (pick.isLive) {
+			updateScore(pick.id);
+		}
+	});
 
 	const updateAlert = () => {
 		if (form) {
@@ -178,20 +200,16 @@
 										<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
 											<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
 										</a>
-										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
+										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
 											<p
 												class={`${
-													pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
+													pick.isLive && pick.homeTeamScore - pick.awayTeamScore > 0
+														? ''
+														: 'font-bold'
 												} text-lg`}
 											>
 												{#if pick.isLive}
-													{#await updateScore(pick.id, 'away')}
-														<p>...Loading</p>
-													{:then data}
-														{data}
-													{:catch error}
-														<p>error</p>
-													{/await}
+													{liveScores[pick.id].awayLiveScore}
 												{:else}
 													{pick.awayTeamScore}
 												{/if}
@@ -206,13 +224,19 @@
 											<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
 										</a>
 
-										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
+										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
 											<p
 												class={`${
-													pick.homeTeamScore - pick.awayTeamScore > 0 ? 'font-bold' : ''
+													!pick.isLive && pick.homeTeamScore - pick.awayTeamScore > 0
+														? 'font-bold'
+														: ''
 												} text-lg`}
 											>
-												{pick.homeTeamScore}
+												{#if pick.isLive}
+													{liveScores[pick.id].homeLiveScore}
+												{:else}
+													{pick.homeTeamScore}
+												{/if}
 											</p>
 										{/if}
 									</div>

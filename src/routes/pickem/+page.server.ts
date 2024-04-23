@@ -2,8 +2,9 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 import { ODDS_API_KEY } from '$env/static/private';
+import type { Odds } from '$lib/utils/types';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
 		throw redirect(303, '/');
 	}
@@ -28,7 +29,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			const odds = await fetch(
 				`https://api.the-odds-api.com/v4/sports/basketball_nba/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
 			);
-			const oddsData = await odds.json();
+			const oddsData: Odds = await odds.json();
 
 			return {
 				user: locals.user,

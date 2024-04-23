@@ -13,7 +13,11 @@
 	<div
 		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-6 md:gap-y-12 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 	>
-		<div class=" md:col-span-2">dd</div>
+		<div class="md:col-span-2 flex flex-row gap-x-4">
+			<div class="">Away Team</div>
+			<div>@</div>
+			<div class="">Home Team</div>
+		</div>
 		<div class="md:col-span-6">
 			<div
 				class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 transition-all ease-in-out duration-300"

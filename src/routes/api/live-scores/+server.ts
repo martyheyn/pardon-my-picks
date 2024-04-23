@@ -9,7 +9,9 @@ import type { Scores } from '$lib/utils/types';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }: { request: Request }) {
-	const { pickId, homeAway } = await request.json();
+	const { pickId } = await request.json();
+
+	console.log('pickId', pickId);
 
 	// if pick add homeScore and awayScore to pick
 	const pick = await prisma.pick.findUnique({
@@ -17,6 +19,8 @@ export async function POST({ request }: { request: Request }) {
 			id: pickId
 		}
 	});
+
+	console.log('pick', pick);
 
 	if (!pick) {
 		return json({ error: 'Pick not found' });
@@ -33,24 +37,25 @@ export async function POST({ request }: { request: Request }) {
 		(game: Scores) => game.scores !== null && game.completed === false
 	);
 
+	let homeLiveScore: number | null = pick.homeTeamScore || null;
+	let awayLiveScore: number | null = pick.awayTeamScore || null;
 	// give the data pickId by mathcing the home and away team
 	scoresLive.map(async (game: Scores) => {
 		if (
 			pick.homeTeam ===
 			game.home_team.split(' ')[game.home_team.split(' ').length - 1].toLowerCase()
 		) {
-			console.log('game', game);
+			const homeTeamLiveScore = game.scores?.find((score) => {
+				const scoreTeamName = score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase();
+				return scoreTeamName === pick.homeTeam;
+			})?.score;
 
-			const homeTeamLiveScore =
-				game.scores?.find(
-					(score) =>
-						score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase() === pick.homeTeam
-				)?.score ?? null;
-			const awayTeamLiveScore =
-				game.scores?.find(
-					(score) =>
-						score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase() === pick.awayTeam
-				)?.score ?? null;
+			const awayTeamLiveScore = game.scores?.find((score) => {
+				const scoreTeamName = score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase();
+				return scoreTeamName === pick.awayTeam;
+			})?.score;
+			homeLiveScore = homeTeamLiveScore ? parseInt(homeTeamLiveScore) : pick.homeTeamScore;
+			awayLiveScore = awayTeamLiveScore ? parseInt(awayTeamLiveScore) : pick.awayTeamScore;
 
 			// update score in the database
 			try {
@@ -59,8 +64,8 @@ export async function POST({ request }: { request: Request }) {
 						id: pickId
 					},
 					data: {
-						homeTeamScore: parseInt(homeTeamLiveScore || pick.homeTeamScore!.toString()),
-						awayTeamScore: parseInt(awayTeamLiveScore || pick.awayTeamScore!.toString()),
+						homeTeamScore: homeTeamLiveScore ? parseInt(homeTeamLiveScore) : pick.homeTeamScore,
+						awayTeamScore: awayTeamLiveScore ? parseInt(awayTeamLiveScore) : pick.awayTeamScore,
 						// check if game is still live to stop function
 						isLive: game.completed ? false : true
 					}
@@ -68,8 +73,8 @@ export async function POST({ request }: { request: Request }) {
 			} catch (error) {
 				console.error('error', error);
 			}
-
-			return homeAway === 'home' ? json(homeTeamLiveScore) : json(awayTeamLiveScore);
 		}
 	});
+
+	return json({ homeLiveScore, awayLiveScore });
 }
