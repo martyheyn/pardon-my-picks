@@ -2,7 +2,7 @@
 	import type { ActionData, PageData } from './$types';
 	import { page } from '$app/stores';
 	import { fade, fly, slide } from 'svelte/transition';
-	import { quadInOut } from 'svelte/easing';
+	import { cubicInOut, quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
 	import { logo, personaImgPath, sortOrder, teamLink } from '$lib/utils/matching-format';
 	import type { PickByPerson } from '$lib/utils/types';
@@ -80,6 +80,7 @@
 			{}
 		);
 
+	let animateScore = false;
 	// check security to make sure this function is not called a billion times
 	const updateScore = (pickId: string) => {
 		console.log('Updating the score!');
@@ -95,10 +96,12 @@
 			const data = await res.json();
 			console.log('data', data);
 
+			animateScore = true;
 			liveScores[pickId] = {
 				homeLiveScore: data.homeLiveScore,
 				awayLiveScore: data.awayLiveScore
 			};
+			animateScore = false;
 		}, 60000);
 	};
 
@@ -202,14 +205,18 @@
 										</a>
 										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
 											<p
-												class={`${
-													pick.isLive && pick.homeTeamScore - pick.awayTeamScore > 0
-														? ''
-														: 'font-bold'
+												class={`${pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'} ${
+													pick.isLive ? ' font-normal' : ''
 												} text-lg`}
 											>
 												{#if pick.isLive}
-													{liveScores[pick.id].awayLiveScore}
+													{#key animateScore}
+														<div
+															transition:fade={{ duration: 1000, delay: 250, easing: cubicInOut }}
+														>
+															{liveScores[pick.id].awayLiveScore}
+														</div>
+													{/key}
 												{:else}
 													{pick.awayTeamScore}
 												{/if}

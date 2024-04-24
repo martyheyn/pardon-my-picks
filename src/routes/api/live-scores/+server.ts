@@ -11,16 +11,12 @@ import type { Scores } from '$lib/utils/types';
 export async function POST({ request }: { request: Request }) {
 	const { pickId } = await request.json();
 
-	console.log('pickId', pickId);
-
 	// if pick add homeScore and awayScore to pick
 	const pick = await prisma.pick.findUnique({
 		where: {
 			id: pickId
 		}
 	});
-
-	console.log('pick', pick);
 
 	if (!pick) {
 		return json({ error: 'Pick not found' });
