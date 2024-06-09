@@ -63,7 +63,7 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/');
+		redirect(303, '/');
 	}
 
 	// make sure it is the right user
@@ -78,7 +78,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	});
 
 	if (!existingUser) {
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 
 	// initialize forms
@@ -113,7 +113,7 @@ export const actions: Actions = {
 		const { user, session } = event.locals;
 		if (!(user && session)) {
 			// TODO:: throw message to on next screen
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		// get all the user input, or only one input at a time?
@@ -189,7 +189,7 @@ export const actions: Actions = {
 	uploadPic: async (event) => {
 		const { user, session } = event.locals;
 		if (!(user && session)) {
-			throw redirect(303, '/login');
+			redirect(303, '/login');
 		}
 
 		const form = await event.request.formData();

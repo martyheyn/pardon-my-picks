@@ -6,7 +6,7 @@ import type { Odds } from '$lib/utils/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(303, '/');
+		redirect(303, '/');
 	}
 
 	// can only bet games for the next 4 days

@@ -29,7 +29,7 @@ const LoginFormSchema = z.object({
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		throw redirect(303, '/');
+		redirect(303, '/');
 	}
 
 	/**
