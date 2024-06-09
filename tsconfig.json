@@ -10,7 +10,7 @@
 		"sourceMap": true,
 		"strict": true
 	},
-	"include": ["src/**/*", "tests/**/*"],
+	"include": ["src/**/*", "src/node_modules", ".svelte-kit/ambient.d.ts"],
 	"exclude": ["node_modules/"]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
