@@ -215,14 +215,14 @@
 						{parseFloat(persona.record_pct).toFixed(1)}%
 					</p>
 
-					<div class="w-full overflow-x-auto rounded-md">
+					<div class="w-full overflow-x-auto rounded-md border">
 						<table
 							class="w-full text-sm text-left rtl:text-right text-gray-600
 						dark:text-gray-300"
 						>
 							<thead
-								class="text-xs text-gray-700 uppercase bg-gray-200
-								dark:bg-gray-700 dark:text-gray-400"
+								class="text-xs uppercase bg-gray-200 border-b
+								dark:bg-gray-700 text-muteTextColor dark:text-darkMuteTextColor"
 							>
 								<tr>
 									{#each tableHeaders as header}
@@ -233,18 +233,17 @@
 							<tbody>
 								<tr
 									class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-200
-							 	even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+							 	even:dark:bg-gray-800 text-xs"
 								>
 									<th
 										scope="row"
 										class="min-w-[82px] px-4 py-3 font-medium text-black
-										whitespace-nowrap dark:text-white border">{persona.record}</th
+										whitespace-nowrap dark:text-white border-r">{persona.record}</th
 									>
-									<td class="min-w-[82px] px-4 py-3 border"
+									<td class="min-w-[82px] px-4 py-3 border-r"
 										>{getBetTypeStats(persona.person, 'spread')}</td
 									>
-									<td class="min-w-[82px] px-4 py-3 border"
-										>{getBetTypeStats(persona.person, 'totals')}</td
+									<td class="min-w-[82px] px-4 py-3">{getBetTypeStats(persona.person, 'totals')}</td
 									>
 								</tr>
 							</tbody>
@@ -264,16 +263,15 @@
 								/>
 							</button>
 						</div>
-						<!-- {#if specialBetOpen === persona.person} -->
 						<div transition:slide={{ duration: 300 }}>
-							<div class="w-full overflow-x-auto rounded-md">
+							<div class="w-full overflow-x-auto rounded-md border">
 								<table
 									class="w-full text-sm text-left rtl:text-right text-gray-600
 										dark:text-gray-300"
 								>
 									<thead
-										class="text-xs text-gray-700 uppercase bg-gray-200
-										dark:bg-gray-700 dark:text-gray-400"
+										class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
+										dark:bg-gray-700 border-b"
 									>
 										<th scope="col" class="font-extrabold px-4 py-3"># Tailed</th>
 										<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
@@ -283,12 +281,12 @@
 									<tbody>
 										<tr
 											class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
-							 				even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+							 				even:dark:bg-gray-800 text-xs"
 										>
 											<th
 												scope="row"
 												class="px-4 py-3 font-medium text-black
-										whitespace-nowrap dark:text-white border">{persona.total_tails}</th
+										whitespace-nowrap dark:text-white border-r">{persona.total_tails}</th
 											>
 											<td
 												class={`text-sm font-semibold leading-4 ${
@@ -297,12 +295,12 @@
 														: parseInt(persona.tails_pct) < 50
 														? 'text-red-500 dark:text-red-300'
 														: 'text-yellow-500 dark:text-yellow-300'
-												} px-4 py-3 border`}
+												} px-4 py-3 border-r`}
 												>{persona.tails_pct === 'NaN'
 													? 'NA'
 													: persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</td
 											>
-											<td class="px-4 py-3 border">{persona.total_fades}</td>
+											<td class="px-4 py-3 border-r">{persona.total_fades}</td>
 											<td
 												class={`text-sm font-semibold leading-4 ${
 													parseInt(persona.fades_pct) > 50
@@ -310,7 +308,7 @@
 														: parseInt(persona.fades_pct) < 50
 														? 'text-red-500 dark:text-red-300'
 														: 'text-yellow-500 dark:text-yellow-300'
-												} px-4 py-3 border`}
+												} px-4 py-3`}
 											>
 												{persona.fades_pct === 'NaN'
 													? 'NA'
@@ -321,7 +319,6 @@
 								</table>
 							</div>
 						</div>
-						<!-- {/if} -->
 					{/if}
 
 					{#if specialBetsData[persona.person]}
@@ -341,36 +338,44 @@
 						</div>
 						{#if specialBetOpen === persona.person}
 							<div transition:slide={{ duration: 300 }}>
-								<div class="w-full overflow-x-auto rounded-md">
+								<div class="w-full overflow-x-auto rounded-md border">
 									<table
 										class="w-full text-sm text-left rtl:text-right text-gray-600
 										dark:text-gray-300"
 									>
 										<thead
-											class="text-xs text-gray-700 uppercase bg-gray-200
-										dark:bg-gray-700 dark:text-gray-400"
+											class="text-xs uppercase bg-gray-200 border-b
+										dark:bg-gray-700 text-muteTextColor dark:text-darkMuteTextColor"
 										>
 											<th scope="col" class="font-extrabold px-4 py-3">Special Bet</th>
 											<th scope="col" class="font-extrabold px-4 py-3">Record</th>
 											<th scope="col" class="font-extrabold px-4 py-3">Results</th>
 										</thead>
 										<tbody>
-											{#each specialBetsData[persona.person] as bet}
+											{#each specialBetsData[persona.person] as bet, i}
 												<tr
 													class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
-							 				even:dark:bg-gray-800 border-b dark:border-gray-700 text-xs"
+							 				even:dark:bg-gray-800 text-xs"
 												>
 													<th
 														scope="row"
-														class="px-4 py-3 font-medium text-black
-										whitespace-nowrap dark:text-white border">{specialBetsLabelMap[bet.specialBet]}</th
+														class={`px-4 py-3 font-medium text-black whitespace-nowrap 
+														dark:text-white border-r 
+														${i !== specialBetsData[persona.person].length - 1 ? 'border-b' : ''}`}
 													>
-													<td class="px-4 py-3 border font-semibold"
+														{specialBetsLabelMap[bet.specialBet]}
+													</th>
+													<td
+														class={`px-4 py-3 border-r font-semibold
+														${i !== specialBetsData[persona.person].length - 1 ? 'border-b' : ''}`}
 														>{bet.wins} -
 														{bet.totalGames - bet.wins - bet.pushes}
 														{bet.pushes ? `- ${bet.pushes}` : ''}</td
 													>
-													<td class="min-w-[320px] px-4 py-3 border">
+													<td
+														class={`min-w-[320px] px-4 py-3 border-r
+														${i !== specialBetsData[persona.person].length - 1 ? 'border-b' : ''}`}
+													>
 														{#await getSpecialBetDetails(persona.person, bet.specialBet)}
 															<p>...Loading</p>
 														{:then data}

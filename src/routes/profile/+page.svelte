@@ -153,7 +153,10 @@
 		<form method="POST" action="?/updateUserData" use:enhance={handleEdit} class="w-full h-full">
 			<div class="w-full flex flex-row gap-x-8">
 				<div class="flex-1">
-					<label for="username" class="block text-sm font-medium text-gray-600">
+					<label
+						for="username"
+						class="block text-sm font-medium text-muteTextColor dark:text-darkMuteTextColor"
+					>
 						<div class="flex justify-between items-center pr-2">
 							<span class="pl-1">Username</span>
 						</div>
@@ -170,7 +173,10 @@
 				</div>
 
 				<div class="flex-1">
-					<label for="email" class="block text-sm font-medium text-gray-600">
+					<label
+						for="email"
+						class="block text-sm font-medium text-muteTextColor dark:text-darkMuteTextColor"
+					>
 						<div class="flex justify-between items-center pr-2">
 							<span class="pl-1">Email</span>
 							<button on:click={() => (infoDisplayed = !infoDisplayed)} type="button">

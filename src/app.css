@@ -10,7 +10,7 @@
 	}
 
 	.btn-primary {
-		@apply bg-primary hover:bg-primaryHover w-fit text-white text-base border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out;
+		@apply bg-primary hover:bg-primaryHover dark:bg-darkPrimary dark:hover:bg-darkHover w-fit text-white text-base border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out;
 	}
 }
 
