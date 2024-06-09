@@ -121,11 +121,8 @@ enum NFLTeam {
   titans
   commanders
 
-  // NBA for testing
-  lakers
-  nuggets
-  pacers
-  bucks
-  cavaliers
-  magic
+  // MLB for testing
+  oriles
+  rays
+  yankees
 }

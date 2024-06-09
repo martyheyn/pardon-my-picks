@@ -23,6 +23,8 @@
 			awayTeam
 			// User: ['1'],
 		};
+
+		console.log('userPick', userPick);
 	};
 	const getDescription = (
 		type: string,
@@ -52,15 +54,15 @@
 <div class="">
 	<h1>Place your picks here</h1>
 
-	<div
-		class="grid grid-cols-1 md:grid-cols-2 my-8 md:gap-x-6 gap-y-6 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
-	>
-		<form action="" use:enhance>
-			{#if usersPicks.length > 0}
-				<div transition:slide={{ duration: 300 }}>
-					<button>Save Picks</button>
-				</div>
-			{/if}
+	<form use:enhance method="POST">
+		{#if usersPicks.length > 0}
+			<div transition:slide={{ duration: 300 }}>
+				<button>Save Picks</button>
+			</div>
+		{/if}
+		<div
+			class="grid grid-cols-1 lg:grid-cols-2 my-8 md:gap-x-6 gap-y-6 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
+		>
 			{#if odds !== undefined}
 				{#each odds as odd}
 					<div class="card pb-4 pt-2 min-w-[360px]">
@@ -81,21 +83,27 @@
 										<div class="flex justify-center items-center font-header font-semibold text-lg">
 											{bets.key.charAt(0).toUpperCase() + bets.key.slice(1)}
 										</div>
-										{#each bets.outcomes as outcome}
+										{#each bets.outcomes as outcome, i}
 											<div class="">
 												<button
-													class="w-full p-4 rounded-md bg-gray-200 hover:bg-gray-300 transition-all duration-300 ease-in-out"
-													on:click={() =>
+													class="w-full p-4 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
+													on:click={(e) => {
+														e.preventDefault();
 														addPick(
 															bets.key.slice(0, -1),
 															'description',
 															odd.home_team,
 															odd.away_team
-														)}
+														);
+													}}
 													>{bets.key === 'spreads' && outcome.point > 0
 														? `+${outcome.point}`
-														: outcome.point}</button
-												>
+														: bets.key === 'spreads' && outcome.point < 0
+														? `${outcome.point}`
+														: bets.key === 'totals' && i % 2 === 0
+														? `O ${outcome.point}`
+														: `U ${outcome.point}`}
+												</button>
 											</div>
 										{/each}
 									</div>
@@ -105,6 +113,6 @@
 					</div>
 				{/each}
 			{/if}
-		</form>
-	</div>
+		</div>
+	</form>
 </div>
