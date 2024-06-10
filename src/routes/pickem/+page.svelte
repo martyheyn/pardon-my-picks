@@ -94,21 +94,21 @@
 	</div>
 
 	<form use:enhance method="POST">
-		<!-- {#if usersPicks.length > 0} -->
-		<div
-			class="w-full mt-4 transition-all duration-300 ease-in-out flex justify-end items-center"
-			transition:slide={{ duration: 300 }}
-		>
-			<button
-				disabled={usersPicks.length < 2}
-				class={`btn-primary ${
-					usersPicks.length < 2
-						? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
-						: ''
-				}`}>Save Picks</button
+		{#if usersPicks.length > 0}
+			<div
+				class="w-full mt-4 transition-all duration-300 ease-in-out flex justify-end items-center"
+				transition:slide={{ duration: 300 }}
 			>
-		</div>
-		<!-- {/if} -->
+				<button
+					disabled={usersPicks.length < 2}
+					class={`btn-primary ${
+						usersPicks.length < 2
+							? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
+							: ''
+					}`}>Save Picks</button
+				>
+			</div>
+		{/if}
 		<div
 			class="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-8 md:gap-x-6 gap-y-6 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 		>

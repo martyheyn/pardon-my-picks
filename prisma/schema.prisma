@@ -33,6 +33,8 @@ model Pick {
   espnLink      String?   @map("espn_link") @db.VarChar(191)
   highlighLink  String?   @map("highlight_link") @db.VarChar(191)
   private       Boolean   @default(false)
+  barstoolEmployee Boolean @default(false) @map("barstool_employee")
+  pmtPersona    Boolean   @default(false) @map("pmt_persona")
   userId        String?   @unique @map("user_id") @db.VarChar(191)
   fade          Fade[]
   user          User?     @relation(fields: [userId], references: [id])

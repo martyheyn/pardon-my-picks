@@ -1,9 +1,24 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { superValidate } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
+import { generateId } from 'lucia';
+import { z } from 'zod';
+import { zod } from 'sveltekit-superforms/adapters';
 
 import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
+import { type $Enums } from '@prisma/client';
+
+// import
+
+// TODO: make the teams emuns and the type 'spread' or 'total'
+const PickFormSchema = z.object({
+	type: z.string(),
+	description: z.string(),
+	homeTeam: z.custom<$Enums.NFLTeam>(),
+	awayTeam: z.custom<$Enums.NFLTeam>()
+});
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
@@ -60,32 +75,49 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	addPick: async ({ url, locals }) => {
+	addPick: async (event) => {
 		// throw error if user is not logged in
-		if (!locals.user) {
+		const { user, session } = event.locals;
+		if (!user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to make a pick buddy',
 				success: false
 			});
 		}
 
+		// get all the user input, or only one input at a time?
+		const form = await superValidate(event, zod(PickFormSchema));
+		console.log('form', form);
+		const { type, description, homeTeam, awayTeam } = form.data;
+
 		// check if user has already made picks
-		const user = await prisma.user.findMany({
+		const pickUser = await prisma.user.findMany({
 			where: {
-				id: locals.user.id
+				id: user.id
 			}
 		});
 
 		// TODO: update pick funcctionality, whole new UI and server action
 		try {
-			// await prisma.pick.create({
-			// data: {
-			// userId: locals.user.id,
-			// pickId: pickId,
-			// winner: pick?.winner ? false : true,
-			// push: pick?.push && pick?.push === 1 ? true : false
-			// }
-			// });
+			await prisma.pick.create({
+				data: {
+					id: generateId(15),
+					year: new Date().getFullYear(),
+					show: 'pmt',
+					week: 18,
+					person: user.username,
+					type,
+					description,
+					league: 'NFL',
+					homeTeam,
+					awayTeam,
+					isLive: false,
+					private: false,
+					userId: user.id,
+					barstoolEmployee: false,
+					pmtPersona: false
+				}
+			});
 		} catch (error) {
 			console.error('error', error);
 			return fail(500, { message: 'Error making picks', success: false });

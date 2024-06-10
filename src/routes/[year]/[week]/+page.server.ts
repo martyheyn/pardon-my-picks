@@ -9,7 +9,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
 			week: parseInt(params.week),
-			year: parseInt(params.year)
+			year: parseInt(params.year),
+			pmtPersona: true,
+			barstoolEmployee: true
 		},
 		include: {
 			tail: true,
