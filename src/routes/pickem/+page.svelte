@@ -3,6 +3,7 @@
 	import { fade, slide } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
+	// import { type $Enums } from '@prisma/client';
 
 	export let data: PageData;
 
@@ -42,24 +43,27 @@
 		}
 
 		// check if the pick already exists
-		// if (usersPicks.length > 0) {
-		// 	const pickExists = usersPicks.find((pick) => pick.description === description);
-		// 	if (pickExists) {
-		// 		const index = usersPicks.indexOf(pickExists);
-		// 		usersPicks.splice(index, 1);
-		// 	}
-		// }
+		if (usersPicks.length > 0) {
+			const pickExists = usersPicks.find((pick) => pick.description === description);
+			if (pickExists) {
+				const index = usersPicks.indexOf(pickExists);
+				usersPicks.splice(index, 1);
+			}
+		}
 
 		// add the pick to the array
 		usersPicks = [...usersPicks, userPick];
 	};
+	$: console.log('usersPicks', usersPicks);
+
 	const getDescription = (
 		type: string,
 		betNumber: number,
-		team: string // should be enum
+		team: string, // should be enum
+		overUnder?: string,
+		otherTeam?: string
 	) => {
 		let description = '';
-		let betNum: string = '';
 		if (betNumber) {
 		}
 
@@ -67,8 +71,8 @@
 			case 'spread':
 				description = `${team} ${betNumber}`;
 				break;
-			case 'total':
-				description = `${team} ${betNumber}`;
+			case 'totals':
+				description = `${team} vs ${otherTeam} ${overUnder} ${betNumber}`;
 				break;
 			default:
 				description = 'No description';
@@ -138,14 +142,22 @@
 													class="w-full p-4 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
 													on:click={(e) => {
 														e.preventDefault();
+														console.log(e);
 														addPick(
-															bets.key.slice(0, -1),
-															'description',
+															bets.key === 'spreads' ? bets.key.slice(0, -1) : bets.key,
+															getDescription(
+																bets.key === 'spreads' ? 'spread' : 'totals',
+																outcome.point,
+																bets.key === 'spreads' ? outcome.name : odd.home_team,
+																bets.key === 'totals' ? outcome.name : undefined,
+																bets.key === 'totals' ? odd.away_team : undefined
+															), // getDescription(type, betNumber, team, overUnder, otherTeam
 															odd.home_team,
 															odd.away_team
 														);
 													}}
-													>{bets.key === 'spreads' && outcome.point > 0
+												>
+													{bets.key === 'spreads' && outcome.point > 0
 														? `+${outcome.point}`
 														: bets.key === 'spreads' && outcome.point < 0
 														? `${outcome.point}`

@@ -14,7 +14,7 @@ import { type $Enums } from '@prisma/client';
 
 // TODO: make the teams emuns and the type 'spread' or 'total'
 const PickFormSchema = z.object({
-	type: z.string(),
+	type: z.enum(['spread', 'totals']),
 	description: z.string(),
 	homeTeam: z.custom<$Enums.NFLTeam>(),
 	awayTeam: z.custom<$Enums.NFLTeam>()
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const betStart = new Date('2024-06-11T12:00:00Z');
+	const betStart = new Date('2024-06-10T12:00:00Z');
 	const betEnd = new Date('2024-06-12T22:00:00Z');
 
 	if (date > betStart && date < betEnd) {
@@ -103,8 +103,8 @@ export const actions: Actions = {
 				data: {
 					id: generateId(15),
 					year: new Date().getFullYear(),
-					show: 'pmt',
-					week: 18,
+					show: 'PMT',
+					week: 1,
 					person: user.username,
 					type,
 					description,
