@@ -12,7 +12,8 @@ export default {
 				darkHover: '#4b5563',
 				darkSecondary: '#333333',
 				muteTextColor: '#4b5563',
-				darkMuteTextColor: '#d1d5db'
+				darkMuteTextColor: '#d1d5db',
+				disabled: '#d1d5db'
 			}
 		},
 		fontFamily: {

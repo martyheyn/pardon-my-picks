@@ -1,14 +1,25 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import type { PageData } from './$types';
+	import { linear, quadInOut } from 'svelte/easing';
 
 	export let data: PageData;
+
+	type PickForm = {
+		year: number;
+		show: string;
+		week: number;
+		type: string;
+		description: string;
+		homeTeam: string;
+		awayTeam: string;
+	};
 
 	$: ({ odds } = data);
 	$: console.log('odds', odds);
 
-	const usersPicks = [];
+	let usersPicks: PickForm[] = [];
 	const addPick = (type: string, description: string, homeTeam: string, awayTeam: string) => {
 		// add this data
 		const userPick = {
@@ -24,7 +35,23 @@
 			// User: ['1'],
 		};
 
-		console.log('userPick', userPick);
+		// check if user has already made picks
+		if (usersPicks.length >= 2) {
+			alert('You have already made your picks');
+			return;
+		}
+
+		// check if the pick already exists
+		// if (usersPicks.length > 0) {
+		// 	const pickExists = usersPicks.find((pick) => pick.description === description);
+		// 	if (pickExists) {
+		// 		const index = usersPicks.indexOf(pickExists);
+		// 		usersPicks.splice(index, 1);
+		// 	}
+		// }
+
+		// add the pick to the array
+		usersPicks = [...usersPicks, userPick];
 	};
 	const getDescription = (
 		type: string,
@@ -51,17 +78,39 @@
 	};
 </script>
 
-<div class="">
-	<h1>Place your picks here</h1>
+<svelte:head>
+	<title>Pardon My Picks - Pickem</title>
+</svelte:head>
+
+<div
+	class=""
+	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
+	out:fade={{ duration: 150, easing: linear }}
+>
+	<div
+		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
+	>
+		<h1 class="font-header">Place this weeks picks here</h1>
+	</div>
 
 	<form use:enhance method="POST">
-		{#if usersPicks.length > 0}
-			<div transition:slide={{ duration: 300 }}>
-				<button>Save Picks</button>
-			</div>
-		{/if}
+		<!-- {#if usersPicks.length > 0} -->
 		<div
-			class="grid grid-cols-1 lg:grid-cols-2 my-8 md:gap-x-6 gap-y-6 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
+			class="w-full mt-4 transition-all duration-300 ease-in-out flex justify-end items-center"
+			transition:slide={{ duration: 300 }}
+		>
+			<button
+				disabled={usersPicks.length < 2}
+				class={`btn-primary ${
+					usersPicks.length < 2
+						? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
+						: ''
+				}`}>Save Picks</button
+			>
+		</div>
+		<!-- {/if} -->
+		<div
+			class="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-8 md:gap-x-6 gap-y-6 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 		>
 			{#if odds !== undefined}
 				{#each odds as odd}
