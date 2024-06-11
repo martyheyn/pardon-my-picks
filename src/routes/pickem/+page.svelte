@@ -3,6 +3,7 @@
 	import { fade, slide } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
+	import type { Odds } from '$lib/utils/types';
 	// import { type $Enums } from '@prisma/client';
 
 	export let data: PageData;
@@ -15,13 +16,32 @@
 		description: string;
 		homeTeam: string;
 		awayTeam: string;
+		indexes: { pickIndex: number; betIndex: number; outcomeIndex: number };
 	};
 
 	$: ({ odds } = data);
 	$: console.log('odds', odds);
 
 	let usersPicks: PickForm[] = [];
-	const addPick = (type: string, description: string, homeTeam: string, awayTeam: string) => {
+	// make a variable with selected picks with the pick index, then the index of the bet, then false
+	$: selected = Array.from({ length: odds ? odds?.length : 0 }, () => {
+		return Array.from({ length: odds ? odds[0].bookmakers[0].markets.length : 0 }, () => {
+			return Array.from(
+				{ length: odds ? odds[0].bookmakers[0].markets[0].outcomes.length : 0 },
+				() => {
+					return false;
+				}
+			);
+		});
+	});
+
+	const addPick = (
+		type: string,
+		description: string,
+		homeTeam: string,
+		awayTeam: string,
+		indexes: { pickIndex: number; betIndex: number; outcomeIndex: number }
+	) => {
 		// add this data
 		const userPick = {
 			// id: '1',
@@ -32,27 +52,43 @@
 			type,
 			description: description,
 			homeTeam,
-			awayTeam
+			awayTeam,
 			// User: ['1'],
+			indexes
 		};
-
-		// check if user has already made picks
-		if (usersPicks.length >= 2) {
-			alert('You have already made your picks');
-			return;
-		}
 
 		// check if the pick already exists
 		if (usersPicks.length > 0) {
 			const pickExists = usersPicks.find((pick) => pick.description === description);
 			if (pickExists) {
-				const index = usersPicks.indexOf(pickExists);
-				usersPicks.splice(index, 1);
+				alert('You have already made this pick');
+				return;
 			}
 		}
 
-		// add the pick to the array
+		// check if the pick is an opposing pick
+		if (usersPicks.length > 0) {
+			const opposingPick = usersPicks.find(
+				(pick) => pick.homeTeam === homeTeam && pick.awayTeam === awayTeam && pick.type === type
+			);
+			const opposingPickIndex =
+				indexes.outcomeIndex % 2 === 0 ? indexes.outcomeIndex + 1 : indexes.outcomeIndex - 1;
+			selected[indexes.pickIndex][indexes.betIndex][opposingPickIndex] = false;
+			if (opposingPick) {
+				const index = usersPicks.indexOf(opposingPick);
+				usersPicks = usersPicks.filter((_, i) => i !== index);
+			}
+		}
+
+		// check if user has already made picks
+		if (usersPicks.length >= 2) {
+			alert('You have already made 2 picks');
+			return;
+		}
+
+		// add the pick to the array and update selected
 		usersPicks = [...usersPicks, userPick];
+		selected[indexes.pickIndex][indexes.betIndex][indexes.outcomeIndex] = true;
 	};
 	$: console.log('usersPicks', usersPicks);
 
@@ -68,8 +104,8 @@
 		}
 
 		switch (type) {
-			case 'spread':
-				description = `${team} ${betNumber}`;
+			case 'spreads' || 'spread':
+				description = `${team} ${betNumber > 0 ? `+${betNumber}` : betNumber}`;
 				break;
 			case 'totals':
 				description = `${team} vs ${otherTeam} ${overUnder} ${betNumber}`;
@@ -99,25 +135,69 @@
 
 	<form use:enhance method="POST">
 		{#if usersPicks.length > 0}
-			<div
-				class="w-full mt-4 transition-all duration-300 ease-in-out flex justify-end items-center"
-				transition:slide={{ duration: 300 }}
-			>
-				<button
-					disabled={usersPicks.length < 2}
-					class={`btn-primary ${
-						usersPicks.length < 2
-							? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
-							: ''
-					}`}>Save Picks</button
+			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
+				<div
+					class="transition-all duration-300 ease-in-out flex justify-end items-center"
+					transition:slide={{ duration: 300, delay: 300 }}
 				>
+					<button
+						type="submit"
+						disabled={usersPicks.length < 2}
+						class={`btn-primary ${
+							usersPicks.length < 2
+								? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
+								: ''
+						}`}
+						>Save Picks
+					</button>
+				</div>
+
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 mt-4 mb-8 sm:gap-x-6 gap-y-6 max-w-6xl
+							font-paragraph transition-all duration-300 ease-in-out"
+				>
+					{#each usersPicks as pick}
+						<div
+							class="card pb-4 pt-2 flex flex-col gap-y-4 gap-x-4 justify-between
+							transition-all duration-300 ease-in-out"
+							in:slide={{ duration: 300, delay: 250 }}
+							out:slide={{ duration: 250 }}
+						>
+							<div class="flex justify-start items-center">
+								<p class="">{pick.awayTeam} vs {pick.homeTeam}</p>
+							</div>
+							<div class="flex justify-start items-center">
+								<p class="font-semibold">{pick.description}</p>
+							</div>
+
+							<div class="flex flex-row gap-x-4">
+								<button
+									class="w-full px-4 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary
+									dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
+									on:click={(e) => {
+										e.preventDefault();
+										const index = usersPicks.indexOf(pick);
+										usersPicks = usersPicks.filter((_, i) => i !== index);
+										// set selected for individual pick to false
+										selected[pick.indexes.pickIndex][pick.indexes.betIndex][
+											pick.indexes.outcomeIndex
+										] = false;
+									}}
+								>
+									Remove
+								</button>
+							</div>
+						</div>
+					{/each}
+				</div>
 			</div>
 		{/if}
 		<div
-			class="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-8 md:gap-x-6 gap-y-6 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
+			class="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-8 md:gap-x-6 gap-y-6 max-w-6xl
+			font-paragraph transition-all duration-300 ease-in-out"
 		>
 			{#if odds !== undefined}
-				{#each odds as odd}
+				{#each odds as odd, pickIndex}
 					<div class="card pb-4 pt-2 min-w-[360px]">
 						<div class="grid grid-cols-8 gap-x-4">
 							<div class="col-span-3 grid grid-rows-3 place-content-start w-full">
@@ -131,29 +211,35 @@
 							</div>
 
 							<div class="w-full col-span-5 flex flex-row gap-x-6 justify-end">
-								{#each odd.bookmakers[0].markets as bets}
+								{#each odd.bookmakers[0].markets as bets, betIndex}
 									<div class="grid grid-rows-3 gap-y-4 place-content-center">
 										<div class="flex justify-center items-center font-header font-semibold text-lg">
 											{bets.key.charAt(0).toUpperCase() + bets.key.slice(1)}
 										</div>
-										{#each bets.outcomes as outcome, i}
+										{#each bets.outcomes as outcome, outcomeIndex}
 											<div class="">
 												<button
-													class="w-full p-4 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
+													class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
+													${
+														selected[pickIndex][betIndex][outcomeIndex]
+															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
+															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
+													}`}
+													disabled={selected[pickIndex][betIndex][outcomeIndex]}
 													on:click={(e) => {
 														e.preventDefault();
-														console.log(e);
 														addPick(
 															bets.key === 'spreads' ? bets.key.slice(0, -1) : bets.key,
 															getDescription(
-																bets.key === 'spreads' ? 'spread' : 'totals',
+																bets.key,
 																outcome.point,
 																bets.key === 'spreads' ? outcome.name : odd.home_team,
 																bets.key === 'totals' ? outcome.name : undefined,
 																bets.key === 'totals' ? odd.away_team : undefined
 															), // getDescription(type, betNumber, team, overUnder, otherTeam
 															odd.home_team,
-															odd.away_team
+															odd.away_team,
+															{ pickIndex, betIndex, outcomeIndex }
 														);
 													}}
 												>
@@ -161,7 +247,7 @@
 														? `+${outcome.point}`
 														: bets.key === 'spreads' && outcome.point < 0
 														? `${outcome.point}`
-														: bets.key === 'totals' && i % 2 === 0
+														: bets.key === 'totals' && outcomeIndex % 2 === 0
 														? `O ${outcome.point}`
 														: `U ${outcome.point}`}
 												</button>
