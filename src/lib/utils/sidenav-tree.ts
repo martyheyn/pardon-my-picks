@@ -30,6 +30,7 @@ for (let i = 1; i <= 18; i++) {
 const yearRoute = (year: number) => {
 	const weeksSubNavArr: { label: string; icon: string; route: string }[] = [];
 
+	// TODO: loop through iterator should be dynamic based on current year or past
 	for (let i = 1; i <= 18; i++) {
 		weeksSubNavArr.push({
 			label: `Week ${i}`,

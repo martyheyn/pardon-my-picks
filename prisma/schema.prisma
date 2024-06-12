@@ -35,7 +35,7 @@ model Pick {
   private       Boolean   @default(false)
   barstoolEmployee Boolean @default(false) @map("barstool_employee")
   pmtPersona    Boolean   @default(false) @map("pmt_persona")
-  userId        String?   @unique @map("user_id") @db.VarChar(191)
+  userId        String?   @map("user_id") @db.VarChar(191)
   fade          Fade[]
   user          User?     @relation(fields: [userId], references: [id])
   tail          Tail[]
@@ -53,7 +53,7 @@ model User {
   expiresAt       DateTime? @map("expires_at") @db.Timestamptz(6)
   avatar          String?   @db.VarChar(191)
   fade            Fade[]
-  picks           Pick?
+  picks           Pick[]
   session         Session?
   tail            Tail[]
 }
@@ -124,7 +124,10 @@ enum NFLTeam {
   commanders
 
   // MLB for testing
-  oriles
+  orioles
   rays
   yankees
+  rockies
+  twins
+  braves
 }

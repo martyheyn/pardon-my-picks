@@ -3,15 +3,13 @@
 	import { fade, slide } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
-	import type { Odds } from '$lib/utils/types';
+	import { fullNameToMascot } from '$lib/utils/matching-format';
 	// import { type $Enums } from '@prisma/client';
 
 	export let data: PageData;
 
 	type PickForm = {
-		year: number;
 		show: string;
-		week: number;
 		type: string;
 		description: string;
 		homeTeam: string;
@@ -23,7 +21,8 @@
 	$: console.log('odds', odds);
 
 	let usersPicks: PickForm[] = [];
-	// make a variable with selected picks with the pick index, then the index of the bet, then false
+	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
+	// used for ui if pick is selected
 	$: selected = Array.from({ length: odds ? odds?.length : 0 }, () => {
 		return Array.from({ length: odds ? odds[0].bookmakers[0].markets.length : 0 }, () => {
 			return Array.from(
@@ -44,16 +43,11 @@
 	) => {
 		// add this data
 		const userPick = {
-			// id: '1',
-			year: 2021,
 			show: 'PMT',
-			week: 1,
-			// person: 'me',
 			type,
 			description: description,
-			homeTeam,
-			awayTeam,
-			// User: ['1'],
+			homeTeam: fullNameToMascot[homeTeam],
+			awayTeam: fullNameToMascot[awayTeam],
 			indexes
 		};
 
@@ -133,7 +127,8 @@
 		<h1 class="font-header">Place this weeks picks here</h1>
 	</div>
 
-	<form use:enhance method="POST">
+	<form method="post" use:enhance>
+		<input type="hidden" name="userPicks" bind:value={hiddenInput} />
 		{#if usersPicks.length > 0}
 			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
 				<div

@@ -10,20 +10,31 @@ import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
 import { type $Enums } from '@prisma/client';
 
+import { CURRENT_WEEK } from '$env/static/private';
+
 // import
 
 // TODO: make the teams emuns and the type 'spread' or 'total'
-const PickFormSchema = z.object({
+// Define the schema for the PickForm object
+const PickFormObjectSchema = z.object({
+	show: z.string(),
 	type: z.enum(['spread', 'totals']),
 	description: z.string(),
 	homeTeam: z.custom<$Enums.NFLTeam>(),
 	awayTeam: z.custom<$Enums.NFLTeam>()
 });
 
+// // Define the schema for an array of PickForm objects
+const PickFormSchema = z.array(PickFormObjectSchema);
+
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
 		redirect(303, '/');
 	}
+
+	// initialize forms
+	// const form = await superValidate(zod(PickFormSchema));
+	let oddsDataClean: Odds[] = [];
 
 	// can only bet games for the next 4 days
 	const date = new Date();
@@ -49,7 +60,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			const oddsDataFiltered = oddsData.filter(
 				(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1
 			);
-			const oddsDataClean = oddsDataFiltered.map((game) => {
+			oddsDataClean = oddsDataFiltered.map((game) => {
 				game.bookmakers[0].markets.forEach((market) => {
 					market.outcomes = market.outcomes
 						.map((outcome) => ({
@@ -60,11 +71,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 				});
 				return game;
 			});
-
-			return {
-				user: locals.user,
-				odds: oddsDataClean
-			};
 		} catch (error) {
 			console.log('error', error);
 			return {
@@ -72,10 +78,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 			};
 		}
 	}
+
+	return { user: locals.user, odds: oddsDataClean };
 };
 
 export const actions: Actions = {
-	addPick: async (event) => {
+	default: async (event) => {
 		// throw error if user is not logged in
 		const { user, session } = event.locals;
 		if (!user) {
@@ -86,41 +94,75 @@ export const actions: Actions = {
 		}
 
 		// get all the user input, or only one input at a time?
-		const form = await superValidate(event, zod(PickFormSchema));
-		console.log('form', form);
-		const { type, description, homeTeam, awayTeam } = form.data;
+		const formData = await event.request.formData();
+		const picksJson = formData.get('userPicks');
 
-		// check if user has already made picks
-		const pickUser = await prisma.user.findMany({
-			where: {
-				id: user.id
-			}
-		});
+		if (typeof picksJson !== 'string') {
+			return {
+				status: 400,
+				body: { success: false, error: 'Invalid data format' }
+			};
+		}
 
-		// TODO: update pick funcctionality, whole new UI and server action
+		const parsedPicks = JSON.parse(picksJson);
+		// Validate the data using Zod
 		try {
-			await prisma.pick.create({
-				data: {
-					id: generateId(15),
-					year: new Date().getFullYear(),
-					show: 'PMT',
-					week: 1,
-					person: user.username,
-					type,
-					description,
-					league: 'NFL',
-					homeTeam,
-					awayTeam,
-					isLive: false,
-					private: false,
-					userId: user.id,
-					barstoolEmployee: false,
-					pmtPersona: false
+			const result = PickFormSchema.safeParse(parsedPicks);
+			if (!result.success) {
+				return {
+					status: 400,
+					body: { success: false, error: result.error }
+				};
+			}
+
+			const picks = result.data;
+			console.log('picks', picks);
+
+			// check if user has already made either
+			const pickUser = await prisma.user.findMany({
+				where: {
+					id: user.id
 				}
 			});
+
+			console.log('pickUser', pickUser);
+
+			// TODO: update pick funcctionality, whole new UI and server action
+			try {
+				picks.forEach(async (pick) => {
+					console.log('pick in loop', pick);
+					await prisma.pick.create({
+						data: {
+							id: generateId(15),
+							year: new Date().getFullYear(),
+							show: 'PMT',
+							week: parseInt(CURRENT_WEEK),
+							person: user.username,
+							type: pick.type,
+							description: pick.description,
+							league: 'NFL',
+							homeTeam: pick.homeTeam,
+							awayTeam: pick.awayTeam,
+							isLive: false,
+							private: false,
+							userId: user.id,
+							barstoolEmployee: false,
+							pmtPersona: false
+						}
+					});
+				});
+			} catch (error) {
+				console.error('error', error);
+				return fail(500, { message: 'Error making picks', success: false });
+			}
 		} catch (error) {
+			if (error instanceof z.ZodError) {
+				return {
+					status: 400,
+					body: { success: false, error: error.errors }
+				};
+			}
 			console.error('error', error);
-			return fail(500, { message: 'Error making picks', success: false });
 		}
 
 		return {
