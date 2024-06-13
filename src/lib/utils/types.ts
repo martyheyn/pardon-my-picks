@@ -76,6 +76,7 @@ export type Odds = {
 			key: string;
 			last_update: string;
 			outcomes: {
+				id: string;
 				name: string;
 				price: number;
 				point: number;
@@ -89,4 +90,14 @@ export type Odds = {
 	id: string;
 	sport_key: string;
 	sport_title: string;
+};
+
+export type PickForm = {
+	id: string;
+	show: string;
+	type: string;
+	description: string;
+	homeTeam: string;
+	awayTeam: string;
+	indexes?: { pickIndex: number; betIndex: number; outcomeIndex: number };
 };

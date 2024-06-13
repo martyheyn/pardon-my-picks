@@ -9,10 +9,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
 import { type $Enums } from '@prisma/client';
+import { type PickForm } from '$lib/utils/types';
 
 import { CURRENT_WEEK } from '$env/static/private';
-
-// import
 
 // TODO: make the teams emuns and the type 'spread' or 'total'
 // Define the schema for the PickForm object
@@ -65,6 +64,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 					market.outcomes = market.outcomes
 						.map((outcome) => ({
 							...outcome,
+							id: generateId(15),
 							sorted: game.away_team === outcome.name ? 1 : 2
 						}))
 						.sort((a, b) => a.sorted - b.sorted);
@@ -79,7 +79,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	return { user: locals.user, odds: oddsDataClean };
+	const userPicks: PickForm[] = await prisma.pick.findMany({
+		where: {
+			userId: locals.user.id,
+			year: new Date().getFullYear(),
+			week: parseInt(CURRENT_WEEK)
+		},
+		select: {
+			id: true,
+			show: true,
+			type: true,
+			description: true,
+			homeTeam: true,
+			awayTeam: true
+		}
+	});
+
+	return { user: locals.user, odds: oddsDataClean, picks: userPicks };
 };
 
 export const actions: Actions = {
@@ -119,15 +135,49 @@ export const actions: Actions = {
 			console.log('picks', picks);
 
 			// check if user has already made either
-			const pickUser = await prisma.user.findMany({
+			const pickUser = await prisma.user.findUnique({
 				where: {
 					id: user.id
+				},
+				include: {
+					picks: {
+						where: {
+							week: parseInt(CURRENT_WEEK),
+							year: new Date().getFullYear()
+						}
+					}
 				}
 			});
-
 			console.log('pickUser', pickUser);
 
-			// TODO: update pick funcctionality, whole new UI and server action
+			if (!pickUser) {
+				return fail(400, {
+					message: 'User not found',
+					success: false
+				});
+			}
+
+			if (pickUser.picks.length >= 2) {
+				return fail(400, {
+					message: 'You have already made picks for this week',
+					success: false
+				});
+			}
+
+			// check if pick is already made, if so reomove it from the array
+			// const picksToRemove = pickUser.picks.map((pick) => {
+			// 	return picks.find(
+			// 		(pick) => pick.description ===
+			// 	);
+			// });
+
+			if (pickUser.picks.length + picks.length > 2) {
+				return fail(400, {
+					message: 'You can only make 2 picks per week',
+					success: false
+				});
+			}
+
 			try {
 				picks.forEach(async (pick) => {
 					console.log('pick in loop', pick);
@@ -156,17 +206,31 @@ export const actions: Actions = {
 				return fail(500, { message: 'Error making picks', success: false });
 			}
 		} catch (error) {
+			console.error('error', error);
+
 			if (error instanceof z.ZodError) {
 				return {
 					status: 400,
 					body: { success: false, error: error.errors }
 				};
 			}
-			console.error('error', error);
+			return {
+				status: 500,
+				body: { success: false, error: 'Sorry, there was an error making your picks' }
+			};
 		}
+
+		const userPicks = await prisma.pick.findMany({
+			where: {
+				userId: user.id,
+				year: new Date().getFullYear(),
+				week: parseInt(CURRENT_WEEK)
+			}
+		});
 
 		return {
 			message: 'You have made this weeks picks! Good luck and godspeed',
+			picks: userPicks,
 			success: true
 		};
 	}

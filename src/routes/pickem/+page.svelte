@@ -1,40 +1,49 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { fade, slide } from 'svelte/transition';
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToMascot } from '$lib/utils/matching-format';
+	import type { Writable } from 'svelte/store';
+	import { getContext } from 'svelte';
+	import AlertFlash from '$lib/components/alert.svelte';
+	import { type Alert } from '$lib/utils/types';
+	import { type PickForm } from '$lib/utils/types';
+	import { i } from 'vitest/dist/reporters-yx5ZTtEV.js';
 	// import { type $Enums } from '@prisma/client';
 
 	export let data: PageData;
+	export let form: ActionData;
 
-	type PickForm = {
-		show: string;
-		type: string;
-		description: string;
-		homeTeam: string;
-		awayTeam: string;
-		indexes: { pickIndex: number; betIndex: number; outcomeIndex: number };
-	};
+	const alert: Writable<Alert> = getContext('alert');
 
 	$: ({ odds } = data);
 	$: console.log('odds', odds);
 
-	let usersPicks: PickForm[] = [];
+	let usersPicks = data.picks ? data.picks : [];
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	// used for ui if pick is selected
-	$: selected = Array.from({ length: odds ? odds?.length : 0 }, () => {
-		return Array.from({ length: odds ? odds[0].bookmakers[0].markets.length : 0 }, () => {
-			return Array.from(
-				{ length: odds ? odds[0].bookmakers[0].markets[0].outcomes.length : 0 },
-				() => {
-					return false;
-				}
-			);
-		});
-	});
+	// $: selected = Array.from({ length: odds ? odds.length : 0 }, () => {
+	// 	return Array.from({ length: odds ? odds[0].bookmakers[0].markets.length : 0 }, () => {
+	// 		return Array.from(
+	// 			{ length: odds ? odds[0].bookmakers[0].markets[0].outcomes.length : 0 },
+	// 			() => {
+	// 				let isSelected = false;
+	// 				form?.picks?.forEach((pick) => {
+	// 					usersPicks.forEach((userPick) => {
+	// 						if (pick.description === userPick.description) {
+	// 							isSelected = true;
+	// 						}
+	// 					});
+	// 				});
+	// 				return isSelected;
+	// 			}
+	// 		);
+	// 	});
+	// });
 
 	const addPick = (
+		id: string,
 		type: string,
 		description: string,
 		homeTeam: string,
@@ -43,6 +52,7 @@
 	) => {
 		// add this data
 		const userPick = {
+			id,
 			show: 'PMT',
 			type,
 			description: description,
@@ -53,9 +63,12 @@
 
 		// check if the pick already exists
 		if (usersPicks.length > 0) {
-			const pickExists = usersPicks.find((pick) => pick.description === description);
+			const pickExists = usersPicks.find((pick) => pick.id === id);
 			if (pickExists) {
-				alert('You have already made this pick');
+				alert.set({
+					text: 'You have already made this pick',
+					alertType: 'error'
+				});
 				return;
 			}
 		}
@@ -65,9 +78,6 @@
 			const opposingPick = usersPicks.find(
 				(pick) => pick.homeTeam === homeTeam && pick.awayTeam === awayTeam && pick.type === type
 			);
-			const opposingPickIndex =
-				indexes.outcomeIndex % 2 === 0 ? indexes.outcomeIndex + 1 : indexes.outcomeIndex - 1;
-			selected[indexes.pickIndex][indexes.betIndex][opposingPickIndex] = false;
 			if (opposingPick) {
 				const index = usersPicks.indexOf(opposingPick);
 				usersPicks = usersPicks.filter((_, i) => i !== index);
@@ -76,15 +86,16 @@
 
 		// check if user has already made picks
 		if (usersPicks.length >= 2) {
-			alert('You have already made 2 picks');
+			alert.set({
+				text: 'You have already made 2 picks. Remove one to choose a new one.',
+				alertType: 'error'
+			});
 			return;
 		}
 
-		// add the pick to the array and update selected
+		// add the pick to the array
 		usersPicks = [...usersPicks, userPick];
-		selected[indexes.pickIndex][indexes.betIndex][indexes.outcomeIndex] = true;
 	};
-	$: console.log('usersPicks', usersPicks);
 
 	const getDescription = (
 		type: string,
@@ -110,6 +121,18 @@
 		}
 		return description;
 	};
+
+	const updateAlert = () => {
+		if (form) {
+			alert.set({
+				text: form.message,
+				alertType: form.success ? 'success' : 'error'
+			});
+		}
+		return;
+	};
+	// alerts
+	$: form, updateAlert();
 </script>
 
 <svelte:head>
@@ -127,25 +150,32 @@
 		<h1 class="font-header">Place this weeks picks here</h1>
 	</div>
 
+	<div class="my-4">
+		<AlertFlash />
+	</div>
+
 	<form method="post" use:enhance>
 		<input type="hidden" name="userPicks" bind:value={hiddenInput} />
 		{#if usersPicks.length > 0}
 			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
-				<div
-					class="transition-all duration-300 ease-in-out flex justify-end items-center"
-					transition:slide={{ duration: 300, delay: 300 }}
-				>
-					<button
-						type="submit"
-						disabled={usersPicks.length < 2}
-						class={`btn-primary ${
-							usersPicks.length < 2
-								? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
-								: ''
-						}`}
-						>Save Picks
-					</button>
-				</div>
+				{#if data.picks !== usersPicks}
+					<div
+						class="transition-all duration-300 ease-in-out flex justify-end items-center"
+						transition:slide={{ duration: 300, delay: 300 }}
+					>
+						<button
+							type="submit"
+							disabled={usersPicks.length < 2}
+							class={`btn-primary ${
+								usersPicks.length < 2
+									? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
+									: ''
+							}`}
+						>
+							Save Picks
+						</button>
+					</div>
+				{/if}
 
 				<div
 					class="grid grid-cols-1 sm:grid-cols-2 mt-4 mb-8 sm:gap-x-6 gap-y-6 max-w-6xl
@@ -159,13 +189,17 @@
 							out:slide={{ duration: 250 }}
 						>
 							<div class="flex justify-start items-center">
-								<p class="">{pick.awayTeam} vs {pick.homeTeam}</p>
+								<p class="">{pick.awayTeam} @ {pick.homeTeam}</p>
 							</div>
 							<div class="flex justify-start items-center">
 								<p class="font-semibold">{pick.description}</p>
 							</div>
 
-							<div class="flex flex-row gap-x-4">
+							<div
+								class="flex flex-row gap-x-4"
+								in:slide={{ duration: 300 }}
+								out:slide={{ duration: 250 }}
+							>
 								<button
 									class="w-full px-4 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary
 									dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
@@ -174,9 +208,7 @@
 										const index = usersPicks.indexOf(pick);
 										usersPicks = usersPicks.filter((_, i) => i !== index);
 										// set selected for individual pick to false
-										selected[pick.indexes.pickIndex][pick.indexes.betIndex][
-											pick.indexes.outcomeIndex
-										] = false;
+										if (!pick.indexes) return;
 									}}
 								>
 									Remove
@@ -216,14 +248,15 @@
 												<button
 													class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
 													${
-														selected[pickIndex][betIndex][outcomeIndex]
+														usersPicks.map((pick) => pick.id === outcome.id).length > 0
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
 															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
 													}`}
-													disabled={selected[pickIndex][betIndex][outcomeIndex]}
+													disabled={usersPicks.map((pick) => pick.id === outcome.id).length > 0}
 													on:click={(e) => {
 														e.preventDefault();
 														addPick(
+															outcome.id,
 															bets.key === 'spreads' ? bets.key.slice(0, -1) : bets.key,
 															getDescription(
 																bets.key,
