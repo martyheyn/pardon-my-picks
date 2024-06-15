@@ -125,9 +125,8 @@ enum NFLTeam {
 
   // MLB for testing
   orioles
-  rays
+  phillies
   yankees
-  rockies
-  twins
-  braves
+  redSox
+  
 }

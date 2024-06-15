@@ -9,7 +9,6 @@
 	import AlertFlash from '$lib/components/alert.svelte';
 	import { type Alert } from '$lib/utils/types';
 	import { type PickForm } from '$lib/utils/types';
-	import { i } from 'vitest/dist/reporters-yx5ZTtEV.js';
 	// import { type $Enums } from '@prisma/client';
 
 	export let data: PageData;
@@ -18,37 +17,17 @@
 	const alert: Writable<Alert> = getContext('alert');
 
 	$: ({ odds } = data);
-	$: console.log('odds', odds);
+	// $: console.log('odds', odds);
 
 	let usersPicks = data.picks ? data.picks : [];
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
-	// used for ui if pick is selected
-	// $: selected = Array.from({ length: odds ? odds.length : 0 }, () => {
-	// 	return Array.from({ length: odds ? odds[0].bookmakers[0].markets.length : 0 }, () => {
-	// 		return Array.from(
-	// 			{ length: odds ? odds[0].bookmakers[0].markets[0].outcomes.length : 0 },
-	// 			() => {
-	// 				let isSelected = false;
-	// 				form?.picks?.forEach((pick) => {
-	// 					usersPicks.forEach((userPick) => {
-	// 						if (pick.description === userPick.description) {
-	// 							isSelected = true;
-	// 						}
-	// 					});
-	// 				});
-	// 				return isSelected;
-	// 			}
-	// 		);
-	// 	});
-	// });
 
 	const addPick = (
 		id: string,
 		type: string,
 		description: string,
 		homeTeam: string,
-		awayTeam: string,
-		indexes: { pickIndex: number; betIndex: number; outcomeIndex: number }
+		awayTeam: string
 	) => {
 		// add this data
 		const userPick = {
@@ -57,8 +36,7 @@
 			type,
 			description: description,
 			homeTeam: fullNameToMascot[homeTeam],
-			awayTeam: fullNameToMascot[awayTeam],
-			indexes
+			awayTeam: fullNameToMascot[awayTeam]
 		};
 
 		// check if the pick already exists
@@ -207,8 +185,6 @@
 										e.preventDefault();
 										const index = usersPicks.indexOf(pick);
 										usersPicks = usersPicks.filter((_, i) => i !== index);
-										// set selected for individual pick to false
-										if (!pick.indexes) return;
 									}}
 								>
 									Remove
@@ -224,7 +200,7 @@
 			font-paragraph transition-all duration-300 ease-in-out"
 		>
 			{#if odds !== undefined}
-				{#each odds as odd, pickIndex}
+				{#each odds as odd}
 					<div class="card pb-4 pt-2 min-w-[360px]">
 						<div class="grid grid-cols-8 gap-x-4">
 							<div class="col-span-3 grid grid-rows-3 place-content-start w-full">
@@ -238,7 +214,7 @@
 							</div>
 
 							<div class="w-full col-span-5 flex flex-row gap-x-6 justify-end">
-								{#each odd.bookmakers[0].markets as bets, betIndex}
+								{#each odd.bookmakers[0].markets as bets}
 									<div class="grid grid-rows-3 gap-y-4 place-content-center">
 										<div class="flex justify-center items-center font-header font-semibold text-lg">
 											{bets.key.charAt(0).toUpperCase() + bets.key.slice(1)}
@@ -248,11 +224,11 @@
 												<button
 													class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
 													${
-														usersPicks.map((pick) => pick.id === outcome.id).length > 0
+														usersPicks.map((pick) => pick.id === outcome.id)[0]
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
 															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
 													}`}
-													disabled={usersPicks.map((pick) => pick.id === outcome.id).length > 0}
+													disabled={usersPicks.map((pick) => pick.id === outcome.id)[0]}
 													on:click={(e) => {
 														e.preventDefault();
 														addPick(
@@ -266,8 +242,7 @@
 																bets.key === 'totals' ? odd.away_team : undefined
 															), // getDescription(type, betNumber, team, overUnder, otherTeam
 															odd.home_team,
-															odd.away_team,
-															{ pickIndex, betIndex, outcomeIndex }
+															odd.away_team
 														);
 													}}
 												>

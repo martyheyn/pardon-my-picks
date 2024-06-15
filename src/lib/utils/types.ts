@@ -99,5 +99,4 @@ export type PickForm = {
 	description: string;
 	homeTeam: string;
 	awayTeam: string;
-	indexes?: { pickIndex: number; betIndex: number; outcomeIndex: number };
 };

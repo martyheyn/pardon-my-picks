@@ -1,10 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { superValidate } from 'sveltekit-superforms';
+// import { superValidate } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
 import { generateId } from 'lucia';
 import { z } from 'zod';
-import { zod } from 'sveltekit-superforms/adapters';
+// import { zod } from 'sveltekit-superforms/adapters';
 
 import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
@@ -16,6 +16,7 @@ import { CURRENT_WEEK } from '$env/static/private';
 // TODO: make the teams emuns and the type 'spread' or 'total'
 // Define the schema for the PickForm object
 const PickFormObjectSchema = z.object({
+	id: z.string(),
 	show: z.string(),
 	type: z.enum(['spread', 'totals']),
 	description: z.string(),
@@ -41,8 +42,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const betStart = new Date('2024-06-10T12:00:00Z');
-	const betEnd = new Date('2024-06-12T22:00:00Z');
+	const betStart = new Date('2024-06-14T12:00:00Z');
+	const betEnd = new Date('2024-06-17T22:00:00Z');
 
 	if (date > betStart && date < betEnd) {
 		console.log('betting is open');
