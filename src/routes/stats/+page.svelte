@@ -13,6 +13,7 @@
 	import { linear, quadInOut } from 'svelte/easing';
 	import Icon from '$lib/components/icon.svelte';
 	import { enhance } from '$app/forms';
+	import Alert from '$lib/components/alert.svelte';
 
 	export let data: PageData;
 	export let form;
@@ -37,9 +38,13 @@
 		return betTypeStats.record;
 	};
 
-	let specialBetOpen: string | undefined = undefined;
+	let specialBetOpen: string[] | undefined = undefined;
 	const handleSpecialBetOpen = (person: string) => {
-		specialBetOpen = specialBetOpen === person ? undefined : person;
+		if (specialBetOpen?.includes(person)) {
+			specialBetOpen = specialBetOpen?.filter((p) => p !== person);
+			return;
+		}
+		specialBetOpen = specialBetOpen ? [...specialBetOpen, person] : [person];
 	};
 	type SpecialBet = {
 		[person: string]: {
@@ -63,6 +68,8 @@
 		acc[person].push(betData);
 		return acc;
 	}, {});
+
+	$: console.log(specialBetsData);
 
 	const getSpecialBetRecord = (person: string) => {
 		const betRecord = specialBetsData[person].reduce(
@@ -329,14 +336,14 @@
 								<Icon
 									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer
 							 	hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit
-								${specialBetOpen === persona.person ? 'rotate-[270deg]' : 'rotate-90'}`}
+								${specialBetOpen?.includes(persona.person) ? 'rotate-[270deg]' : 'rotate-90'}`}
 									width="24px"
 									height="24px"
 									iconName="arrow"
 								/>
 							</button>
 						</div>
-						{#if specialBetOpen === persona.person}
+						{#if specialBetOpen?.includes(persona.person)}
 							<div transition:slide={{ duration: 300 }}>
 								<div class="w-full overflow-x-auto rounded-md border">
 									<table
