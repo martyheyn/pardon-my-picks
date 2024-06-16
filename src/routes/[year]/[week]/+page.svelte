@@ -180,10 +180,10 @@
 											pick.homeTeamScore === null || pick.homeTeamScore === undefined
 												? 'bg-slate-300 bg-opacity-70'
 												: pick.winner
-												? 'bg-green-300 dark:bg-green-900'
+												? 'bg-lightGreen dark:bg-darkGreen'
 												: pick.push
-												? 'bg-yellow-300 dark:bg-yellow-500'
-												: 'bg-red-300 dark:bg-red-900'
+												? 'bg-lightYellow dark:bg-darkYellow'
+												: 'bg-lightRed dark:bg-darkRed'
 										} w-fit px-6 rounded-md flex justify-start items-center`}
 									>
 										{pick.description}
@@ -383,7 +383,7 @@
 										{#if (pick.tail && pick.tail.length > 0) || (pick.fade && pick.fade.length > 0)}
 											<div class={`w-full h-1 flex rounded-md`}>
 												<div
-													class={`h-full bg-green-300 bg-opacity-90
+													class={`h-full bg-lightGreen bg-opacity-90
 											${
 												pick.tail &&
 												pick.fade &&
@@ -398,7 +398,7 @@
 													}%`}
 												/>
 												<div
-													class={`h-full bg-red-300 bg-opacity-90 
+													class={`h-full bg-lightRed bg-opacity-90 
 											${
 												pick.tail &&
 												pick.fade &&

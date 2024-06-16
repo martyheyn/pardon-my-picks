@@ -188,8 +188,8 @@
 							>
 								<form use:enhance action="?/deletePick&id={pick.id}" method="post">
 									<button
-										class="w-full px-4 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary
-									dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
+										class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover
+										dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out"
 										type="submit"
 										on:click={(e) => {
 											// this is giving an id every render so the db id does not match with the other id
