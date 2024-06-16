@@ -17,9 +17,9 @@
 	const alert: Writable<Alert> = getContext('alert');
 
 	$: ({ odds } = data);
-	// $: console.log('odds', odds);
+	$: console.log('odds', odds);
 
-	let usersPicks = data.picks ? data.picks : [];
+	$: usersPicks = data.picks ? data.picks : form?.picks ? form?.picks : [];
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 
 	const addPick = (
@@ -74,6 +74,7 @@
 		// add the pick to the array
 		usersPicks = [...usersPicks, userPick];
 	};
+	$: console.log('usersPicks', usersPicks);
 
 	const getDescription = (
 		type: string,
@@ -132,7 +133,7 @@
 		<AlertFlash />
 	</div>
 
-	<form method="post" use:enhance>
+	<form use:enhance action="?/addPicks" method="post">
 		<input type="hidden" name="userPicks" bind:value={hiddenInput} />
 		{#if usersPicks.length > 0}
 			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
@@ -143,7 +144,7 @@
 					>
 						<button
 							type="submit"
-							disabled={usersPicks.length < 2}
+							disabled={data.picks === usersPicks || usersPicks.length !== 2}
 							class={`btn-primary ${
 								usersPicks.length < 2
 									? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
@@ -152,6 +153,13 @@
 						>
 							Save Picks
 						</button>
+					</div>
+				{:else}
+					<div
+						class="transition-all duration-300 ease-in-out flex justify-start items-center"
+						transition:slide={{ duration: 300, delay: 300 }}
+					>
+						<h2 class="font-header text-2xl">Your Picks</h2>
 					</div>
 				{/if}
 
@@ -178,17 +186,26 @@
 								in:slide={{ duration: 300 }}
 								out:slide={{ duration: 250 }}
 							>
-								<button
-									class="w-full px-4 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary
+								<form use:enhance action="?/deletePick&id={pick.id}" method="post">
+									<button
+										class="w-full px-4 py-1.5 rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary
 									dark:hover:bg-darkHover transition-all duration-300 ease-in-out"
-									on:click={(e) => {
-										e.preventDefault();
-										const index = usersPicks.indexOf(pick);
-										usersPicks = usersPicks.filter((_, i) => i !== index);
-									}}
-								>
-									Remove
-								</button>
+										type="submit"
+										on:click={(e) => {
+											// this is giving an id every render so the db id does not match with the other id
+											if (
+												form?.picks?.map((formPick) => formPick.id === pick.id).includes(false) ||
+												data.picks?.map((dataPick) => dataPick.id === pick.id).includes(false)
+											) {
+												console.log('here cause nothing is here');
+												e.preventDefault();
+												usersPicks = usersPicks.filter((p) => p.id !== pick.id);
+											}
+										}}
+									>
+										Remove
+									</button>
+								</form>
 							</div>
 						</div>
 					{/each}
@@ -221,10 +238,15 @@
 										</div>
 										{#each bets.outcomes as outcome, outcomeIndex}
 											<div class="">
+												{outcome.id}
+												{#each usersPicks as pick}
+													<p>{pick.id}</p>
+												{/each}
+												{usersPicks.map((pick) => pick.id === outcome.id).includes(true)}
 												<button
 													class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
 													${
-														usersPicks.map((pick) => pick.id === outcome.id)[0]
+														usersPicks.map((pick) => pick.id === outcome.id).includes(true)
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
 															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
 													}`}
