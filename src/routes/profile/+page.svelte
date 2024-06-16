@@ -98,9 +98,8 @@
 					>
 						<div class="w-full h-full flex justify-center mt-1">
 							<Icon
-								class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full ${
-									editting ? '' : 'hover:scale-110'
-								}`}
+								class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full 
+								${editting ? '' : 'hover:scale-110'}`}
 								width="24px"
 								height="24px"
 								iconName="upload"
@@ -165,8 +164,9 @@
 						id="username"
 						name="username"
 						type="text"
-						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 
-						w-full rounded-md transition duration-150 ease-in-out ${editting ? '' : 'bg-stone-50'}`}
+						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 focus:dark:border-gray-300
+						w-full rounded-md transition duration-150 ease-in-out dark:bg-dark focus:dark:bg-gray-600
+						bg-stone-50`}
 						disabled={!editting}
 						bind:value={user.username}
 					/>
@@ -181,7 +181,7 @@
 							<span class="pl-1">Email</span>
 							<button on:click={() => (infoDisplayed = !infoDisplayed)} type="button">
 								<Icon
-									class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full  hover:scale-110 `}
+									class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full hover:scale-110 `}
 									fillRule="evenodd"
 									clipRule="evenodd"
 									width="16px"
@@ -205,23 +205,24 @@
 						id="email"
 						name="email"
 						type="email"
-						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 
-						w-full rounded-md transition duration-150 ease-in-out ${editting ? '' : 'bg-stone-50'}`}
+						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 focus:dark:border-gray-300
+						w-full rounded-md transition duration-150 ease-in-out dark:bg-dark focus:dark:bg-gray-600
+						bg-stone-50`}
 						disabled={!editting}
 						bind:value={user.email}
 					/>
 				</div>
 			</div>
 
-			<div class={`flex ${editting ? 'justify-end' : 'justify-start'}`}>
-				{#if !editting}
-					<button
-						in:fly={{ x: -40, duration: 300, delay: 750 }}
-						on:click={handleEdit}
-						disabled={disableSave}
-						class={`mt-4 ${disableSave && 'bg-gray-400'} btn-primary`}>Edit Profile</button
-					>
-				{:else}
+			<div class={`flex ${editting ? 'justify-between' : 'justify-start'}`}>
+				<button
+					in:fly={{ x: -40, duration: 300, delay: 750 }}
+					on:click={handleEdit}
+					disabled={disableSave}
+					class={`mt-4 ${disableSave && 'bg-gray-400'} btn-primary`}
+					>{editting ? 'Cancel' : 'Edit Profile'}</button
+				>
+				{#if editting}
 					<button
 						in:fly={{ x: 40, duration: 300, delay: 100 }}
 						disabled={disableSave}
