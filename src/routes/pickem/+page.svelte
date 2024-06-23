@@ -16,8 +16,10 @@
 
 	const alert: Writable<Alert> = getContext('alert');
 
-	$: ({ odds } = data);
+	$: ({ odds, savedPicks } = data);
 	$: console.log('odds', odds);
+	$: console.log('data', data);
+	console.log('form', form);
 
 	$: usersPicks = data.picks ? data.picks : form?.picks ? form?.picks : [];
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
@@ -53,11 +55,13 @@
 
 		// check if the pick is an opposing pick
 		if (usersPicks.length > 0) {
-			const opposingPick = usersPicks.find(
+			const opposingPick: PickForm | undefined = usersPicks.find(
 				(pick) => pick.homeTeam === homeTeam && pick.awayTeam === awayTeam && pick.type === type
 			);
 			if (opposingPick) {
-				const index = usersPicks.indexOf(opposingPick);
+				const index = usersPicks.findIndex(
+					(pick) => pick.homeTeam === homeTeam && pick.awayTeam === awayTeam && pick.type === type
+				);
 				usersPicks = usersPicks.filter((_, i) => i !== index);
 			}
 		}
@@ -137,7 +141,7 @@
 		<input type="hidden" name="userPicks" bind:value={hiddenInput} />
 		{#if usersPicks.length > 0}
 			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
-				{#if data.picks !== usersPicks}
+				{#if data.picks !== usersPicks && usersPicks.length === 2}
 					<div
 						class="transition-all duration-300 ease-in-out flex justify-end items-center"
 						transition:slide={{ duration: 300, delay: 300 }}
@@ -159,7 +163,9 @@
 						class="transition-all duration-300 ease-in-out flex justify-start items-center"
 						transition:slide={{ duration: 300, delay: 300 }}
 					>
-						<h2 class="font-header text-2xl">Your Picks</h2>
+						<h2 class="font-header text-2xl">
+							{savedPicks ? 'Your Picks' : 'Make 2 Picks & Save Them'}
+						</h2>
 					</div>
 				{/if}
 
@@ -186,22 +192,14 @@
 								in:slide={{ duration: 300 }}
 								out:slide={{ duration: 250 }}
 							>
-								<form use:enhance action="?/deletePick&id={pick.id}" method="post">
+								<form use:enhance action="?/deletePick" method="post">
+									<input type="hidden" name="pickId" value={pick.id} />
+									<input type="hidden" name="usersPicks" bind:value={hiddenInput} />
+
 									<button
 										class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover
 										dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out"
 										type="submit"
-										on:click={(e) => {
-											// this is giving an id every render so the db id does not match with the other id
-											if (
-												form?.picks?.map((formPick) => formPick.id === pick.id).includes(false) ||
-												data.picks?.map((dataPick) => dataPick.id === pick.id).includes(false)
-											) {
-												console.log('here cause nothing is here');
-												e.preventDefault();
-												usersPicks = usersPicks.filter((p) => p.id !== pick.id);
-											}
-										}}
 									>
 										Remove
 									</button>

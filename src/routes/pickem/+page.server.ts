@@ -1,9 +1,9 @@
 import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-// import { superValidate } from 'sveltekit-superforms';
 import { fail } from '@sveltejs/kit';
 import { generateId } from 'lucia';
 import { z } from 'zod';
+// import { setError, superValidate } from 'sveltekit-superforms';
 // import { zod } from 'sveltekit-superforms/adapters';
 
 import { ODDS_API_KEY } from '$env/static/private';
@@ -19,6 +19,7 @@ import { CURRENT_WEEK } from '$env/static/private';
 // Define the schema for the PickForm object
 const PickFormObjectSchema = z.object({
 	id: z.string(),
+	gameId: z.string(),
 	show: z.string(),
 	type: z.enum(['spread', 'totals']),
 	description: z.string(),
@@ -29,13 +30,21 @@ const PickFormObjectSchema = z.object({
 // // Define the schema for an array of PickForm objects
 const PickFormSchema = z.array(PickFormObjectSchema);
 
+// const DeletePickSchema = z.object({
+// 	pickId: z.string(),
+// 	usersPicks: z.array(PickFormObjectSchema)
+// });
+
+let uiUserPicks: PickForm[] = [];
+
 export const load: PageServerLoad = async ({ locals }) => {
+	console.log('uiUserPicks from serverload', uiUserPicks);
 	const { user } = locals;
 	if (!user) {
 		redirect(303, '/');
 	}
 
-	const userPicks: PickForm[] = await prisma.pick.findMany({
+	const dbUserPicks: PickForm[] = await prisma.pick.findMany({
 		where: {
 			userId: user.id,
 			year: new Date().getFullYear(),
@@ -50,36 +59,39 @@ export const load: PageServerLoad = async ({ locals }) => {
 			awayTeam: true
 		}
 	});
+	console.log('dbUserPicks', dbUserPicks);
+
+	const userPicks = dbUserPicks.length > 0 ? dbUserPicks : uiUserPicks;
 
 	// initialize forms
 	// const form = await superValidate(zod(PickFormSchema));
 	let oddsDataClean: Odds[] = [];
 
-	// can only bet games for the next 4 days
-	const date = new Date();
-
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const betStart = new Date('2024-07-01T12:00:00Z');
-	const betEnd = new Date('2024-07-03T22:00:00Z');
+	const betStart = new Date('2024-06-23T12:00:00Z');
+	const betEnd = new Date('2024-06-26T22:00:00Z');
+
+	// can only bet games for the next 4 days
+	const date = new Date();
+	const commenceTimeTo =
+		new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';
 
 	if (date > betStart && date < betEnd) {
 		console.log('betting is open');
-
-		const commenceTimeTo =
-			new Date(date.setDate(date.getDate() + 3)).toISOString().split('.')[0] + 'Z';
-		console.log(commenceTimeTo);
 
 		try {
 			const odds = await fetch(
 				`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
 			);
 			const oddsData: Odds[] = await odds.json();
+			// console.log('oddsData', JSON.stringify(oddsData, null, 2));
+
 			const oddsDataFiltered = oddsData.filter(
 				(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1
 			);
-			console.log('userPicks', userPicks);
+			// console.log('userPicks', userPicks);
 			oddsDataClean = oddsDataFiltered.map((game) => {
 				game.bookmakers[0].markets.forEach((market) => {
 					market.outcomes = market.outcomes
@@ -88,9 +100,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 							// if this odd is already picked in the db by the user, give it the same id
 							userPicks.map((up) => {
 								if (
+									fullNameToMascot[game.away_team] &&
+									up.awayTeam &&
 									fullNameToMascot[game.away_team] === up.awayTeam &&
 									fullNameToMascot[game.home_team] === up.homeTeam &&
-									(market.key === 'spreads' ? market.key.slice(0, -1) : market.key) === up.type
+									(market.key === 'spreads' ? market.key.slice(0, -1) : market.key) === up.type &&
+									market.key === 'totals'
+										? outcome.name === (up.description.indexOf('Over') > -1 ? 'Over' : 'Under')
+										: outcome.point ===
+										  parseFloat(up.description.split(' ')[up.description.split(' ').length - 1])
 								) {
 									id = up.id;
 								}
@@ -114,7 +132,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	return { user: locals.user, odds: oddsDataClean, picks: userPicks };
+	const savedPicks = dbUserPicks.length > 0 ? true : false;
+
+	return { user: locals.user, odds: oddsDataClean, picks: userPicks, savedPicks };
 };
 
 export const actions: Actions = {
@@ -192,11 +212,54 @@ export const actions: Actions = {
 				});
 			}
 
+			picks.map(async (pick) => {
+				let gameId = '';
+				const dbGameIds = await prisma.pick.findMany({
+					select: {
+						gameId: true
+					},
+					where: {
+						week: parseInt(CURRENT_WEEK),
+						year: new Date().getFullYear(),
+						homeTeam: pick.homeTeam,
+						awayTeam: pick.awayTeam
+					}
+				});
+				gameId = dbGameIds[0]?.gameId;
+				console.log('dbGameIds', dbGameIds);
+
+				// can only bet games for the next 4 days
+				const date = new Date();
+				const commenceTimeTo =
+					new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';
+
+				// if the game was not picked by the fellas then search the odds api for it
+				// only do this if the game is not already in the db so I'm not making too many calls to the api
+				if (dbGameIds.length === 0) {
+					const oddsGameIds = await fetch(
+						`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
+					);
+					const oddsGameIdsData: Odds[] = await oddsGameIds.json();
+					console.log('oddsGameIdsData', oddsGameIdsData);
+					console.log('pick', pick);
+					const oddsGameId = oddsGameIdsData.find(
+						(game) => game.away_team === pick.awayTeam && game.home_team === pick.homeTeam
+					);
+					gameId = oddsGameId?.id || '';
+				}
+
+				return {
+					...pick,
+					gameId: gameId
+				};
+			});
+
 			try {
 				picks.forEach(async (pick) => {
 					await prisma.pick.create({
 						data: {
 							id: generateId(15),
+							gameId: pick.gameId,
 							year: new Date().getFullYear(),
 							show: 'PMT',
 							week: parseInt(CURRENT_WEEK),
@@ -240,9 +303,9 @@ export const actions: Actions = {
 		}
 	},
 
-	deletePick: async ({ url, locals }) => {
+	deletePick: async (event) => {
 		// throw error if user is not logged in
-		const { user } = locals;
+		const { user } = event.locals;
 		if (!user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to make a pick buddy',
@@ -250,16 +313,49 @@ export const actions: Actions = {
 			});
 		}
 
-		const id = url.searchParams.get('id');
-		if (!id) {
+		const formData = await event.request.formData();
+		const pickId = formData.get('pickId') as string;
+		const usersPicksRaw = formData.get('usersPicks');
+
+		if (typeof usersPicksRaw !== 'string') {
+			return fail(400, { message: 'Invalid request', success: false });
+		}
+		const usersPicks: PickForm[] = JSON.parse(usersPicksRaw);
+
+		if (!pickId) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let picks;
+		if (!usersPicks) {
+			return fail(500, { message: 'Invalid request', success: false });
+		}
+
+		// see if the pick exists
+		const pick = await prisma.pick.findUnique({
+			where: {
+				id: pickId
+			}
+		});
+
+		// if the pick does not exist, remove on the client side
+		if (!pick) {
+			console.log('deletingggg pick reload populating Ui');
+
+			const newPicks = usersPicks.filter((p: PickForm) => p.id !== pickId);
+			uiUserPicks = newPicks;
+
+			return {
+				picks: newPicks
+			};
+		}
+
+		let picks: PickForm[] = [];
+
 		try {
+			console.log('deletingggg pick from db');
 			await prisma.pick.delete({
 				where: {
-					id: id
+					id: pickId
 				}
 			});
 
@@ -271,15 +367,15 @@ export const actions: Actions = {
 					week: parseInt(CURRENT_WEEK)
 				}
 			});
+
+			return {
+				message: 'Pick deleted',
+				picks,
+				success: true
+			};
 		} catch (error) {
 			console.error('error', error);
 			return fail(500, { message: 'Error deleting pick', success: false });
 		}
-
-		return {
-			message: 'Pick deleted',
-			picks,
-			success: true
-		};
 	}
 };

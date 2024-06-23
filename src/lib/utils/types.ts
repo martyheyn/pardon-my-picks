@@ -94,6 +94,7 @@ export type Odds = {
 
 export type PickForm = {
 	id: string;
+	gameId?: string | null;
 	show: string;
 	type: string;
 	description: string;

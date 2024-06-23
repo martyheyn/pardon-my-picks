@@ -1,0 +1,73 @@
+[
+	{
+		"id": "0d93b66aeed7b461d817be3f5f99e53f",
+		"sport_key": "baseball_mlb",
+		"sport_title": "MLB",
+		"commence_time": "2024-06-20T23:35:00Z",
+		"completed": true,
+		"home_team": "St. Louis Cardinals",
+		"away_team": "San Francisco Giants",
+		"scores": [
+			{
+				"name": "St. Louis Cardinals",
+				"score": "6"
+			},
+			{
+				"name": "San Francisco Giants",
+				"score": "5"
+			}
+		],
+		"last_update": "2024-06-21T18:15:31Z"
+	},
+	{
+		"id": "71c3c69b206512eda8dd77ace86a66d1",
+		"sport_key": "baseball_mlb",
+		"sport_title": "MLB",
+		"commence_time": "2024-06-21T01:40:39Z",
+		"completed": true,
+		"home_team": "San Diego Padres",
+		"away_team": "Milwaukee Brewers",
+		"scores": [
+			{
+				"name": "San Diego Padres",
+				"score": "7"
+			},
+			{
+				"name": "Milwaukee Brewers",
+				"score": "6"
+			}
+		],
+		"last_update": "2024-06-21T18:15:31Z"
+	},
+	{
+		"id": "5cde162f9d82c10d90ad39ac80c4a287",
+		"sport_key": "baseball_mlb",
+		"sport_title": "MLB",
+		"commence_time": "2024-06-21T18:18:36Z",
+		"completed": false,
+		"home_team": "Chicago Cubs",
+		"away_team": "New York Mets",
+		"scores": [
+			{
+				"name": "Chicago Cubs",
+				"score": "1"
+			},
+			{
+				"name": "New York Mets",
+				"score": "11"
+			}
+		],
+		"last_update": "2024-06-21T21:19:53Z"
+	},
+	{
+		"id": "5819213e7cb18d664e60dae28b318db3",
+		"sport_key": "baseball_mlb",
+		"sport_title": "MLB",
+		"commence_time": "2024-06-21T22:40:00Z",
+		"completed": false,
+		"home_team": "Philadelphia Phillies",
+		"away_team": "Arizona Diamondbacks",
+		"scores": null,
+		"last_update": "2024-06-21T21:19:53Z"
+	}
+]
