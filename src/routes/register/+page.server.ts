@@ -31,7 +31,7 @@ const RegisterFormSchema = z.object({
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		throw redirect(303, '/');
+		redirect(303, '/');
 	}
 
 	await limiter.cookieLimiter?.preflight(event);
