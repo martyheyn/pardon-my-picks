@@ -3,7 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { generateId } from 'lucia';
 import { zod } from 'sveltekit-superforms/adapters';
-import { set, z } from 'zod';
+import { z } from 'zod';
 
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import {

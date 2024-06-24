@@ -50,12 +50,17 @@
 
 	// update alert based on form response
 	// TODO:: clean this up, maybe put it in a function somewhere else
-	$: if (form) {
-		alert.set({
-			text: form.message,
-			alertType: form.success ? 'success' : 'error'
-		});
-	}
+	const updateAlert = () => {
+		if (form) {
+			alert.set({
+				text: form.message,
+				alertType: form.success ? 'success' : 'error'
+			});
+		}
+		return;
+	};
+	// alerts
+	$: form, updateAlert();
 </script>
 
 <div
@@ -93,9 +98,8 @@
 					>
 						<div class="w-full h-full flex justify-center mt-1">
 							<Icon
-								class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full ${
-									editting ? '' : 'hover:scale-110'
-								}`}
+								class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full 
+								${editting ? '' : 'hover:scale-110'}`}
 								width="24px"
 								height="24px"
 								iconName="upload"
@@ -134,9 +138,7 @@
 		</div>
 	{/if}
 
-	<div
-		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
-	>
+	<div class="max-w-2xl card">
 		{#if !form?.uploadPic}
 			<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 				<AlertFlash />
@@ -150,7 +152,10 @@
 		<form method="POST" action="?/updateUserData" use:enhance={handleEdit} class="w-full h-full">
 			<div class="w-full flex flex-row gap-x-8">
 				<div class="flex-1">
-					<label for="username" class="block text-sm font-medium text-gray-600">
+					<label
+						for="username"
+						class="block text-sm font-medium text-muteTextColor dark:text-darkMuteTextColor"
+					>
 						<div class="flex justify-between items-center pr-2">
 							<span class="pl-1">Username</span>
 						</div>
@@ -159,20 +164,24 @@
 						id="username"
 						name="username"
 						type="text"
-						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 
-						w-full rounded-md transition duration-150 ease-in-out ${editting ? '' : 'bg-stone-50'}`}
+						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 focus:dark:border-gray-300
+						w-full rounded-md transition duration-150 ease-in-out dark:bg-dark focus:dark:bg-gray-600
+						bg-stone-50`}
 						disabled={!editting}
 						bind:value={user.username}
 					/>
 				</div>
 
 				<div class="flex-1">
-					<label for="email" class="block text-sm font-medium text-gray-600">
+					<label
+						for="email"
+						class="block text-sm font-medium text-muteTextColor dark:text-darkMuteTextColor"
+					>
 						<div class="flex justify-between items-center pr-2">
 							<span class="pl-1">Email</span>
 							<button on:click={() => (infoDisplayed = !infoDisplayed)} type="button">
 								<Icon
-									class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full  hover:scale-110 `}
+									class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full hover:scale-110 `}
 									fillRule="evenodd"
 									clipRule="evenodd"
 									width="16px"
@@ -196,32 +205,28 @@
 						id="email"
 						name="email"
 						type="email"
-						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 
-						w-full rounded-md transition duration-150 ease-in-out ${editting ? '' : 'bg-stone-50'}`}
+						class={`mt-1 py-2 indent-2 border focus:outline-none focus:border-blue-300 focus:dark:border-gray-300
+						w-full rounded-md transition duration-150 ease-in-out dark:bg-dark focus:dark:bg-gray-600
+						bg-stone-50`}
 						disabled={!editting}
 						bind:value={user.email}
 					/>
 				</div>
 			</div>
 
-			<div class={`flex ${editting ? 'justify-end' : 'justify-start'}`}>
-				{#if !editting}
-					<button
-						in:fly={{ x: -40, duration: 300, delay: 750 }}
-						on:click={handleEdit}
-						disabled={disableSave}
-						class={`mt-4 w-fit text-white ${
-							disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
-						} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
-						>Edit Profile</button
-					>
-				{:else}
+			<div class={`flex ${editting ? 'justify-between' : 'justify-start'}`}>
+				<button
+					in:fly={{ x: -40, duration: 300, delay: 750 }}
+					on:click={handleEdit}
+					disabled={disableSave}
+					class={`mt-4 ${disableSave && 'bg-gray-400'} btn-primary`}
+					>{editting ? 'Cancel' : 'Edit Profile'}</button
+				>
+				{#if editting}
 					<button
 						in:fly={{ x: 40, duration: 300, delay: 100 }}
 						disabled={disableSave}
-						class={`mt-4 w-fit text-white ${
-							disableSave ? 'bg-gray-400' : 'bg-primary hover:bg-primaryHover'
-						} border rounded-md px-4 py-1.5 transition-all duration-200 ease-in-out`}
+						class={`mt-4 w-fit text-white ${disableSave && 'bg-gray-400'} btn-primary`}
 						>Save Profile</button
 					>
 				{/if}
@@ -229,9 +234,7 @@
 		</form>
 	</div>
 
-	<div
-		class="max-w-2xl border border-black border-opacity-50 rounded-md px-6 py-4 mt-4 flex flex-col gap-y-4"
-	>
+	<div class="max-w-2xl card">
 		<div class="flex">
 			<h2 class="text-xl font-semibold">Stats</h2>
 		</div>

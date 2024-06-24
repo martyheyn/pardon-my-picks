@@ -2,7 +2,7 @@
 	import type { ActionData, PageData } from './$types';
 	import { page } from '$app/stores';
 	import { fade, fly, slide } from 'svelte/transition';
-	import { quadInOut } from 'svelte/easing';
+	import { cubicInOut, quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
 	import { logo, personaImgPath, sortOrder, teamLink } from '$lib/utils/matching-format';
 	import type { PickByPerson } from '$lib/utils/types';
@@ -19,6 +19,8 @@
 	export let form: ActionData;
 
 	$: ({ picks, user } = data);
+	$: console.log('picks', picks);
+	// change back to packers home, bears away
 
 	$: ({ year, week } = $page.params);
 
@@ -46,11 +48,6 @@
 		);
 	});
 
-	// set height on pick description element to max-h of row
-
-	// get todays datetime to compare to game datetime
-	const now = new Date();
-
 	let showNerdNug: { person: string; indx: number } | undefined;
 
 	const toggleNerdNug = (person: string, indx: number) => {
@@ -63,13 +60,69 @@
 
 	let btnsDivWidth: number = 0;
 
+	// call live-scores api server every minute to get the latest scores, only call if is live
+	// pick is only called when the game is live
+	// this can come from the winner function I will have to create, this will be called at the end of a game,
+	//  maybe based off the response from the odds api
+	$: liveScores = picks
+		.filter((pick) => pick.isLive)
+		.reduce(
+			(
+				acc: { [key: string]: { homeLiveScore: number | null; awayLiveScore: number | null } },
+				pick
+			) => {
+				acc[pick.id] = {
+					homeLiveScore: pick.homeTeamScore,
+					awayLiveScore: pick.awayTeamScore
+				};
+				return acc;
+			},
+			{}
+		);
+
+	let animateScore = false;
+	// check security to make sure this function is not called a billion times
+	const updateScore = (pickId: string) => {
+		console.log('Updating the score!');
+		// only call this if the game is currently happening, aka score is not null
+		setInterval(async () => {
+			const res = await fetch('/api/live-scores', {
+				method: 'POST',
+				body: JSON.stringify({ pickId }),
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+			const data = await res.json();
+			console.log('data', data);
+
+			animateScore = true;
+			liveScores[pickId] = {
+				homeLiveScore: data.homeLiveScore,
+				awayLiveScore: data.awayLiveScore
+			};
+			animateScore = false;
+		}, 60000);
+	};
+
+	// run updateScore function for all live games
+	$: picks.forEach((pick) => {
+		if (pick.isLive) {
+			updateScore(pick.id);
+		}
+	});
+
+	const updateAlert = () => {
+		if (form) {
+			alert.set({
+				text: form.message,
+				alertType: form.success ? 'success' : 'error'
+			});
+		}
+		return;
+	};
 	// alerts
-	$: if (form) {
-		alert.set({
-			text: form.message,
-			alertType: form.success ? 'success' : 'error'
-		});
-	}
+	$: form, updateAlert();
 
 	$: alertBool = $alert.text ? true : false;
 
@@ -77,6 +130,7 @@
 	// TODO: clean up logic making data reactive
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
 	// not sure if passing arguments through the url is the best way to do it
+	// do it as a form so it can have a zod schema
 </script>
 
 <svelte:head>
@@ -85,10 +139,13 @@
 
 <div class="" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
-		class="flex justify-start items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
+		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
 	>
 		<h1 class="font-header">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
+		{#if user}
+			<a href="/pickem" class="btn-primary">Make your picks</a>
+		{/if}
 	</div>
 
 	{#if form && !form.pickId}
@@ -116,22 +173,17 @@
 				>
 					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 						{#key week}
-							<div
-								class="rounded-md border border-black border-opacity-20 dark:border-white
-								 dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-col
-								 gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out"
-								in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
-							>
+							<div class="card" in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}>
 								<div class="">
 									<h4
 										class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
 											pick.homeTeamScore === null || pick.homeTeamScore === undefined
 												? 'bg-slate-300 bg-opacity-70'
 												: pick.winner
-												? 'bg-green-300 dark:bg-green-900'
+												? 'bg-lightGreen dark:bg-darkGreen'
 												: pick.push
-												? 'bg-yellow-300 dark:bg-yellow-500'
-												: 'bg-red-300 dark:bg-red-900'
+												? 'bg-lightYellow dark:bg-darkYellow'
+												: 'bg-lightRed dark:bg-darkRed'
 										} w-fit px-6 rounded-md flex justify-start items-center`}
 									>
 										{pick.description}
@@ -151,13 +203,23 @@
 										<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
 											<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
 										</a>
-										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
+										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
 											<p
-												class={`${
-													pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
+												class={`${pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'} ${
+													pick.isLive ? ' font-normal' : ''
 												} text-lg`}
 											>
-												{pick.awayTeamScore}
+												{#if pick.isLive}
+													{#key animateScore}
+														<div
+															transition:fade={{ duration: 1000, delay: 250, easing: cubicInOut }}
+														>
+															{liveScores[pick.id].awayLiveScore}
+														</div>
+													{/key}
+												{:else}
+													{pick.awayTeamScore}
+												{/if}
 											</p>
 										{/if}
 									</div>
@@ -169,13 +231,19 @@
 											<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
 										</a>
 
-										{#if pick.homeTeamScore !== null && pick.homeTeamScore !== undefined && pick.awayTeamScore !== null && pick.awayTeamScore !== undefined}
+										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
 											<p
 												class={`${
-													pick.homeTeamScore - pick.awayTeamScore > 0 ? 'font-bold' : ''
+													!pick.isLive && pick.homeTeamScore - pick.awayTeamScore > 0
+														? 'font-bold'
+														: ''
 												} text-lg`}
 											>
-												{pick.homeTeamScore}
+												{#if pick.isLive}
+													{liveScores[pick.id].homeLiveScore}
+												{:else}
+													{pick.homeTeamScore}
+												{/if}
 											</p>
 										{/if}
 									</div>
@@ -272,7 +340,7 @@
 																		: ''
 																} ${
 																	pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
-																		? 'fill-green-300 dark:fill-green-900 cursor-default'
+																		? 'fill-green-300 dark:fill-green-900'
 																		: 'fill-none'
 																}`}
 																width="24px"
@@ -298,7 +366,7 @@
 																		: ''
 																} ${
 																	pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
-																		? 'fill-red-300 dark:fill-red-900 cursor-default'
+																		? 'fill-red-300 dark:fill-red-900'
 																		: 'fill-none'
 																}`}
 																width="24px"
@@ -315,7 +383,7 @@
 										{#if (pick.tail && pick.tail.length > 0) || (pick.fade && pick.fade.length > 0)}
 											<div class={`w-full h-1 flex rounded-md`}>
 												<div
-													class={`h-full bg-green-300 bg-opacity-90
+													class={`h-full bg-lightGreen bg-opacity-90
 											${
 												pick.tail &&
 												pick.fade &&
@@ -330,7 +398,7 @@
 													}%`}
 												/>
 												<div
-													class={`h-full bg-red-300 bg-opacity-90 
+													class={`h-full bg-lightRed bg-opacity-90 
 											${
 												pick.tail &&
 												pick.fade &&

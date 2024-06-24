@@ -68,6 +68,46 @@ export const teamLink: { [key: string]: string } = {
 	commanders: 'https://www.espn.com/nfl/team/_/name/wsh/washington-commanders'
 };
 
+// TODO: make this an enum
+export const fullNameToMascot: { [key: string]: string } = {
+	'Arizona Cardinals': 'cardinals',
+	'Atlanta Falcons': 'falcons',
+	'Baltimore Ravens': 'ravens',
+	'Buffalo Bills': 'bills',
+	'Carolina Panthers': 'panthers',
+	'Chicago Bears': 'bears',
+	'Cincinnati Bengals': 'bengals',
+	'Cleveland Browns': 'browns',
+	'Dallas Cowboys': 'cowboys',
+	'Denver Broncos': 'broncos',
+	'Detroit Lions': 'lions',
+	'Green Bay Packers': 'packers',
+	'Houston Texans': 'texans',
+	'Indianapolis Colts': 'colts',
+	'Jacksonville Jaguars': 'jaguars',
+	'Kansas City Chiefs': 'chiefs',
+	'Los Angeles Chargers': 'chargers',
+	'Los Angeles Rams': 'rams',
+	'Miami Dolphins': 'dolphins',
+	'Minnesota Vikings': 'vikings',
+	'New England Patriots': 'patriots',
+	'New Orleans Saints': 'saints',
+	'New York Giants': 'giants',
+	'New York Jets': 'jets',
+	'Las Vegas Raiders': 'raiders',
+	'Philadelphia Eagles': 'eagles',
+	'Pittsburgh Steelers': 'steelers',
+	'San Francisco 49ers': 'fortyNiners',
+	'Seattle Seahawks': 'seahawks',
+	'Tampa Bay Buccaneers': 'buccaneers',
+	'Tennessee Titans': 'titans',
+	'Washington Commanders': 'commanders',
+	'Baltimore Orioles': 'orioles',
+	'Washington Nationals': 'nationals',
+	'San Diego Padres': 'padres',
+	'Cleveland Guardians': 'guardians'
+};
+
 export const personaImgPath = (person: string) => {
 	switch (person) {
 		case 'Big Cat':

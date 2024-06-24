@@ -90,7 +90,7 @@ export const actions: Actions = {
 		}
 
 		// secure flag for security duh
-		console.log('security', event.request.secure);
+		// console.log('security', event.request.secure);
 
 		const session = await lucia.createSession(existingUser.id, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
