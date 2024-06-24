@@ -127,8 +127,8 @@ enum NFLTeam {
 
   // MLB for testing
   orioles
-  astros
-  mets
-  cubs
+  guardians
+  nationals
+  padres
   
 }

@@ -18,8 +18,8 @@
 
 	$: ({ odds, savedPicks } = data);
 	$: console.log('odds', odds);
-	$: console.log('data', data);
-	console.log('form', form);
+	// $: console.log('data', data);
+	// $: console.log('form', form);
 
 	$: usersPicks = data.picks ? data.picks : form?.picks ? form?.picks : [];
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
@@ -55,14 +55,21 @@
 
 		// check if the pick is an opposing pick
 		if (usersPicks.length > 0) {
+			if (savedPicks && usersPicks.length >= 2) {
+				alert.set({
+					text: 'You already have 2 saved. Please remove them to choose a new ones.',
+					alertType: 'error'
+				});
+				return;
+			}
 			const opposingPick: PickForm | undefined = usersPicks.find(
-				(pick) => pick.homeTeam === homeTeam && pick.awayTeam === awayTeam && pick.type === type
+				(pick) =>
+					pick.homeTeam === fullNameToMascot[homeTeam] &&
+					pick.awayTeam === fullNameToMascot[awayTeam] &&
+					pick.type === type
 			);
 			if (opposingPick) {
-				const index = usersPicks.findIndex(
-					(pick) => pick.homeTeam === homeTeam && pick.awayTeam === awayTeam && pick.type === type
-				);
-				usersPicks = usersPicks.filter((_, i) => i !== index);
+				usersPicks = usersPicks.filter((pick) => pick.id !== opposingPick.id);
 			}
 		}
 

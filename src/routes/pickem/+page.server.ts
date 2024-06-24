@@ -51,6 +51,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		},
 		select: {
 			id: true,
+			gameId: true,
 			show: true,
 			type: true,
 			description: true,
@@ -101,18 +102,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 							// if this odd is already picked by the user, give it the same id
 							userPicks.map((up) => {
 								if (
-									fullNameToMascot[game.away_team] &&
-									up.awayTeam &&
-									fullNameToMascot[game.away_team] === up.awayTeam &&
-									fullNameToMascot[game.home_team] === up.homeTeam &&
-									// id === up.gameId
-									// despriction === up.description
+									// fullNameToMascot[game.away_team] === up.awayTeam &&
+									(up.gameId === game.id ||
+										(fullNameToMascot[game.away_team] === up.awayTeam &&
+											fullNameToMascot[game.home_team] === up.homeTeam)) &&
 									(market.key === 'spreads' ? market.key.slice(0, -1) : market.key) === up.type &&
-									// comment below out becuase I don't I need it but we'll
-									market.key === 'totals'
+									// TODO: need to change this so it is not dependent on the exact number as that might change
+									(market.key === 'totals'
 										? outcome.name === (up.description.indexOf('Over') > -1 ? 'Over' : 'Under')
 										: outcome.point ===
-										  parseFloat(up.description.split(' ')[up.description.split(' ').length - 1])
+										  parseFloat(up.description.split(' ')[up.description.split(' ').length - 1]))
 								) {
 									id = up.id;
 								}
