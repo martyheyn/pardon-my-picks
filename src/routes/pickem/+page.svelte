@@ -236,11 +236,6 @@
 										</div>
 										{#each bets.outcomes as outcome, outcomeIndex}
 											<div class="">
-												{outcome.id}
-												{#each usersPicks as pick}
-													<p>{pick.id}</p>
-												{/each}
-												{usersPicks.map((pick) => pick.id === outcome.id).includes(true)}
 												<button
 													class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
 													${
