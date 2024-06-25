@@ -46,6 +46,10 @@
 
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });
+
+	function onMount(arg0: () => Promise<void>) {
+		throw new Error('Function not implemented.');
+	}
 </script>
 
 <svelte:head>

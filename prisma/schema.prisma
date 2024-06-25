@@ -9,7 +9,7 @@ datasource db {
 
 model Pick {
   id            String    @id @db.VarChar(191)
-  gameId        String    @map("game_id") @db.VarChar(191)
+  gameId        String?    @map("game_id") @db.VarChar(191)
   createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
   year          Int       @default(0)
@@ -18,8 +18,8 @@ model Pick {
   person        String    @db.VarChar(191)
   type          String    @db.VarChar(191)
   description   String    @db.VarChar(191)
-  homeTeam      NFLTeam   @map("home_team")
-  awayTeam      NFLTeam   @map("away_team")
+  homeTeam      NFLTeam?   @map("home_team")
+  awayTeam      NFLTeam?   @map("away_team")
   homeTeamScore Int?      @map("home_team_score")
   awayTeamScore Int?      @map("away_team_score")
   isLive        Boolean   @default(false) @map("is_live")

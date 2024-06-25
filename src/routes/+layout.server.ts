@@ -1,12 +1,13 @@
 import type { LayoutServerLoad } from './$types';
-import { MAINTANANCE_MODE } from '$env/static/private';
+import { MAINTENANCE_MODE } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 
-export const load: LayoutServerLoad = async (event) => {
-	if (MAINTANANCE_MODE) {
-		redirect(302, '/maintenance');
+export const load: LayoutServerLoad = async ({ url }) => {
+	const targetPath = '/maintenance';
+	if (MAINTENANCE_MODE && url.pathname !== targetPath) {
+		throw redirect(302, targetPath);
 	}
-	return {
-		user: event.locals.user
-	};
+	// return {
+	// 	user: event.locals.user
+	// };
 };
