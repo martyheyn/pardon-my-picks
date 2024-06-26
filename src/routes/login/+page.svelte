@@ -56,7 +56,7 @@
 			</div>
 
 			<form class="flex flex-col gap-y-2 mt-2" method="post" use:enhance>
-				<label for="username" class="block text-sm font-medium text-gray-600"
+				<label for="username" class="block text-sm font-medium text-gray-600 dark:text-white"
 					><span class="pl-[2px]">Username</span>
 					<input
 						id="username"
@@ -74,7 +74,7 @@
 					{/if}
 				</label>
 
-				<label for="password" class="block text-sm font-medium text-gray-600"
+				<label for="password" class="block text-sm font-medium text-gray-600 dark:text-white"
 					><span class="pl-[2px]">Password</span>
 					<input
 						id="password"
@@ -110,14 +110,18 @@
 				{/if}
 
 				<div class="flex flex-col gap-y-1">
-					<p class="text-xs text-gray-500 flex gap-x-2">
+					<p class="text-xs text-gray-500 dark:text-white flex gap-x-2">
 						Don't have an account?
-						<a href="/register" class=""> <p class="text-blue-500">Sign Up</p></a>
+						<a href="/register" class="">
+							<p class="text-blue-500 dark:text-blue-200">Sign Up</p></a
+						>
 					</p>
 
-					<p class="text-xs text-gray-500 flex gap-x-2">
+					<p class="text-xs text-gray-500 dark:text-white flex gap-x-2">
 						Forgot your password?
-						<a href="/reset-password" class=""> <p class="text-blue-500">Reset Password</p></a>
+						<a href="/reset-password" class="">
+							<p class="text-blue-500 dark:text-blue-200">Reset Password</p></a
+						>
 					</p>
 				</div>
 			</form>
