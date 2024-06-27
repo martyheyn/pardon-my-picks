@@ -50,10 +50,10 @@ export const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
 export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
 
 export type Scores = {
-	away_team: string;
+	away_team: $Enums.NFLTeam;
 	commence_time: string;
 	completed: boolean;
-	home_team: string;
+	home_team: $Enums.NFLTeam;
 	id: string;
 	last_update: string;
 	scores:

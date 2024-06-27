@@ -71,8 +71,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const betStart = new Date('2024-06-23T12:00:00Z');
-	const betEnd = new Date('2024-06-26T22:00:00Z');
+	const betStart = new Date('2024-06-25T12:00:00Z');
+	const betEnd = new Date('2024-06-28T22:00:00Z');
 
 	// can only bet games for the next 4 days
 	const date = new Date();
@@ -216,6 +216,7 @@ export const actions: Actions = {
 				});
 			}
 
+			// let newPicks: PickForm[] = [];
 			try {
 				picks.forEach(async (pick) => {
 					let gameId = '';
@@ -252,9 +253,21 @@ export const actions: Actions = {
 						gameId = oddsGameId?.id || '';
 					}
 
+					const pickId = generateId(15);
+
+					uiUserPicks.push({
+						id: pickId,
+						gameId: gameId,
+						show: 'PMT',
+						type: pick.type,
+						description: pick.description,
+						homeTeam: pick.homeTeam,
+						awayTeam: pick.awayTeam
+					});
+
 					await prisma.pick.create({
 						data: {
-							id: generateId(15),
+							id: pickId,
 							gameId: gameId || '',
 							year: new Date().getFullYear(),
 							show: 'PMT',
@@ -281,6 +294,7 @@ export const actions: Actions = {
 				};
 			} catch (error) {
 				console.error('error', error);
+				uiUserPicks = [];
 				return fail(500, { message: 'Error making picks', success: false });
 			}
 		} catch (error) {

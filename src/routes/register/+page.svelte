@@ -61,7 +61,7 @@
 						id="username"
 						name="username"
 						type="text"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none
+						class="mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
 						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
 						aria-invalid={$errors.username ? 'true' : undefined}
 						bind:value={$form.username}
@@ -79,7 +79,7 @@
 						id="password"
 						name="password"
 						type="password"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none
+						class="mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
 						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
 						aria-invalid={$errors.password ? 'true' : undefined}
 						bind:value={$form.password}
@@ -97,7 +97,7 @@
 						id="confirmPassword"
 						name="confirmPassword"
 						type="password"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none
+						class="mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
 						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
 						aria-invalid={$errors.confirmPassword ? 'true' : undefined}
 						bind:value={$form.confirmPassword}
