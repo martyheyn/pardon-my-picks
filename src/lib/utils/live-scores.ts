@@ -3,6 +3,16 @@ import type { Scores } from './types';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { ODDS_API_KEY } from '$env/static/private';
 
+export const getTeamScores = async (scores: Scores, teamName: string) => {
+	if (!scores) return null;
+	const score = scores.scores?.find((score) => {
+		const scoreTeamName = score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase();
+		return scoreTeamName === teamName;
+	})?.score;
+
+	return score ? parseInt(score) : null;
+};
+
 export const getLiveGames = async ({ year }: { year: string }) => {
 	// get live scores if the games have already started (americanfootball_nfl)
 	const scores = await fetch(
@@ -27,7 +37,6 @@ export const getLiveGames = async ({ year }: { year: string }) => {
 				}
 			}
 		});
-		console.log('gamesToMark', gamesToMark);
 
 		if (gamesToMark.length > 0) {
 			// call the marking function
@@ -35,10 +44,14 @@ export const getLiveGames = async ({ year }: { year: string }) => {
 			const gamesToMarkData = gamesToMark.map((game) => {
 				return {
 					gameId: game.id,
+					type: game.type,
+					descrption: game.description,
 					homeTeam: game.homeTeam,
 					awayTeam: game.awayTeam,
 					homeTeamScore: game.homeTeamScore,
-					awayTeamScore: game.awayTeamScore
+					awayTeamScore: game.awayTeamScore,
+					pickTeam: game.pickTeam,
+					pickScore: game.pickScore
 				};
 			});
 			console.log('gamesToMarkData', gamesToMarkData);
@@ -59,15 +72,4 @@ export const getLiveGames = async ({ year }: { year: string }) => {
 	console.log('scoresLive', scoresLive);
 
 	return scoresLive;
-};
-
-// need this to be a scores object to Scores, scores within scores
-export const getTeamScores = async (scores: Scores, teamName: string) => {
-	if (!scores) return null;
-	const score = scores.scores?.find((score) => {
-		const scoreTeamName = score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase();
-		return scoreTeamName === teamName;
-	})?.score;
-
-	return score ? parseInt(score) : null;
 };

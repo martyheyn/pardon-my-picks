@@ -3,23 +3,27 @@ import { generateId } from 'lucia';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
-import { ODDS_API_KEY } from '$env/static/private';
-import { fullNameToMascot } from '$lib/utils/matching-format';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
-		where: {
-			week: parseInt(params.week),
-			year: parseInt(params.year),
-			pmtPersona: true,
-			barstoolEmployee: true
-		},
-		include: {
-			tail: true,
-			fade: true
-		}
-	});
+	console.log('hereeeee in page server');
+	console.log('params', params);
+	console.log('params', parseInt(params.week));
+	let picks: PicksWithTailsAndFades[] = [];
+	if (!isNaN(parseInt(params.week))) {
+		picks = await prisma.pick.findMany({
+			where: {
+				week: parseInt(params.week),
+				year: parseInt(params.year),
+				pmtPersona: true,
+				barstoolEmployee: true
+			},
+			include: {
+				tail: true,
+				fade: true
+			}
+		});
+	}
 
 	// can only bet games for the next 4 days
 
@@ -33,68 +37,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const gameEnd = new Date('2024-06-28T22:00:00Z');
 
 	if (date > gameStart && date < gameEnd) {
-		// // get live scores if the games have already started (americanfootball_nfl)
-		// const scores = await fetch(
-		// 	`https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
-		// );
-		// const scoresDataRaw: Scores[] = await scores.json();
-		// // console.log('scoresDataRaw', JSON.stringify(scoresDataRaw, null, 2));
-
-		// // if the game is not live, from it from the list and call the marking function
-		// const completedGames: Scores[] = scoresDataRaw.filter(
-		// 	(game: Scores) => game.scores !== null && game.completed === true
-		// );
-		// // make sure this game is not already marked, it is the first time the game has flipped from not live to live
-		// if (completedGames.length > 0) {
-		// 	const gamesToMark = await prisma.pick.findMany({
-		// 		where: {
-		// 			year: parseInt(params.year),
-		// 			winner: null,
-		// 			marked: false,
-		// 			gameId: {
-		// 				in: completedGames.map((game) => game.id)
-		// 			}
-		// 		}
-		// 	});
-		// 	console.log('gamesToMark', gamesToMark);
-
-		// 	if (gamesToMark.length > 0) {
-		// 		// call the marking function
-		// 		// get data of all completedGames in gamesToMark
-		// 		const gamesToMarkData = gamesToMark.map((game) => {
-		// 			return {
-		// 				gameId: game.id,
-		// 				homeTeam: game.homeTeam,
-		// 				awayTeam: game.awayTeam,
-		// 				homeTeamScore: game.homeTeamScore,
-		// 				awayTeamScore: game.awayTeamScore
-		// 			};
-		// 		});
-		// 		console.log('gamesToMarkData', gamesToMarkData);
-
-		// 		// markGames(gamesToMark);
-		// 	}
-		// }
-		// // const scoresNonNull = scoresDataRaw.filter((game) => game.scores !== null);
-
-		// // only pull games that are currently being played (and teams that are in the enum)
-		// const scoresLive: Scores[] = scoresDataRaw.filter(
-		// 	(game: Scores) =>
-		// 		game.scores !== null &&
-		// 		game.completed === false &&
-		// 		fullNameToMascot[game.home_team] &&
-		// 		fullNameToMascot[game.away_team]
-		// );
-		// console.log('scoresLive', scoresLive);
-
 		const scoresLive = await getLiveGames({ year: params.year });
 
 		scoresLive.map(async (game: Scores) => {
 			const prismaPicks = await prisma.pick.updateMany({
 				where: {
-					id: game.id,
-					year: parseInt(params.year),
-					winner: null
+					gameId: game.id
 				},
 				data: {
 					isLive: false,
@@ -102,34 +50,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 					awayTeamScore: await getTeamScores(game, game.away_team)
 				}
 			});
+			console.log('prismaPicks', prismaPicks);
 		});
-
-		// scoresLive.map((game: Scores) => {
-		// 	// I might be able to get this by gameId now
-		// 	const homeTeamName = game.home_team
-		// 		.split(' ')
-		// 		[game.home_team.split(' ').length - 1].toLowerCase();
-		// 	picks.map((pick) => {
-		// 		if (pick.homeTeam === homeTeamName) {
-		// 			pick.isLive = true;
-		// 			const homeTeamLiveScore = game.scores?.find((score) => {
-		// 				const scoreTeamName = score.name
-		// 					.split(' ')
-		// 					[score.name.split(' ').length - 1].toLowerCase();
-		// 				return scoreTeamName === pick.homeTeam;
-		// 			})?.score;
-
-		// 			const awayTeamLiveScore = game.scores?.find((score) => {
-		// 				const scoreTeamName = score.name
-		// 					.split(' ')
-		// 					[score.name.split(' ').length - 1].toLowerCase();
-		// 				return scoreTeamName === pick.awayTeam;
-		// 			})?.score;
-		// 			pick.homeTeamScore = homeTeamLiveScore ? parseInt(homeTeamLiveScore) : null;
-		// 			pick.awayTeamScore = awayTeamLiveScore ? parseInt(awayTeamLiveScore) : null;
-		// 		}
-		// 	});
-		// });
 	}
 
 	return {
@@ -206,8 +128,8 @@ export const actions: Actions = {
 					id: generateId(15),
 					userId: locals.user.id,
 					pickId: pickId,
-					winner: pick?.winner ? false : true,
-					push: pick?.push && pick?.push === 1 ? true : false
+					winner: pick?.winner ? (pick?.winner ? 0 : 1) : null,
+					push: pick?.push ? (pick?.push === 1 ? 1 : 0) : null
 				}
 			});
 		} catch (error) {
@@ -290,8 +212,8 @@ export const actions: Actions = {
 					id: generateId(15),
 					userId: locals.user.id,
 					pickId: pickId,
-					winner: pick?.winner && pick?.winner === 1 ? true : false,
-					push: pick?.push && pick?.push === 1 ? true : false
+					winner: pick?.winner ? (pick?.winner === 1 ? 1 : 0) : null,
+					push: pick?.push ? (pick?.push === 1 ? 1 : 0) : null
 				}
 			});
 		} catch (error) {

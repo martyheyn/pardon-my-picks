@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { fly, slide } from 'svelte/transition';
-	import { quadInOut } from 'svelte/easing';
 
 	import {
 		personaAvatarPath,
