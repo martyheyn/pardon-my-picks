@@ -1,6 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
-import { raw } from '@prisma/client/runtime/library';
 
 type RawPersonData = {
 	person: string;
@@ -45,9 +44,9 @@ export const load: PageServerLoad = async () => {
        SUM(p.winner) as wins, 
        SUM(p.push) as pushes,
        COUNT(t.id) as total_tails,
-       SUM(CASE WHEN t.winner THEN 1 ELSE 0 END) as tail_wins,
+       SUM(t.winner) as tail_wins,
        COUNT(f.id) as total_fades,
-       SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
+       SUM(f.winner) as fade_wins
 	   FROM "Pick" as p
 	   LEFT JOIN "Tail" as t ON p.id = t.pick_id
 	   LEFT JOIN "Fade" as f ON p.id = f.pick_id
@@ -153,9 +152,9 @@ export const actions: Actions = {
 		   		SUM(p.winner) as wins,
 		   		SUM(p.push) as pushes,
 		   		COUNT(t.id) as total_tails,
-		   		SUM(CASE WHEN t.winner THEN 1 ELSE 0 END) as tail_wins,
+		   		SUM(t.winner) as tail_wins,
 		   		COUNT(f.id) as total_fades,
-		   		SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
+		   		SUM(f.winner) as fade_wins
 		   		FROM "Pick" as p
 		   		LEFT JOIN "Tail" as t ON p.id = t.pick_id
 		   		LEFT JOIN "Fade" as f ON p.id = f.pick_id
@@ -169,9 +168,9 @@ export const actions: Actions = {
 		   		SUM(p.winner) as wins,
 		   		SUM(p.push) as pushes,
 		   		COUNT(t.id) as total_tails,
-		   		SUM(CASE WHEN t.winner THEN 1 ELSE 0 END) as tail_wins,
+		   		SUM(t.winner) as tail_wins,
 		   		COUNT(f.id) as total_fades,
-		   		SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
+		   		SUM(f.winner) as fade_wins
 		   		FROM "Pick" as p
 		   		LEFT JOIN "Tail" as t ON p.id = t.pick_id
 		   		LEFT JOIN "Fade" as f ON p.id = f.pick_id

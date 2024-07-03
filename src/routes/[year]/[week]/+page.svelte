@@ -126,13 +126,6 @@
 
 	$: alertBool = $alert.text ? true : false;
 
-	const testTailFade = async () => {
-		const res = await fetch('/api/test-tailfade');
-		console.log(res);
-		const data = await res.json();
-		console.log('data', data);
-	};
-
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
@@ -151,12 +144,7 @@
 		<h1 class="font-header">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
 		{#if user}
-			<div class="flex gap-4">
-				<a href="/pickem" class="btn-primary">Make your picks</a>
-				<button class="btn-primary" on:click|preventDefault={testTailFade}
-					>Test Mark Tail & Fades</button
-				>
-			</div>
+			<a href="/pickem" class="btn-primary">Make your picks</a>
 		{/if}
 	</div>
 

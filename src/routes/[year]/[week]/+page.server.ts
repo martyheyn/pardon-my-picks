@@ -6,24 +6,18 @@ import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	console.log('hereeeee in page server');
-	console.log('params', params);
-	console.log('params', parseInt(params.week));
-	let picks: PicksWithTailsAndFades[] = [];
-	if (!isNaN(parseInt(params.week))) {
-		picks = await prisma.pick.findMany({
-			where: {
-				week: parseInt(params.week),
-				year: parseInt(params.year),
-				pmtPersona: true,
-				barstoolEmployee: true
-			},
-			include: {
-				tail: true,
-				fade: true
-			}
-		});
-	}
+	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
+		where: {
+			week: parseInt(params.week),
+			year: parseInt(params.year),
+			pmtPersona: true,
+			barstoolEmployee: true
+		},
+		include: {
+			tail: true,
+			fade: true
+		}
+	});
 
 	// can only bet games for the next 4 days
 
@@ -33,11 +27,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const gameStart = new Date('2024-06-25T12:00:00Z');
-	const gameEnd = new Date('2024-06-28T22:00:00Z');
+	const gameStart = new Date('2024-07-01T12:00:00Z');
+	const gameEnd = new Date('2024-07-28T22:00:00Z');
 
 	if (date > gameStart && date < gameEnd) {
 		const scoresLive = await getLiveGames({ year: params.year });
+		console.log('scoresLive', scoresLive);
 
 		scoresLive.map(async (game: Scores) => {
 			const prismaPicks = await prisma.pick.updateMany({

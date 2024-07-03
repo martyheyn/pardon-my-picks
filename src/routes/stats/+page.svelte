@@ -55,6 +55,17 @@
 		}[];
 	};
 
+	$: tailFadeOpen = personData
+		.filter((person) => parseInt(person.total_tails) > 0 || parseInt(person.total_fades) > 0)
+		.map((person) => person.person);
+	const handleTailFadeOpen = (person: string) => {
+		if (tailFadeOpen?.includes(person)) {
+			tailFadeOpen = tailFadeOpen?.filter((p) => p !== person);
+			return;
+		}
+		tailFadeOpen = tailFadeOpen ? [...tailFadeOpen, person] : [person];
+	};
+
 	// want this indexed so it can be easily accessed in the loop for jsx
 	$: specialBetsData = specialBets.reduce((acc: SpecialBet, bet: any) => {
 		const { person } = bet;
@@ -68,8 +79,6 @@
 		acc[person].push(betData);
 		return acc;
 	}, {});
-
-	$: console.log(specialBetsData);
 
 	const getSpecialBetRecord = (person: string) => {
 		const betRecord = specialBetsData[person].reduce(
@@ -260,72 +269,75 @@
 					{#if parseInt(persona.total_tails) > 0 || parseInt(persona.total_fades) > 0}
 						<div class="flex flex-row justify-start gap-x-3 mt-2 px-1">
 							<h2 class="text-md pl-1">Tail / Fade</h2>
-							<button class="pr-3">
+							<button class="pr-3" on:click={() => handleTailFadeOpen(persona.person)}>
 								<Icon
-									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[270deg]
-							 hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit`}
+									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer
+							 			hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit
+										${tailFadeOpen?.includes(persona.person) ? 'rotate-[270deg]' : 'rotate-90'}`}
 									width="24px"
 									height="24px"
 									iconName="arrow"
 								/>
 							</button>
 						</div>
-						<div transition:slide={{ duration: 300 }}>
-							<div class="w-full overflow-x-auto rounded-md border">
-								<table
-									class="w-full text-sm text-left rtl:text-right text-gray-600
+						{#if tailFadeOpen?.includes(persona.person)}
+							<div transition:slide={{ duration: 300 }}>
+								<div class="w-full overflow-x-auto rounded-md border">
+									<table
+										class="w-full text-sm text-left rtl:text-right text-gray-600
 										dark:text-gray-300"
-								>
-									<thead
-										class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
-										dark:bg-gray-700 border-b"
 									>
-										<th scope="col" class="font-extrabold px-4 py-3"># Tailed</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
-										<th scope="col" class="font-extrabold px-4 py-3"># Faded</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
-									</thead>
-									<tbody>
-										<tr
-											class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
-							 				even:dark:bg-gray-800 text-xs"
+										<thead
+											class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
+										dark:bg-gray-700 border-b"
 										>
-											<th
-												scope="row"
-												class="px-4 py-3 font-medium text-black
+											<th scope="col" class="font-extrabold px-4 py-3"># Tailed</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
+											<th scope="col" class="font-extrabold px-4 py-3"># Faded</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
+										</thead>
+										<tbody>
+											<tr
+												class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
+							 				even:dark:bg-gray-800 text-xs"
+											>
+												<th
+													scope="row"
+													class="px-4 py-3 font-medium text-black
 										whitespace-nowrap dark:text-white border-r">{persona.total_tails}</th
-											>
-											<td
-												class={`text-sm font-semibold leading-4 ${
-													parseInt(persona.tails_pct) > 50
-														? 'text-green-500 dark:text-green-300'
-														: parseInt(persona.tails_pct) < 50
-														? 'text-red-500 dark:text-red-300'
-														: 'text-yellow-500 dark:text-yellow-300'
-												} px-4 py-3 border-r`}
-												>{persona.tails_pct === 'NaN'
-													? 'NA'
-													: persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</td
-											>
-											<td class="px-4 py-3 border-r">{persona.total_fades}</td>
-											<td
-												class={`text-sm font-semibold leading-4 ${
-													parseInt(persona.fades_pct) > 50
-														? 'text-green-500 dark:text-green-300'
-														: parseInt(persona.fades_pct) < 50
-														? 'text-red-500 dark:text-red-300'
-														: 'text-yellow-500 dark:text-yellow-300'
-												} px-4 py-3`}
-											>
-												{persona.fades_pct === 'NaN'
-													? 'NA'
-													: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}
-											</td>
-										</tr>
-									</tbody>
-								</table>
+												>
+												<td
+													class={`text-sm font-semibold leading-4 ${
+														parseInt(persona.tails_pct) > 50
+															? 'text-green-500 dark:text-green-300'
+															: parseInt(persona.tails_pct) < 50
+															? 'text-red-500 dark:text-red-300'
+															: 'text-yellow-500 dark:text-yellow-300'
+													} px-4 py-3 border-r`}
+													>{persona.tails_pct === 'NaN'
+														? 'NA'
+														: persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</td
+												>
+												<td class="px-4 py-3 border-r">{persona.total_fades}</td>
+												<td
+													class={`text-sm font-semibold leading-4 ${
+														parseInt(persona.fades_pct) > 50
+															? 'text-green-500 dark:text-green-300'
+															: parseInt(persona.fades_pct) < 50
+															? 'text-red-500 dark:text-red-300'
+															: 'text-yellow-500 dark:text-yellow-300'
+													} px-4 py-3`}
+												>
+													{persona.fades_pct === 'NaN'
+														? 'NA'
+														: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
 							</div>
-						</div>
+						{/if}
 					{/if}
 
 					{#if specialBetsData[persona.person]}
