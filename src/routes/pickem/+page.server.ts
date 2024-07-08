@@ -71,10 +71,10 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
 	// use 6 hours ahead to account for GMT time
-	const betStart = new Date('2024-06-25T12:00:00Z');
-	const betEnd = new Date('2024-06-28T22:00:00Z');
+	const betStart = new Date('2024-07-01T12:00:00Z');
+	const betEnd = new Date('2024-07-30T22:00:00Z');
 
-	// can only bet games for the next 4 days
+	// can only bet games for the next 2 days
 	const date = new Date();
 	const commenceTimeTo =
 		new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';

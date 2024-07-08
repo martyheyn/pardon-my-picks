@@ -50,7 +50,7 @@
 		<div class="font-paragraph mt-2">
 			<p class="text-sm">Register an account fade & tail the boys or make your own picks.</p>
 
-			<div class="pt-2">
+			<div class="pt-2" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 				<AlertFlash />
 			</div>
 

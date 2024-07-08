@@ -19,9 +19,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	});
 
-	// can only bet games for the next 4 days
-
-	// if the games have not started yet, get the odds
 	const date = new Date();
 
 	// this will be the end of Friday or early Sunday
@@ -32,7 +29,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	if (date > gameStart && date < gameEnd) {
 		const scoresLive = await getLiveGames({ year: params.year });
-		console.log('scoresLive', scoresLive);
 
 		scoresLive.map(async (game: Scores) => {
 			const prismaPicks = await prisma.pick.updateMany({

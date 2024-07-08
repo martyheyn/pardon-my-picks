@@ -291,9 +291,9 @@
 											class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
 										dark:bg-gray-700 border-b"
 										>
-											<th scope="col" class="font-extrabold px-4 py-3"># Tailed</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Times Tailed</th>
 											<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
-											<th scope="col" class="font-extrabold px-4 py-3"># Faded</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Times Faded</th>
 											<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
 										</thead>
 										<tbody>

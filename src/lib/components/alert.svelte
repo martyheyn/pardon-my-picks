@@ -30,7 +30,7 @@
 			// hide Alert if message is empty
 			visible = false;
 		} else {
-			visible = true; // show alert
+			visible = true;
 			if (ms > 0)
 				timeout = window.setTimeout(() => {
 					alert.set({ text: undefined, alertType: undefined });
@@ -45,10 +45,7 @@
 </script>
 
 {#if visible}
-	<div
-		class={`px-4 py-3 ${color} rounded-md`}
-		transition:fly={{ x: -50, duration: 300, delay: 50 }}
-	>
+	<div class={`px-4 py-3 ${color} rounded-md`}>
 		{$alert.text}
 	</div>
 {/if}

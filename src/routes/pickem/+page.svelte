@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { fade, slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToMascot } from '$lib/utils/matching-format';
@@ -140,7 +140,7 @@
 		<h1 class="font-header">Place this weeks picks here</h1>
 	</div>
 
-	<div class="my-4">
+	<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 		<AlertFlash />
 	</div>
 

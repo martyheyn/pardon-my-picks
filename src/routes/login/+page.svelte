@@ -51,7 +51,7 @@
 		<div class="font-paragraph mt-2">
 			<p class="text-sm">Log in to do stuff.</p>
 
-			<div class="pt-2">
+			<div class="pt-2" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 				<AlertFlash />
 			</div>
 

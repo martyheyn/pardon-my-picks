@@ -2,6 +2,7 @@ import { prisma } from '$lib/server/prisma';
 import type { Scores } from './types';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { ODDS_API_KEY } from '$env/static/private';
+import { markTailFade, markWinner } from './marking';
 
 export const getTeamScores = async (scores: Scores, teamName: string) => {
 	if (!scores) return null;
@@ -45,7 +46,7 @@ export const getLiveGames = async ({ year }: { year: string }) => {
 				return {
 					gameId: game.id,
 					type: game.type,
-					descrption: game.description,
+					description: game.description,
 					homeTeam: game.homeTeam,
 					awayTeam: game.awayTeam,
 					homeTeamScore: game.homeTeamScore,
@@ -54,9 +55,9 @@ export const getLiveGames = async ({ year }: { year: string }) => {
 					pickScore: game.pickScore
 				};
 			});
-			console.log('gamesToMarkData', gamesToMarkData);
 
-			// markGames(gamesToMark);
+			markWinner(gamesToMarkData);
+			markTailFade();
 		}
 	}
 	// const scoresNonNull = scoresDataRaw.filter((game) => game.scores !== null);

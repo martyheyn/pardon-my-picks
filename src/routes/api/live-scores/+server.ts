@@ -1,15 +1,11 @@
 //kit.svelte.dev/docs/routing#server
 import { json } from '@sveltejs/kit';
 import type { Scores } from '$lib/utils/types';
-
-// export async function GET(event: Event) {
-// put rate limiter in here
-// 	return new Response(JSON.stringify('Hello GET'));
-// }
+import { markTailFade, markWinner } from '$lib/utils/marking';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }: { request: Request }) {
-	const { pickId } = await request.json();
+	const { pickId, year } = await request.json();
 
 	// if pick add homeScore and awayScore to pick
 	const pick = await prisma.pick.findUnique({
@@ -71,6 +67,41 @@ export async function POST({ request }: { request: Request }) {
 			}
 		}
 	});
+
+	// mark em done if they are complete
+	if (scoresLive.length > 0) {
+		const gamesToMark = await prisma.pick.findMany({
+			where: {
+				year: parseInt(year),
+				winner: null,
+				marked: false,
+				gameId: {
+					in: scoresLive.map((game) => game.id)
+				}
+			}
+		});
+
+		if (gamesToMark.length > 0) {
+			// call the marking function
+			// get data of all completedGames in gamesToMark
+			const gamesToMarkData = gamesToMark.map((game) => {
+				return {
+					gameId: game.id,
+					type: game.type,
+					description: game.description,
+					homeTeam: game.homeTeam,
+					awayTeam: game.awayTeam,
+					homeTeamScore: game.homeTeamScore,
+					awayTeamScore: game.awayTeamScore,
+					pickTeam: game.pickTeam,
+					pickScore: game.pickScore
+				};
+			});
+
+			markWinner(gamesToMarkData);
+			markTailFade();
+		}
+	}
 
 	return json({ homeLiveScore, awayLiveScore });
 }

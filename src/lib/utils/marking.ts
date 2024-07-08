@@ -216,8 +216,6 @@ export const markTailFade = async () => {
 		}
 	});
 
-	console.log('tails', tails);
-
 	// markem
 	tails.map(async (tail) => {
 		if (tail.pick.winner === 1) {
@@ -271,7 +269,6 @@ export const markTailFade = async () => {
 		}
 	});
 
-	console.log('fades', fades);
 	// markem
 	fades.map(async (fade) => {
 		if (fade.pick.winner === 1) {

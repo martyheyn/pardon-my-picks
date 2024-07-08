@@ -54,7 +54,7 @@
 				If you entered your email into profile, enter it below to reset your password
 			</p>
 
-			<div class="pt-2">
+			<div class="pt-2" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 				<AlertFlash />
 			</div>
 

@@ -129,7 +129,7 @@ enum NFLTeam {
 
   // MLB for testing
   orioles
-  mariners
-  tigers
-  angels  
+  cubs
+  dodgers
+  philles  
 }

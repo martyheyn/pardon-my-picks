@@ -91,26 +91,27 @@
 
 <!-- only render app if screen width is not undefined, not have jumpy navbar -->
 {#if $screenWidth}
-	<div class="min-h-screen dark:text-white">
+	<div class="min-h-screen dark:text-white m-0 p-0">
 		<Topnav user={data.user} />
 
 		<Sidenav user={data.user} {scrollY} />
 
 		<div
-			class={`${
+			class={` ${
 				$sideNavCollasped
 					? 'w-[calc(100vw - 64px)]'
 					: 'w-[calc(100vw - 64px)] lg:w-[calc(100vw - 224px)] lg:ml-40'
 			} ${
 				mobile ? 'ml-0' : 'ml-14 '
-			}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
+			} z-0 relative transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden `}
 		>
 			<div
 				class={`${
 					$page.route.id?.includes('register') || $page.route.id?.includes('login')
 						? 'p-4'
 						: 'p-4 sm:p-8'
-				} bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out z-0`}
+				} bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out z-0
+				 scroll-smooth h-full overflow-y-auto`}
 				style="min-height: calc(100vh - 56px);"
 			>
 				<slot />

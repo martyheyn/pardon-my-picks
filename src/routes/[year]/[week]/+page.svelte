@@ -19,8 +19,7 @@
 	export let form: ActionData;
 
 	$: ({ picks, user } = data);
-	$: console.log('picks', picks);
-	// change back to packers home, bears away
+	// $: console.log('picks', picks);
 
 	$: ({ year, week } = $page.params);
 
@@ -88,7 +87,7 @@
 		setInterval(async () => {
 			const res = await fetch('/api/live-scores', {
 				method: 'POST',
-				body: JSON.stringify({ pickId }),
+				body: JSON.stringify({ pickId, year: parseInt(year) }),
 				headers: {
 					'content-type': 'application/json'
 				}
@@ -113,12 +112,20 @@
 	});
 
 	const updateAlert = () => {
-		if (form) {
+		if (form?.pickId) {
 			alert.set({
 				text: form.message,
 				alertType: form.success ? 'success' : 'error'
 			});
+
+			setTimeout(() => {
+				form = {
+					...form,
+					pickId: ''
+				};
+			}, 3000);
 		}
+
 		return;
 	};
 	// alerts
@@ -149,7 +156,9 @@
 	</div>
 
 	{#if form && !form.pickId}
-		<AlertFlash />
+		<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+			<AlertFlash />
+		</div>
 	{/if}
 
 	<div
@@ -224,7 +233,17 @@
 										{/if}
 									</div>
 
-									<p class="font-semibold">@</p>
+									<div>
+										{#if pick.isLive}
+											{#key animateScore}
+												<div transition:fade={{ duration: 1000, delay: 250, easing: cubicInOut }}>
+													<p class="text-xl">Time Left in the game</p>
+												</div>
+											{/key}
+										{:else}
+											<p class="font-semibold">@</p>
+										{/if}
+									</div>
 
 									<div class="flex flex-col items-center gap-2">
 										<a href={`${teamLink[pick.homeTeam]}`} target="_blank" rel="noopener">
