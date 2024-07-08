@@ -51,11 +51,13 @@
 		<div class="font-paragraph mt-2">
 			<p class="text-sm">Log in to do stuff.</p>
 
-			<div class="pt-2" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
-				<AlertFlash />
-			</div>
+			{#if $errors && $errors._errors}
+				<div class="pt-2" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+					<AlertFlash />
+				</div>
+			{/if}
 
-			<form class="flex flex-col gap-y-2 mt-2" method="post" use:enhance>
+			<form class="flex flex-col gap-y-3 mt-4" method="post" use:enhance>
 				<label for="username" class="block text-sm font-medium text-gray-600 dark:text-white"
 					><span class="pl-[2px]">Username</span>
 					<input
