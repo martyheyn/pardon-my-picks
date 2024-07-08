@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import type { User } from 'lucia';
 	import { page } from '$app/stores';
@@ -133,11 +133,14 @@
 				<a
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
 					href={navItem.route}
-					on:click={() => handleItemClick(navItem.label)}
 				>
 					<div
 						class={`w-2 h-full bg-yellow-400 absolute left-0 top-0 rounded-r-md transition-all duration-300 ease-in-out ${
-							$active === navItem.label ? 'opacity-100' : 'opacity-0'
+							$active === navItem.route
+								? 'opacity-100'
+								: $active === '/week' && navItem.label === 'Week'
+								? 'opacity-100'
+								: 'opacity-0'
 						}`}
 					/>
 

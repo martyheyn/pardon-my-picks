@@ -13,6 +13,7 @@
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
 	import type { Alert } from '$lib/utils/types';
+	import type { Page } from '@sveltejs/kit';
 
 	const sideNavCollasped = writable(true);
 	const currWeek = writable(18);
@@ -44,12 +45,23 @@
 
 	$: mobile = $screenWidth < 640;
 
+	const setSidenavActive = (page: Page<Record<string, string>, string | null>) => {
+		const route = $page.route.id;
+		if (route && !page.params.year && !page.params.week) {
+			active.set(route);
+			return;
+		}
+
+		if (page.params && page.params.year && page.params.week) {
+			active.set(`/week`);
+			return;
+		}
+	};
+	$: $page.route.id, setSidenavActive($page);
+	$: console.log(`active ${$active}`);
+
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });
-
-	function onMount(arg0: () => Promise<void>) {
-		throw new Error('Function not implemented.');
-	}
 </script>
 
 <svelte:head>
