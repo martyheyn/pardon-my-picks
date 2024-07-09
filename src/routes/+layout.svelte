@@ -58,7 +58,6 @@
 		}
 	};
 	$: $page.route.id, setSidenavActive($page);
-	$: console.log(`active ${$active}`);
 
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });

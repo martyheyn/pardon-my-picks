@@ -28,7 +28,6 @@
 	 rounded-md z-[999] transition-all duration-300 ease-in-out delay-100 opacity-0 -translate-x-8
 	  group-hover:opacity-100 group-hover:translate-x-0`}
 >
-	<!-- Left-pointing arrow -->
 	<div class="relative w-full h-full">
 		<p class="px-6 py-2">{text}</p>
 	</div>

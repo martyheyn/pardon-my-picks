@@ -23,9 +23,11 @@
 
 	$: usersPicks = data.picks ? data.picks : form?.picks ? form?.picks : [];
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
+	let errorId: string;
 
 	const addPick = (
 		id: string,
+		oddId: string,
 		type: string,
 		description: string,
 		homeTeam: string,
@@ -49,6 +51,10 @@
 					text: 'You have already made this pick',
 					alertType: 'error'
 				});
+				errorId = oddId;
+				setTimeout(() => {
+					errorId = '';
+				}, 3000);
 				return;
 			}
 		}
@@ -60,6 +66,7 @@
 					text: 'You already have 2 saved. Please remove them to choose a new ones.',
 					alertType: 'error'
 				});
+				errorId = oddId;
 				return;
 			}
 			const opposingPick: PickForm | undefined = usersPicks.find(
@@ -73,12 +80,30 @@
 			}
 		}
 
+		// check if the user has already made that type of pick
+		if (usersPicks.length > 0) {
+			const pickType = usersPicks.find((pick) => pick.type === type);
+			if (pickType) {
+				alert.set({
+					text: `You have already made a ${type} pick. Please choose a different type.`,
+					alertType: 'error'
+				});
+				errorId = oddId;
+				setTimeout(() => {
+					errorId = '';
+				}, 3000);
+
+				return;
+			}
+		}
+
 		// check if user has already made picks
 		if (usersPicks.length >= 2) {
 			alert.set({
 				text: 'You have already made 2 picks. Remove one to choose a new one.',
 				alertType: 'error'
 			});
+			errorId = oddId;
 			return;
 		}
 
@@ -223,6 +248,12 @@
 		>
 			{#if odds !== undefined}
 				{#each odds as odd}
+					{#if errorId === odd.id}
+						<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+							<AlertFlash />
+						</div>
+					{/if}
+
 					<div class="card pb-4 pt-2 min-w-[360px]">
 						<div class="grid grid-cols-8 gap-x-4">
 							<div class="col-span-3 grid grid-rows-3 place-content-start w-full">
@@ -255,6 +286,7 @@
 														e.preventDefault();
 														addPick(
 															outcome.id,
+															odd.id,
 															bets.key === 'spreads' ? bets.key.slice(0, -1) : bets.key,
 															getDescription(
 																bets.key,

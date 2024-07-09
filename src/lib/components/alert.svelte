@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
 	import type { Writable } from 'svelte/store';
 	import { getContext, onDestroy } from 'svelte';
 	import type { Alert } from '$lib/utils/types';
+	import { fly } from 'svelte/transition';
 
 	const alert: Writable<Alert> = getContext('alert');
 
@@ -45,7 +45,10 @@
 </script>
 
 {#if visible}
-	<div class={`px-4 py-3 ${color} rounded-md`}>
+	<div
+		class={`px-4 py-3 ${color} rounded-md`}
+		transition:fly={{ x: -50, duration: 300, delay: 50 }}
+	>
 		{$alert.text}
 	</div>
 {/if}

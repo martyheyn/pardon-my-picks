@@ -73,28 +73,40 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// use 6 hours ahead to account for GMT time
 	const betStart = new Date('2024-07-01T12:00:00Z');
 	const betEnd = new Date('2024-07-30T22:00:00Z');
+	// const betEndTime = betEnd.toLocaleString('en-US', {
+	// 	timeZone: 'America/New_York'
+	// });
 
 	// can only bet games for the next 2 days
 	const date = new Date();
+	const tzoffset = new Date().getTimezoneOffset() * 60000;
+	const commenceTimeFrom = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 	const commenceTimeTo =
-		new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';
+		new Date(
+			new Date(date.getTime() - tzoffset).setDate(new Date(date.getTime() - tzoffset).getDate() + 1)
+		)
+			.toISOString()
+			.split('.')[0] + 'Z';
 
 	if (date > betStart && date < betEnd) {
 		console.log('betting is open');
 
 		try {
 			const odds = await fetch(
-				`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
+				`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}`
 			);
 			const oddsData: Odds[] = await odds.json();
-			// console.log('oddsData', JSON.stringify(oddsData, null, 2));
+			// console.log('oddsData', oddsData);
 
 			const oddsDataFiltered = oddsData.filter(
 				(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1
 			);
 
-			// console.log('oddsDataFiltered', JSON.stringify(oddsDataFiltered, null, 2));
 			oddsDataClean = oddsDataFiltered.map((game) => {
+				// only this weeks games
+				// const gameTime = new Date(game.commence_time).toLocaleString('en-US', {
+				// 	timeZone: 'America/New_York'
+				// });
 				game.bookmakers[0].markets.forEach((market) => {
 					market.outcomes = market.outcomes
 						.map((outcome) => {
@@ -125,7 +137,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 						})
 						.sort((a, b) => a.sorted - b.sorted);
 				});
-				return game;
+
+				return {
+					...game,
+					commence_time: new Date(game.commence_time).toLocaleString('en-US', {
+						timeZone: 'America/New_York'
+					})
+				};
 			});
 		} catch (error) {
 			console.log('error', error);
@@ -134,6 +152,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 			};
 		}
 	}
+
+	// console.log('oddsDataClean', oddsDataClean);
 
 	const savedPicks = dbUserPicks.length > 0 ? true : false;
 
@@ -194,6 +214,16 @@ export const actions: Actions = {
 			if (!userDbPicks) {
 				return fail(400, {
 					message: 'User not found',
+					success: false
+				});
+			}
+
+			// make sure 1 pick is spread and 1 pick is total
+			const spreadPicks = picks.filter((pick) => pick.type === 'spread');
+			const totalPicks = picks.filter((pick) => pick.type === 'totals');
+			if (spreadPicks.length !== 1 || totalPicks.length !== 1) {
+				return fail(400, {
+					message: 'One pick must be a spread and one pick must be a total',
 					success: false
 				});
 			}
