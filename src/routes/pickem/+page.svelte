@@ -1,31 +1,47 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import { fade, fly, slide } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToMascot } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
-	import { type Alert } from '$lib/utils/types';
+	import { type Alert, type Odds } from '$lib/utils/types';
 	import { type PickForm } from '$lib/utils/types';
-	// import { type $Enums } from '@prisma/client';
+	import { type $Enums } from '@prisma/client';
+	import { generateId } from 'lucia';
 
-	export let data: PageData;
+	// export let data: PageData;
 	export let form: ActionData;
 
 	const alert: Writable<Alert> = getContext('alert');
 
-	$: ({ odds, savedPicks } = data);
-	$: console.log('odds', odds);
-	// $: console.log('data', data);
-	// $: console.log('form', form);
+	// $: ({ picks } = data);
 
-	$: usersPicks = data.picks ? data.picks : form?.picks ? form?.picks : [];
+	let odds: Odds[];
+	let dbPicks: PickForm[];
+	let usersPicks: PickForm[] = [];
+	onMount(async () => {
+		console.log('fetching data');
+		const oddsRes = await fetch(`/api/odds`);
+		let oddsData = await oddsRes.json();
+		odds = oddsData.odds;
+
+		const dbPicksRes = await fetch(`/api/db-picks`);
+		let dbPicksData = await dbPicksRes.json();
+		dbPicks = dbPicksData.picks;
+		usersPicks = dbPicksData.picks;
+	});
+	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
+	$: console.log('odds', odds);
+	$: console.log('usersPicks', usersPicks);
+	$: console.log('dbPicks', dbPicks);
+
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
 
-	const addPick = (
+	const addPick = async (
 		id: string,
 		oddId: string,
 		type: string,
@@ -34,13 +50,13 @@
 		awayTeam: string
 	) => {
 		// add this data
-		const userPick = {
+		const userPick: PickForm = {
 			id,
 			show: 'PMT',
 			type,
 			description: description,
-			homeTeam: fullNameToMascot[homeTeam],
-			awayTeam: fullNameToMascot[awayTeam]
+			homeTeam: fullNameToMascot[homeTeam] as $Enums.NFLTeam,
+			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam
 		};
 
 		// check if the pick already exists
@@ -61,38 +77,12 @@
 
 		// check if the pick is an opposing pick
 		if (usersPicks.length > 0) {
-			if (savedPicks && usersPicks.length >= 2) {
+			if (dbPicks.length >= 2 && usersPicks.length >= 2) {
 				alert.set({
 					text: 'You already have 2 saved. Please remove them to choose a new ones.',
 					alertType: 'error'
 				});
 				errorId = oddId;
-				return;
-			}
-			const opposingPick: PickForm | undefined = usersPicks.find(
-				(pick) =>
-					pick.homeTeam === fullNameToMascot[homeTeam] &&
-					pick.awayTeam === fullNameToMascot[awayTeam] &&
-					pick.type === type
-			);
-			if (opposingPick) {
-				usersPicks = usersPicks.filter((pick) => pick.id !== opposingPick.id);
-			}
-		}
-
-		// check if the user has already made that type of pick
-		if (usersPicks.length > 0) {
-			const pickType = usersPicks.find((pick) => pick.type === type);
-			if (pickType) {
-				alert.set({
-					text: `You have already made a ${type} pick. Please choose a different type.`,
-					alertType: 'error'
-				});
-				errorId = oddId;
-				setTimeout(() => {
-					errorId = '';
-				}, 3000);
-
 				return;
 			}
 		}
@@ -107,10 +97,35 @@
 			return;
 		}
 
+		// check if the user has already made that type of pick
+		if (usersPicks.length > 0) {
+			const pickType = usersPicks.find((pick) => pick.type === type);
+			if (pickType) {
+				alert.set({
+					text: `You have already made a ${type} pick. Please choose a different type or remove the selected pick.`,
+					alertType: 'error'
+				});
+				errorId = oddId;
+				setTimeout(() => {
+					errorId = '';
+				}, 3000);
+
+				return;
+			}
+		}
+
+		const response = await fetch(`/api/db-picks`);
+		let data = await response.json();
+
+		dbPicks = data.picks;
+
 		// add the pick to the array
 		usersPicks = [...usersPicks, userPick];
 	};
-	$: console.log('usersPicks', usersPicks);
+
+	const removeUnsavedPick = (pickId: string) => {
+		usersPicks = usersPicks.filter((pick) => pick.id !== pickId);
+	};
 
 	const getDescription = (
 		type: string,
@@ -173,33 +188,32 @@
 		<input type="hidden" name="userPicks" bind:value={hiddenInput} />
 		{#if usersPicks.length > 0}
 			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
-				{#if data.picks !== usersPicks && usersPicks.length === 2}
-					<div
-						class="transition-all duration-300 ease-in-out flex justify-end items-center"
-						transition:slide={{ duration: 300, delay: 300 }}
-					>
-						<button
-							type="submit"
-							disabled={data.picks === usersPicks || usersPicks.length !== 2}
-							class={`btn-primary ${
-								usersPicks.length < 2
-									? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
-									: ''
-							}`}
-						>
-							Save Picks
-						</button>
-					</div>
-				{:else}
-					<div
-						class="transition-all duration-300 ease-in-out flex justify-start items-center"
-						transition:slide={{ duration: 300, delay: 300 }}
-					>
-						<h2 class="font-header text-2xl">
-							{savedPicks ? 'Your Picks' : 'Make 2 Picks & Save Them'}
-						</h2>
-					</div>
-				{/if}
+				<div
+					class={`transition-all duration-300 ease-in-out flex justify-start items-center`}
+					transition:slide={{ duration: 300, delay: 300 }}
+				>
+					{#if dbPicks.length === 2 && usersPicks.length === 2}
+						<h2 class="font-header text-2xl">Your Picks</h2>
+					{:else if dbPicks.length < 2 && usersPicks.length === 2}
+						<div class="w-full flex justify-end">
+							<button
+								type="submit"
+								disabled={dbPicks === usersPicks || usersPicks.length !== 2}
+								class={`btn-primary ${
+									usersPicks.length < 2
+										? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
+										: ''
+								}`}
+							>
+								Save Picks
+							</button>
+						</div>
+					{:else if usersPicks.length < 2}
+						<h2 class="font-header text-2xl">Make 2 Picks & Save Them</h2>
+					{:else}
+						<h2 class="font-header text-2xl">Error, Please Refresh Page</h2>
+					{/if}
+				</div>
 
 				<div
 					class="grid grid-cols-1 sm:grid-cols-2 mt-4 mb-8 sm:gap-x-6 gap-y-6 max-w-6xl
@@ -224,7 +238,36 @@
 								in:slide={{ duration: 300 }}
 								out:slide={{ duration: 250 }}
 							>
-								<form use:enhance action="?/deletePick" method="post">
+								<!-- {#if dbPicks} -->
+								<form
+									action="?/deletePick"
+									method="post"
+									use:enhance={({ cancel }) => {
+										console.log('dbPicks', dbPicks);
+										console.log('pick', pick);
+										const findPick = dbPicks.find((dbPick) => dbPick.id === pick.id) ? true : false;
+										console.log('findPick', findPick);
+
+										// scan for if id is in the DB
+
+										if (!findPick) {
+											console.log('here didnt make it to deleting');
+											removeUnsavedPick(pick.id);
+											cancel();
+										}
+
+										return async ({ result }) => {
+											console.log('result', result);
+											// `result` is an `ActionResult` object
+											if (result.type === 'success') {
+												await applyAction(result);
+												removeUnsavedPick(pick.id);
+											} else if (result.type === 'failure') {
+												await applyAction(result);
+											}
+										};
+									}}
+								>
 									<input type="hidden" name="pickId" value={pick.id} />
 									<input type="hidden" name="usersPicks" bind:value={hiddenInput} />
 
@@ -246,9 +289,9 @@
 			class="grid grid-cols-1 lg:grid-cols-2 mt-4 mb-8 md:gap-x-6 gap-y-6 max-w-6xl
 			font-paragraph transition-all duration-300 ease-in-out"
 		>
-			{#if odds !== undefined}
+			{#if odds !== undefined && odds.length > 0}
 				{#each odds as odd}
-					{#if errorId === odd.id}
+					{#if errorId === odd.id && $alert.text}
 						<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 							<AlertFlash />
 						</div>
@@ -283,9 +326,11 @@
 													}`}
 													disabled={usersPicks.map((pick) => pick.id === outcome.id)[0]}
 													on:click={(e) => {
+														let outcomeId = generateId(15);
+														outcome.id = outcomeId;
 														e.preventDefault();
 														addPick(
-															outcome.id,
+															outcomeId,
 															odd.id,
 															bets.key === 'spreads' ? bets.key.slice(0, -1) : bets.key,
 															getDescription(
@@ -294,7 +339,7 @@
 																bets.key === 'spreads' ? outcome.name : odd.home_team,
 																bets.key === 'totals' ? outcome.name : undefined,
 																bets.key === 'totals' ? odd.away_team : undefined
-															), // getDescription(type, betNumber, team, overUnder, otherTeam
+															), // getDescription(type, betNumber, team, overUnder, otherTeam)
 															odd.home_team,
 															odd.away_team
 														);

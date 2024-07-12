@@ -103,8 +103,8 @@ export const fullNameToMascot: { [key: string]: string } = {
 	'Tennessee Titans': 'titans',
 	'Washington Commanders': 'commanders',
 	'Baltimore Orioles': 'orioles',
-	'Chicago Cubs': 'cubs',
-	'Los Angeles Dodgers': 'dodgers',
+	'New York Yankees': 'yankees',
+	'Oakland Athletics': 'athletics',
 	'Philadelphia Phillies': 'phillies'
 };
 

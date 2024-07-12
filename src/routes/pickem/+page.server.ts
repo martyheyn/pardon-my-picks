@@ -35,129 +35,11 @@ const PickFormSchema = z.array(PickFormObjectSchema);
 // 	usersPicks: z.array(PickFormObjectSchema)
 // });
 
-let uiUserPicks: PickForm[] = [];
-
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
 	if (!user) {
 		redirect(303, '/');
 	}
-
-	const dbUserPicks: PickForm[] = await prisma.pick.findMany({
-		where: {
-			userId: user.id,
-			year: new Date().getFullYear(),
-			week: parseInt(CURRENT_WEEK)
-		},
-		select: {
-			id: true,
-			gameId: true,
-			show: true,
-			type: true,
-			description: true,
-			homeTeam: true,
-			awayTeam: true
-		}
-	});
-	console.log('dbUserPicks', dbUserPicks);
-	console.log('uiUserPicks', uiUserPicks);
-
-	const userPicks = dbUserPicks.length > 0 ? dbUserPicks : uiUserPicks;
-
-	// initialize forms
-	// const form = await superValidate(zod(PickFormSchema));
-	let oddsDataClean: Odds[] = [];
-
-	// this will be the end of Friday or early Sunday
-	// should it be hardcoded, it is not used anywhere else
-	// use 6 hours ahead to account for GMT time
-	const betStart = new Date('2024-07-01T12:00:00Z');
-	const betEnd = new Date('2024-07-30T22:00:00Z');
-	// const betEndTime = betEnd.toLocaleString('en-US', {
-	// 	timeZone: 'America/New_York'
-	// });
-
-	// can only bet games for the next 2 days
-	const date = new Date();
-	const tzoffset = new Date().getTimezoneOffset() * 60000;
-	const commenceTimeFrom = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
-	const commenceTimeTo =
-		new Date(
-			new Date(date.getTime() - tzoffset).setDate(new Date(date.getTime() - tzoffset).getDate() + 1)
-		)
-			.toISOString()
-			.split('.')[0] + 'Z';
-
-	if (date > betStart && date < betEnd) {
-		console.log('betting is open');
-
-		try {
-			const odds = await fetch(
-				`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}`
-			);
-			const oddsData: Odds[] = await odds.json();
-			// console.log('oddsData', oddsData);
-
-			const oddsDataFiltered = oddsData.filter(
-				(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1
-			);
-
-			oddsDataClean = oddsDataFiltered.map((game) => {
-				// only this weeks games
-				// const gameTime = new Date(game.commence_time).toLocaleString('en-US', {
-				// 	timeZone: 'America/New_York'
-				// });
-				game.bookmakers[0].markets.forEach((market) => {
-					market.outcomes = market.outcomes
-						.map((outcome) => {
-							let id = generateId(15);
-							// if this odd is already picked by the user, give it the same id
-							userPicks.map((up) => {
-								if (
-									// fullNameToMascot[game.away_team] === up.awayTeam &&
-									(up.gameId === game.id ||
-										(fullNameToMascot[game.away_team] === up.awayTeam &&
-											fullNameToMascot[game.home_team] === up.homeTeam)) &&
-									(market.key === 'spreads' ? market.key.slice(0, -1) : market.key) === up.type &&
-									// TODO: need to change this so it is not dependent on the exact number as that might change
-									(market.key === 'totals'
-										? outcome.name === (up.description.indexOf('Over') > -1 ? 'Over' : 'Under')
-										: outcome.point ===
-										  parseFloat(up.description.split(' ')[up.description.split(' ').length - 1]))
-								) {
-									id = up.id;
-								}
-							});
-
-							return {
-								...outcome,
-								id,
-								sorted: game.away_team === outcome.name ? 1 : 2
-							};
-						})
-						.sort((a, b) => a.sorted - b.sorted);
-				});
-
-				return {
-					...game,
-					commence_time: new Date(game.commence_time).toLocaleString('en-US', {
-						timeZone: 'America/New_York'
-					})
-				};
-			});
-		} catch (error) {
-			console.log('error', error);
-			return {
-				error: error
-			};
-		}
-	}
-
-	// console.log('oddsDataClean', oddsDataClean);
-
-	const savedPicks = dbUserPicks.length > 0 ? true : false;
-
-	return { user: locals.user, odds: oddsDataClean, picks: userPicks, savedPicks };
 };
 
 export const actions: Actions = {
@@ -194,7 +76,7 @@ export const actions: Actions = {
 				};
 			}
 
-			const picks = result.data;
+			const picks: PickForm[] = result.data;
 
 			// check if user has already made either pick
 			let userDbPicks = await prisma.user.findUnique({
@@ -283,21 +165,9 @@ export const actions: Actions = {
 						gameId = oddsGameId?.id || '';
 					}
 
-					const pickId = generateId(15);
-
-					uiUserPicks.push({
-						id: pickId,
-						gameId: gameId,
-						show: 'PMT',
-						type: pick.type,
-						description: pick.description,
-						homeTeam: pick.homeTeam,
-						awayTeam: pick.awayTeam
-					});
-
 					await prisma.pick.create({
 						data: {
-							id: pickId,
+							id: pick.id,
 							gameId: gameId || '',
 							year: new Date().getFullYear(),
 							show: 'PMT',
@@ -324,7 +194,6 @@ export const actions: Actions = {
 				};
 			} catch (error) {
 				console.error('error', error);
-				uiUserPicks = [];
 				return fail(500, { message: 'Error making picks', success: false });
 			}
 		} catch (error) {
@@ -377,14 +246,9 @@ export const actions: Actions = {
 			}
 		});
 
-		// if the pick does not exist, remove on the client side
+		// if the pick does not exist fail
 		if (!pick) {
-			const newPicks = usersPicks.filter((p: PickForm) => p.id !== pickId);
-			uiUserPicks = newPicks;
-
-			return {
-				picks: newPicks
-			};
+			return fail(500, { message: 'Pick not found', success: false });
 		}
 
 		let picks: PickForm[] = [];

@@ -98,6 +98,6 @@ export type PickForm = {
 	show: string;
 	type: string;
 	description: string;
-	homeTeam: string;
-	awayTeam: string;
+	homeTeam: $Enums.NFLTeam;
+	awayTeam: $Enums.NFLTeam;
 };

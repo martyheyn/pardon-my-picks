@@ -70,7 +70,7 @@ export const getLiveGames = async ({ year }: { year: string }) => {
 			fullNameToMascot[game.home_team] &&
 			fullNameToMascot[game.away_team]
 	);
-	console.log('scoresLive', scoresLive);
+	// console.log('scoresLive', scoresLive);
 
 	return scoresLive;
 };
