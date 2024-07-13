@@ -126,7 +126,6 @@
 		// add the pick to the array
 		usersPicks = [...usersPicks, userPick];
 	};
-	$: console.log('usersPicks', usersPicks);
 
 	const removeUnsavedPick = (pickId: string) => {
 		usersPicks = usersPicks.filter((pick) => pick.id !== pickId);
@@ -341,7 +340,7 @@
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
 															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
 													}`}
-													disabled={usersPicks.map((pick) => pick.id === outcome.id)[0]}
+													disabled={usersPicks.map((pick) => pick.id === outcome.id).includes(true)}
 													on:click={(e) => {
 														let outcomeId = generateId(15);
 														outcome.id = outcomeId;
