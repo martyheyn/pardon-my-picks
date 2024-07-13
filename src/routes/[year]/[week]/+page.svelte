@@ -19,7 +19,6 @@
 	export let form: ActionData;
 
 	$: ({ picks, user } = data);
-	// $: console.log('picks', picks);
 
 	$: ({ year, week } = $page.params);
 

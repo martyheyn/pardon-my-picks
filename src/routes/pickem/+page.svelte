@@ -158,9 +158,6 @@
 
 	let showModal = false;
 	beforeNavigate(({ cancel }) => {
-		console.log('hereeeee in dbPicks');
-		console.log('dbPicks', dbPicks);
-		console.log('usersPicks', usersPicks);
 		if (usersPicks.length > 0 && dbPicks.length < 1 && stoppedToSave === 0) {
 			showModal = true;
 			stoppedToSave += 1;

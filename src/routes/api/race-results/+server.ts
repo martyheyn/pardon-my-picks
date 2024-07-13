@@ -11,6 +11,10 @@ export async function GET() {
 			_count: {
 				winner: true
 			},
+			where: {
+				pmtPersona: true,
+				barstoolEmployee: true
+			},
 			orderBy: [
 				{
 					week: 'asc'
