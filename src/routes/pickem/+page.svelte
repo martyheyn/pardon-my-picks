@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
 	import { fade, fly, slide } from 'svelte/transition';
-	import type { ActionData, PageData } from './$types';
+	import type { ActionData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToMascot } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
@@ -11,13 +11,12 @@
 	import { type PickForm } from '$lib/utils/types';
 	import { type $Enums } from '@prisma/client';
 	import { generateId } from 'lucia';
+	import { beforeNavigate } from '$app/navigation';
+	import Modal from '$lib/components/modal.svelte';
 
-	// export let data: PageData;
 	export let form: ActionData;
 
 	const alert: Writable<Alert> = getContext('alert');
-
-	// $: ({ picks } = data);
 
 	let odds: Odds[];
 	let dbPicks: PickForm[];
@@ -35,8 +34,8 @@
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
 	$: console.log('odds', odds);
-	$: console.log('usersPicks', usersPicks);
-	$: console.log('dbPicks', dbPicks);
+	// $: console.log('usersPicks', usersPicks);
+	// $: console.log('dbPicks', dbPicks);
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
@@ -151,6 +150,17 @@
 		}
 		return description;
 	};
+
+	let showModal = false;
+	beforeNavigate(({ cancel }) => {
+		console.log('hereeeee in dbPicks');
+		console.log('dbPicks', dbPicks);
+		console.log('usersPicks', usersPicks);
+		if (usersPicks.length > 0 && dbPicks.length < 1) {
+			showModal = true;
+			cancel();
+		}
+	});
 
 	const updateAlert = () => {
 		if (form) {
@@ -365,3 +375,13 @@
 		</div>
 	</form>
 </div>
+
+<Modal bind:showModal>
+	<div class="flex flex-col gap-y-4">
+		<h2 class="font-header text-2xl">Yo</h2>
+		<p class="font-paragraph">
+			You haven't saved your picks yet, so they are not fully submitted. Press the save button to
+			submit them. Don't be like Max and forget to push the button
+		</p>
+	</div>
+</Modal>
