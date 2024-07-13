@@ -21,6 +21,7 @@
 	let odds: Odds[];
 	let dbPicks: PickForm[];
 	let usersPicks: PickForm[] = [];
+	let stoppedToSave = 0;
 	onMount(async () => {
 		console.log('fetching data');
 		const oddsRes = await fetch(`/api/odds`);
@@ -161,8 +162,9 @@
 		console.log('hereeeee in dbPicks');
 		console.log('dbPicks', dbPicks);
 		console.log('usersPicks', usersPicks);
-		if (usersPicks.length > 0 && dbPicks.length < 1) {
+		if (usersPicks.length > 0 && dbPicks.length < 1 && stoppedToSave === 0) {
 			showModal = true;
+			stoppedToSave += 1;
 			cancel();
 		}
 	});
@@ -388,7 +390,8 @@
 		<h2 class="font-header text-2xl">Yo</h2>
 		<p class="font-paragraph">
 			You haven't saved your picks yet, so they are not fully submitted. Press the save button to
-			submit them. Don't be like Max and forget to push the button
+			submit them.
 		</p>
+		<p class="font-paragraph">Don't be like Max and forget to push the button</p>
 	</div>
 </Modal>

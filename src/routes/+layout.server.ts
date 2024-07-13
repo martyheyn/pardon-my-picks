@@ -35,9 +35,7 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 				console.log('score', score);
 				if (score.completed === true) {
 					const homeTeamScore = score.scores?.find((sc) => sc.name === score.home_team)?.score;
-					console.log('homeTeamScore', homeTeamScore);
 					const awayTeamScore = score.scores?.find((sc) => sc.name === score.away_team)?.score;
-					console.log('awayTeamScore', awayTeamScore);
 					gameData.push({
 						gameId: game.id,
 						type: game.type,
