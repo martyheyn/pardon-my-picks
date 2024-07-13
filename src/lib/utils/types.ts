@@ -100,4 +100,6 @@ export type PickForm = {
 	description: string;
 	homeTeam: $Enums.NFLTeam;
 	awayTeam: $Enums.NFLTeam;
+	pickTeam?: $Enums.NFLTeam;
+	pickScore?: number;
 };

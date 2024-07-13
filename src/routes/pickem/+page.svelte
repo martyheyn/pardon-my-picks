@@ -46,7 +46,9 @@
 		type: string,
 		description: string,
 		homeTeam: string,
-		awayTeam: string
+		awayTeam: string,
+		pickTeam?: string,
+		pickScore?: number
 	) => {
 		// add this data
 		const userPick: PickForm = {
@@ -55,7 +57,9 @@
 			type,
 			description: description,
 			homeTeam: fullNameToMascot[homeTeam] as $Enums.NFLTeam,
-			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam
+			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam,
+			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : undefined,
+			pickScore: pickScore
 		};
 
 		// check if the pick already exists
@@ -121,6 +125,7 @@
 		// add the pick to the array
 		usersPicks = [...usersPicks, userPick];
 	};
+	$: console.log('usersPicks', usersPicks);
 
 	const removeUnsavedPick = (pickId: string) => {
 		usersPicks = usersPicks.filter((pick) => pick.id !== pickId);
@@ -351,7 +356,9 @@
 																bets.key === 'totals' ? odd.away_team : undefined
 															), // getDescription(type, betNumber, team, overUnder, otherTeam)
 															odd.home_team,
-															odd.away_team
+															odd.away_team,
+															bets.key === 'spreads' ? outcome.name : undefined,
+															bets.key === 'totals' ? outcome.point : undefined
 														);
 													}}
 												>

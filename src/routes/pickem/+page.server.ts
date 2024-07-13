@@ -24,7 +24,9 @@ const PickFormObjectSchema = z.object({
 	type: z.enum(['spread', 'totals']),
 	description: z.string(),
 	homeTeam: z.custom<$Enums.NFLTeam>(),
-	awayTeam: z.custom<$Enums.NFLTeam>()
+	awayTeam: z.custom<$Enums.NFLTeam>(),
+	pickTeam: z.custom<$Enums.NFLTeam>().optional(),
+	pickScore: z.number().optional()
 });
 
 // // Define the schema for an array of PickForm objects
@@ -179,6 +181,8 @@ export const actions: Actions = {
 							homeTeam: pick.homeTeam,
 							awayTeam: pick.awayTeam,
 							isLive: false,
+							pickTeam: pick?.pickTeam,
+							pickScore: pick?.pickScore,
 							private: false,
 							userId: user.id,
 							barstoolEmployee: false,
@@ -267,6 +271,15 @@ export const actions: Actions = {
 					userId: user.id,
 					year: new Date().getFullYear(),
 					week: parseInt(CURRENT_WEEK)
+				},
+				select: {
+					id: true,
+					gameId: true,
+					show: true,
+					type: true,
+					description: true,
+					homeTeam: true,
+					awayTeam: true
 				}
 			});
 

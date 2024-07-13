@@ -25,7 +25,7 @@ model Pick {
   isLive        Boolean   @default(false) @map("is_live")
   winner        Int?
   pickTeam      NFLTeam?  @map("pick_team")
-  pickScore     Int?      @map("pick_score")
+  pickScore     Float?      @map("pick_score")
   marked        Boolean   @default(false)
   gameDate      DateTime? @map("game_date") @db.Timestamptz(6)
   result        String?   @db.VarChar(191)

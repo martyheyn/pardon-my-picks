@@ -1,7 +1,7 @@
 import { prisma } from '$lib/server/prisma';
 import type { $Enums } from '@prisma/client';
 
-type markGames = {
+export type markGames = {
 	gameId: string;
 	type: string;
 	description: string;
