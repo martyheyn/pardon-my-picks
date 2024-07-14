@@ -81,5 +81,10 @@ export const sideNavItems: sideNavItems = [
 		label: 'Profile',
 		icon: 'user',
 		route: `/user`
+	},
+	{
+		label: 'Leader Board',
+		icon: 'leaderBoard',
+		route: '/leaderboard'
 	}
 ];
