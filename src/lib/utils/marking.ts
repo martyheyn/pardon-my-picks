@@ -14,6 +14,7 @@ export type markGames = {
 };
 
 export const markWinner = async (games: markGames[]) => {
+	console.log('marking winners');
 	games.map(async (game) => {
 		if (!game.homeTeamScore || !game.awayTeamScore || !game.pickScore) return;
 		if (game.type === 'spread') {

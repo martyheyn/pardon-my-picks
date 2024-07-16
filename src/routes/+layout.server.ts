@@ -3,8 +3,8 @@ import { MAINTENANCE_MODE } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 import { ODDS_API_KEY } from '$env/static/private';
 import type { Scores } from '$lib/utils/types';
-import { markWinner, type markGames } from '$lib/utils/marking';
-import { parse } from 'svelte/compiler';
+import { markWinner } from '$lib/utils/marking';
+import { type markGames } from '$lib/utils/marking';
 
 export const load: LayoutServerLoad = async ({ url, locals }) => {
 	const targetPath = '/maintenance';
@@ -22,6 +22,8 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 	});
 
 	if (unMarkedGames.length > 0) {
+		let gameData: markGames[] = [];
+
 		console.log('here checking unmarked games');
 		// check odds api if the game finished
 		unMarkedGames.map(async (game) => {
@@ -29,10 +31,8 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 				`https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}&daysFrom=3&eventIds=${game.gameId}`
 			);
 			const scoresDataRaw: Scores[] = await scores.json();
-			let gameData: markGames[] = [];
 
 			scoresDataRaw.map(async (score) => {
-				console.log('score', score);
 				if (score.completed === true) {
 					const homeTeamScore = score.scores?.find((sc) => sc.name === score.home_team)?.score;
 					const awayTeamScore = score.scores?.find((sc) => sc.name === score.away_team)?.score;
@@ -49,9 +49,17 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 					});
 				}
 			});
-			console.log('gameData', gameData);
-			// markWinner(gameData);
 		});
+
+		try {
+			console.log('gameData', gameData);
+			if (gameData && gameData.length > 0) {
+				console.log('marking winners');
+				// await markWinner(gameData);
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	return {
