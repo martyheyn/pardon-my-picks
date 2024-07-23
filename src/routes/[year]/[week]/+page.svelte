@@ -112,7 +112,7 @@
 
 <div class="" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
-		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black dark:border-white border-opacity-10 max-w-6xl"
+		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>
 		<h1 class="font-header text-2xl sm:text-3xl">{year} Week: {week}</h1>
 		{#if pickemOpen}

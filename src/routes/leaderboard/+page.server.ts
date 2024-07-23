@@ -18,43 +18,43 @@ interface TailFadeStats extends TailFadeRawQuery {
 
 export const load: PageServerLoad = async () => {
 	const winsByUser = await await prisma.$queryRaw`
-	SELECT u.username as username, 
-       COUNT(p.winner) as total_picks,
-       SUM(p.winner) as wins, 
-       SUM(p.push) as pushes
-	   FROM "Pick" as p
-	   LEFT JOIN "User" as u ON p.user_id = u.id
+	SELECT u.username as username,
+		COUNT(p.winner) as total_picks,
+    	SUM(p.winner) as wins,
+    	SUM(p.push) as pushes,
+		COUNT(u.id) as user_count
+	   FROM "User" u
+	   LEFT JOIN "Pick" p ON u.id = p.user_id
 	--    WHERE p.year = 2023
 	   GROUP BY u.username;
 	`;
-	console.log('winsByUser', winsByUser);
 
 	const tailsAndFadesByUser: TailFadeRawQuery[] = await await prisma.$queryRaw`
-    SELECT u.username,
-       COALESCE(t.tail_count, 0) as total_tails,
-       COALESCE(t.tail_winner, 0) as tail_wins,
-       COALESCE(t.tail_push, 0) as tail_push,
-       COALESCE(f.fade_count, 0) as total_fades,
-       COALESCE(f.fade_winner, 0) as fade_wins,
-       COALESCE(f.fade_push, 0) as fade_push
-       FROM "User" u
-       LEFT JOIN (
-        SELECT t.user_id,
-           COUNT(t.id) as tail_count,
-           SUM(t.winner) as tail_winner,
-           SUM(t.push) as tail_push
-        FROM "Tail" t
-        GROUP BY t.user_id
-       ) t ON u.id = t.user_id
-       LEFT JOIN (
-        SELECT f.user_id,
-           COUNT(f.id) as fade_count,
-           SUM(f.winner) as fade_winner,
-           SUM(f.push) as fade_push
-        FROM "Fade" f
-        GROUP BY f.user_id
-       ) f ON u.id = f.user_id;
-       `;
+	SELECT u.username,
+	   COALESCE(t.tail_count, 0) as total_tails,
+	   COALESCE(t.tail_winner, 0) as tail_wins,
+	   COALESCE(t.tail_push, 0) as tail_push,
+	   COALESCE(f.fade_count, 0) as total_fades,
+	   COALESCE(f.fade_winner, 0) as fade_wins,
+	   COALESCE(f.fade_push, 0) as fade_push
+	   FROM "User" u
+	   LEFT JOIN (
+	    SELECT t.user_id,
+	       COUNT(t.id) as tail_count,
+	       SUM(t.winner) as tail_winner,
+	       SUM(t.push) as tail_push
+	    FROM "Tail" t
+	    GROUP BY t.user_id
+	   ) t ON u.id = t.user_id
+	   LEFT JOIN (
+	    SELECT f.user_id,
+	       COUNT(f.id) as fade_count,
+	       SUM(f.winner) as fade_winner,
+	       SUM(f.push) as fade_push
+	    FROM "Fade" f
+	    GROUP BY f.user_id
+	   ) f ON u.id = f.user_id;
+	   `;
 
 	const tailFadeStats: TailFadeStats[] = tailsAndFadesByUser.map((user) => {
 		const tailWins = Number(user.tail_wins);
@@ -82,7 +82,7 @@ export const load: PageServerLoad = async () => {
 	console.log('tailFadeStats', tailFadeStats);
 
 	return {
-		wins: winsByUser,
-		tailFade: tailFadeStats
+		wins: winsByUser
+		// tailFade: tailFadeStats
 	};
 };
