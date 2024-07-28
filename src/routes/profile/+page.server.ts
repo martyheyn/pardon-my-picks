@@ -73,7 +73,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		},
 		include: {
 			fade: true,
-			tail: true
+			tail: true,
+			picks: true
 		}
 	});
 
@@ -104,6 +105,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 				losses: fades.length > 0 ? fades.filter((fade) => !fade.winner && !fade.push).length : 0
 			}
 		},
+		picks: existingUser.picks,
 		form
 	};
 };
