@@ -156,6 +156,8 @@
 		return description;
 	};
 
+	// const getPickScore = (type: string) => {};
+
 	let showModal = false;
 	beforeNavigate(({ cancel }) => {
 		if (usersPicks.length > 0 && dbPicks.length < 1 && stoppedToSave === 0) {
@@ -339,6 +341,8 @@
 													}`}
 													disabled={usersPicks.map((pick) => pick.id === outcome.id).includes(true)}
 													on:click={(e) => {
+														console.log('outcome', outcome);
+														console.log('bets', bets);
 														let outcomeId = generateId(15);
 														outcome.id = outcomeId;
 														e.preventDefault();
@@ -356,7 +360,7 @@
 															odd.home_team,
 															odd.away_team,
 															bets.key === 'spreads' ? outcome.name : undefined,
-															bets.key === 'totals' ? outcome.point : undefined
+															outcome.point
 														);
 													}}
 												>

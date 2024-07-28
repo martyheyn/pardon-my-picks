@@ -145,7 +145,7 @@
 
 <div class="" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
-		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10"
+		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black dark:border-white border-opacity-10"
 	>
 		<h1 class="font-header">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->

@@ -23,6 +23,7 @@ model Pick {
   homeTeamScore Int?      @map("home_team_score")
   awayTeamScore Int?      @map("away_team_score")
   isLive        Boolean   @default(false) @map("is_live")
+  completed     Boolean?   @default(false)
   winner        Int?
   pickTeam      NFLTeam?  @map("pick_team")
   pickScore     Float?      @map("pick_score")
@@ -129,7 +130,9 @@ enum NFLTeam {
 
   // MLB for testing
   orioles
-  yankees
-  athletics
-  phillies  
+  padres
+  tigers
+  twins
+
+  
 }

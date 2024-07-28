@@ -29,6 +29,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	if (date > gameStart && date < gameEnd) {
 		const scoresLive = await getLiveGames({ year: params.year });
+		// console.log('scoresLive', scoresLive);
 
 		scoresLive.map(async (game: Scores) => {
 			const prismaPicks = await prisma.pick.updateMany({

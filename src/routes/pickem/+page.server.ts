@@ -181,6 +181,7 @@ export const actions: Actions = {
 							homeTeam: pick.homeTeam,
 							awayTeam: pick.awayTeam,
 							isLive: false,
+							completed: false,
 							pickTeam: pick?.pickTeam,
 							pickScore: pick?.pickScore,
 							private: false,

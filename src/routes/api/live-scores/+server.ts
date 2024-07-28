@@ -86,7 +86,8 @@ export async function POST({ request }: { request: Request }) {
 			// get data of all completedGames in gamesToMark
 			const gamesToMarkData = gamesToMark.map((game) => {
 				return {
-					gameId: game.id,
+					id: game.id,
+					gameId: game.gameId,
 					type: game.type,
 					description: game.description,
 					homeTeam: game.homeTeam,

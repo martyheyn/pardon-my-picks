@@ -103,9 +103,9 @@ export const fullNameToMascot: { [key: string]: string } = {
 	'Tennessee Titans': 'titans',
 	'Washington Commanders': 'commanders',
 	'Baltimore Orioles': 'orioles',
-	'New York Yankees': 'yankees',
-	'Oakland Athletics': 'athletics',
-	'Philadelphia Phillies': 'phillies'
+	'San Diego Padres': 'padres',
+	'Detroit Tigers': 'tigers',
+	'Minnesota Twins': 'twins'
 };
 
 export const personaImgPath = (person: string) => {

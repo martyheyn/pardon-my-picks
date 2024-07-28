@@ -5,6 +5,7 @@ import { ODDS_API_KEY } from '$env/static/private';
 import type { Scores } from '$lib/utils/types';
 import { markWinner } from '$lib/utils/marking';
 import { type markGames } from '$lib/utils/marking';
+import { fullNameToMascot } from '$lib/utils/matching-format';
 
 export const load: LayoutServerLoad = async ({ url, locals }) => {
 	const targetPath = '/maintenance';
@@ -20,45 +21,69 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 			marked: false
 		}
 	});
+	console.log('unMarkedGames', unMarkedGames);
 
 	if (unMarkedGames.length > 0) {
-		let gameData: markGames[] = [];
-
 		console.log('here checking unmarked games');
 		// check odds api if the game finished
-		unMarkedGames.map(async (game) => {
-			const scores = await fetch(
-				`https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}&daysFrom=3&eventIds=${game.gameId}`
-			);
-			const scoresDataRaw: Scores[] = await scores.json();
+		const gamesToMark = await Promise.all(
+			unMarkedGames.map(async (game) => {
+				const response = await fetch(
+					`https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?daysFrom=3&apiKey=${ODDS_API_KEY}&eventIds=${game.gameId}`
+				);
+				const scoresDataRaw: Scores[] = await response.json();
+				const completedGames = scoresDataRaw.filter((score) => score.completed === true);
+				if (completedGames.length === 0) return [];
 
-			scoresDataRaw.map(async (score) => {
-				if (score.completed === true) {
-					const homeTeamScore = score.scores?.find((sc) => sc.name === score.home_team)?.score;
-					const awayTeamScore = score.scores?.find((sc) => sc.name === score.away_team)?.score;
-					gameData.push({
-						gameId: game.id,
-						type: game.type,
-						description: game.description,
-						homeTeam: game.homeTeam,
-						awayTeam: game.awayTeam,
-						homeTeamScore: homeTeamScore ? parseInt(homeTeamScore) : null,
-						awayTeamScore: awayTeamScore ? parseInt(awayTeamScore) : null,
-						pickTeam: game.pickTeam,
-						pickScore: game.pickScore
-					});
-				}
+				return {
+					...game,
+					scores: completedGames
+				};
+			})
+		).then((results) => results.flat());
+		console.log('gamesToMark', gamesToMark);
+
+		if (gamesToMark.length > 0) {
+			const gameData: markGames[] = gamesToMark.map((game) => {
+				let homeTeamScore = null;
+				let awayTeamScore = null;
+				game.scores.map((score) => {
+					const home_team_score = score.scores?.find(
+						(sc) => fullNameToMascot[sc.name] === game.homeTeam
+					)?.score;
+					const away_team_score = score.scores?.find(
+						(sc) => fullNameToMascot[sc.name] === game.awayTeam
+					)?.score;
+
+					// console.log('homeTeamScore', home_team_score);
+					// console.log('awayTeamScore', home_team_score);
+					homeTeamScore = home_team_score ? parseInt(home_team_score) : null;
+					awayTeamScore = away_team_score ? parseInt(away_team_score) : null;
+				});
+				return {
+					id: game.id,
+					gameId: game.gameId,
+					type: game.type,
+					description: game.description,
+					homeTeam: game.homeTeam,
+					awayTeam: game.awayTeam,
+					homeTeamScore: homeTeamScore,
+					awayTeamScore: awayTeamScore,
+					pickTeam: game.pickTeam,
+					pickScore: game.pickScore
+				};
 			});
-		});
 
-		try {
-			console.log('gameData', gameData);
-			if (gameData && gameData.length > 0) {
-				console.log('marking winners');
-				// await markWinner(gameData);
+			console.log('ereeeeee');
+
+			try {
+				console.log('gameData', gameData);
+				if (gameData && gameData.length > 0) {
+					await markWinner(gameData);
+				}
+			} catch (error) {
+				console.error(error);
 			}
-		} catch (error) {
-			console.error(error);
 		}
 	}
 
