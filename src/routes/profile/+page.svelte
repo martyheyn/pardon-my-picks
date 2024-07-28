@@ -263,7 +263,9 @@
 								: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
-						{stats?.tails.total ? `${(stats?.tails.wins / stats.tails.total) * 100} %` : 'NA'}
+						{stats?.tails.total
+							? `${((stats?.tails.wins / stats.tails.total) * 100).toFixed(2)} %`
+							: 'NA'}
 					</span>
 				</p>
 			</div>
@@ -291,7 +293,9 @@
 								: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
-						{stats?.fades.total ? `${(stats?.fades.wins / stats.fades.total) * 100} %` : 'NA'}
+						{stats?.fades.total
+							? `${((stats?.fades.wins / stats.fades.total) * 100).toFixed(2)} %`
+							: 'NA'}
 					</span>
 				</p>
 			</div>
