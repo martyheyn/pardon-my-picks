@@ -74,7 +74,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 		include: {
 			fade: true,
 			tail: true,
-			picks: true
+			picks: {
+				orderBy: {
+					week: 'desc'
+				}
+			}
 		}
 	});
 

@@ -133,6 +133,7 @@ export const actions: Actions = {
 			// let newPicks: PickForm[] = [];
 			try {
 				picks.forEach(async (pick) => {
+					// get the game id from the db if it exists
 					let gameId = '';
 					const dbGameIds = await prisma.pick.findMany({
 						select: {

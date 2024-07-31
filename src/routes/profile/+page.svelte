@@ -55,7 +55,7 @@
 
 	const showWeekPicks = (weekNum: number) => {
 		if (selectedWeekPicks === weekNum) {
-			selectedWeekPicks = 0;
+			selectedWeekPicks = -999;
 			return;
 		}
 		selectedWeekPicks = weekNum;
@@ -315,19 +315,23 @@
 		</div>
 	</div>
 
-	<div class="max-w-2xl card">
+	<div class="max-w-2xl card gap-y-1.5">
 		<div class="flex">
-			<h2 class="text-xl font-semibold">Picks</h2>
+			<h2 class="text-xl font-semibold mb-2">Picks</h2>
 		</div>
 
-		<div
-			class="rounded-md border border-black border-opacity-20 dark:border-white
-			dark:border-opacity-100 shadow-lg px-6 lg:px-8 py-4 lg:py-6"
-		>
-			{#each weekPicks as week}
+		{#each weekPicks as week}
+			<div
+				class="my-.5 p-4 rounded-md border border-black border-opacity-20
+					dark:border-white dark:border-opacity-100"
+			>
 				{#if week}
-					<div class="flex justify-between items-center mb-1.5">
-						<h4 class="text-lg font-semibold mb-2">Week {week}</h4>
+					<div
+						class={`flex justify-between items-center ${
+							selectedWeekPicks === week ? 'mb-1.5' : ''
+						}`}
+					>
+						<h4 class="text-lg font-semibold">Week {week}</h4>
 						<button on:click={() => showWeekPicks(week)}>
 							<Icon
 								class={`${
@@ -347,70 +351,72 @@
 						transition:slide={{ duration: 300, easing: quadInOut }}
 					>
 						{#each picks as pick}
-							<div
-								class="rounded-md border border-gray-800 border-opacity-20 dark:border-white
-						dark:border-opacity-60 shadow-lg px-6 lg:px-8 py-4 lg:py-6 flex flex-row gap-x-8
-						justify-between items-center gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out"
-							>
-								<div class=" max-w-64">
-									<h4
-										class={`py-2 px-4 text-lg shadow-lg dark:text-white ${
-											pick.homeTeamScore === null || pick.homeTeamScore === undefined
-												? 'bg-slate-300 bg-opacity-70'
-												: pick.winner
-												? 'bg-lightGreen dark:bg-darkGreen'
-												: pick.push
-												? 'bg-lightYellow dark:bg-darkYellow'
-												: 'bg-lightRed dark:bg-darkRed'
-										} w-fit rounded-md flex justify-start items-center`}
-									>
-										{pick.description}
-									</h4>
+							{#if pick.week === week}
+								<div
+									class="rounded-md border border-gray-800 border-opacity-20 dark:border-white
+								dark:border-opacity-60 shadow-lg px-4 lg:px-8 py-4 lg:py-6 flex flex-row gap-x-8
+								justify-between items-center gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out"
+								>
+									<div class=" max-w-64">
+										<h4
+											class={`py-2 px-4 text-lg shadow-lg dark:text-white ${
+												pick.homeTeamScore === null || pick.homeTeamScore === undefined
+													? 'bg-slate-300 bg-opacity-70'
+													: pick.winner
+													? 'bg-lightGreen dark:bg-darkGreen'
+													: pick.push
+													? 'bg-lightYellow dark:bg-darkYellow'
+													: 'bg-lightRed dark:bg-darkRed'
+											} w-fit rounded-md flex justify-start items-center`}
+										>
+											{pick.description}
+										</h4>
+									</div>
+
+									<div class="flex justify-between gap-x-4 md:gap-x-8 items-center">
+										<div class="flex flex-col items-center gap-2">
+											<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
+												<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
+											</a>
+											{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
+												<p
+													class={`${
+														pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
+													} ${pick.isLive ? ' font-normal' : ''} text-lg`}
+												>
+													{pick.awayTeamScore}
+												</p>
+											{/if}
+										</div>
+
+										<div>
+											<p class="font-semibold">@</p>
+										</div>
+
+										<div class="flex flex-col items-center gap-2">
+											<a href={`${teamLink[pick.homeTeam]}`} target="_blank" rel="noopener">
+												<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
+											</a>
+
+											{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
+												<p
+													class={`${
+														!pick.isLive && pick.homeTeamScore - pick.awayTeamScore > 0
+															? 'font-bold'
+															: ''
+													} text-lg`}
+												>
+													{pick.homeTeamScore}
+												</p>
+											{/if}
+										</div>
+									</div>
 								</div>
-
-								<div class="flex justify-between gap-x-4 md:gap-x-8 items-center">
-									<div class="flex flex-col items-center gap-2">
-										<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
-											<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
-										</a>
-										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
-											<p
-												class={`${pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'} ${
-													pick.isLive ? ' font-normal' : ''
-												} text-lg`}
-											>
-												{pick.awayTeamScore}
-											</p>
-										{/if}
-									</div>
-
-									<div>
-										<p class="font-semibold">@</p>
-									</div>
-
-									<div class="flex flex-col items-center gap-2">
-										<a href={`${teamLink[pick.homeTeam]}`} target="_blank" rel="noopener">
-											<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
-										</a>
-
-										{#if pick.homeTeamScore !== null && pick.awayTeamScore !== null}
-											<p
-												class={`${
-													!pick.isLive && pick.homeTeamScore - pick.awayTeamScore > 0
-														? 'font-bold'
-														: ''
-												} text-lg`}
-											>
-												{pick.homeTeamScore}
-											</p>
-										{/if}
-									</div>
-								</div>
-							</div>
+							{/if}
 						{/each}
 					</div>
 				{/if}
-			{/each}
-		</div>
+			</div>
+		{/each}
 	</div>
 </div>
