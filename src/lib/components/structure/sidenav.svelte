@@ -132,7 +132,9 @@
 
 				<a
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
-					href={navItem.route}
+					href={navItem.label === 'Profile' && user
+						? `${navItem.route}/${user.username}`
+						: navItem.route}
 				>
 					<div
 						class={`w-2 h-full bg-yellow-400 absolute left-0 top-0 rounded-r-md transition-all duration-300 ease-in-out ${

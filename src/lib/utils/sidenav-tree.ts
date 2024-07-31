@@ -78,6 +78,6 @@ export const sideNavItems: sideNavItems = [
 	{
 		label: 'Profile',
 		icon: 'user',
-		route: '/profile'
+		route: `/user`
 	}
 ];

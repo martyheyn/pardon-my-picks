@@ -1,6 +1,6 @@
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
-import { setError, superValidate } from 'sveltekit-superforms';
+import { superValidate } from 'sveltekit-superforms';
 import { generateId } from 'lucia';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
@@ -61,15 +61,22 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 	}
 };
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
 		redirect(303, '/');
+	}
+
+	let usersProfile: boolean = false;
+	const { username } = params;
+
+	if (locals.user.username === username) {
+		usersProfile = true;
 	}
 
 	// make sure it is the right user
 	const existingUser = await prisma.user.findUnique({
 		where: {
-			id: locals.user.id
+			username: username
 		},
 		include: {
 			fade: true,
@@ -83,7 +90,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	});
 
 	if (!existingUser) {
-		redirect(303, '/login');
+		redirect(303, '/');
+		// set message to user that profile does not exist in alert
 	}
 
 	// initialize forms
@@ -110,6 +118,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			}
 		},
 		picks: existingUser.picks,
+		usersProfile,
 		form
 	};
 };
