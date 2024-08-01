@@ -26,6 +26,8 @@
 	const currWeek: Writable<number> = getContext('currWeek');
 	const alert: Writable<Alert> = getContext('alert');
 
+	let cardWidth: number;
+
 	$: picksByPerson = picks.reduce((acc: PickByPerson, pick: any) => {
 		const { person } = pick;
 		acc[person] = acc[person] || [];
@@ -137,6 +139,7 @@
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
 	// not sure if passing arguments through the url is the best way to do it
 	// do it as a form so it can have a zod schema
+	$: console.log('cardWidth', cardWidth);
 </script>
 
 <svelte:head>
@@ -181,7 +184,11 @@
 				>
 					{#each pickPerson[Object.keys(pickPerson)[0]] as pick, i}
 						{#key week}
-							<div class="card" in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}>
+							<div
+								class="card"
+								bind:clientWidth={cardWidth}
+								in:fade={{ duration: 400, easing: quadInOut, delay: 100 }}
+							>
 								<div class="">
 									<h4
 										class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
@@ -301,7 +308,8 @@
 									{#if pick.espnLink}
 										<a href={pick.espnLink} target="_blank" rel="noopener">
 											<button
-												class={`px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
+												class={`min-w-[122px] px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 
+												rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10  hover:shadow-lg`}
 											>
 												Box Score
 											</button>
@@ -311,7 +319,8 @@
 									{#if pick.highlighLink}
 										<a href={pick.highlighLink} target="_blank" rel="noopener">
 											<button
-												class="px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
+												class="min-w-[122px] px-4 sm:px-6 py-2 shadow-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100
+												rounded-sm hover:bg-slate-500 transition-all duration-300 ease-in-out hover:bg-opacity-10 hover:shadow-lg"
 											>
 												Highlights
 											</button>
@@ -320,7 +329,8 @@
 
 									{#if pick.nerdNugget}
 										<button
-											class={`p-1.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full ${
+											class={`p-1.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50
+											 rounded-full ${cardWidth > 305 && cardWidth < 370 ? 'hidden' : 'block'} ${
 												showNerdNug &&
 												showNerdNug.person === Object.keys(pickPerson)[0] &&
 												showNerdNug.indx === i
