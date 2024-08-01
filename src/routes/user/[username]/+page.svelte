@@ -179,7 +179,7 @@
 	{/if}
 
 	{#if usersProfile}
-		<div class="max-w-2xl card">
+		<div class="max-w-2xl card px-4 sm:px-6">
 			{#if !form?.uploadPic}
 				<div
 					class={`${!form?.uploadPic ? '-mb-4' : ''}`}
@@ -279,14 +279,16 @@
 		</div>
 	{/if}
 
-	<div class="max-w-2xl card">
+	<div class="max-w-2xl card px-4 sm:px-6">
 		<div class="flex">
 			<h2 class="text-xl font-semibold">Stats</h2>
 		</div>
 
-		<div class="flex flex-row items-center gap-x-20">
+		<div class="flex flex-col sm:flex-row items-start sm:items-center gap-x-20">
 			<div class="flex flex-col gap-y-2">
-				<h2 class="text-lg mb-1 border-b border-black border-opacity-25">Tailed Picks</h2>
+				<h2 class="text-lg sm:mb-1 border-b border-black border-opacity-25 dark:border-white">
+					Tailed Picks
+				</h2>
 
 				<p class="text-[16px] leading-4">
 					Total Tailed: <span class="text-lg font-semibold ml-2 leading-4">
@@ -315,8 +317,10 @@
 				</p>
 			</div>
 
-			<div class="flex flex-col gap-y-2">
-				<h2 class="text-lg mb-1 border-b border-black border-opacity-25">Faded Picks</h2>
+			<div class="flex flex-col mt-4 sm:mt-0 gap-y-2">
+				<h2 class="text-lg sm:mb-1 border-b border-black border-opacity-25 dark:border-white">
+					Faded Picks
+				</h2>
 
 				<p class="text-[16px] leading-4">
 					Total Faded: <span class="text-lg font-semibold ml-2 leading-4">
@@ -386,10 +390,11 @@
 							{#if pick.week === week}
 								<div
 									class="rounded-md border border-gray-800 border-opacity-20 dark:border-white
-								dark:border-opacity-60 shadow-lg px-4 lg:px-8 py-4 lg:py-6 flex flex-row gap-x-8
-								justify-between items-center gap-y-4 font-paragraph relative transition-all duration-300 ease-in-out"
+								dark:border-opacity-60 shadow-lg px-4 lg:px-8 py-4 lg:py-6 flex flex-col sm:flex-row
+								justify-between items-center gap-y-6 sm:gap-x-8 sm:gap-y-4 font-paragraph relative
+								transition-all duration-300 ease-in-out"
 								>
-									<div class=" max-w-64">
+									<div class="w-full sm:max-w-64">
 										<h4
 											class={`py-2 px-4 text-lg shadow-lg dark:text-white ${
 												pick.homeTeamScore === null || pick.homeTeamScore === undefined
@@ -405,7 +410,9 @@
 										</h4>
 									</div>
 
-									<div class="flex justify-between gap-x-4 md:gap-x-8 items-center">
+									<div
+										class="w-full sm:w-fit flex justify-between px-4 sm:px-0 gap-x-4 md:gap-x-8 items-center"
+									>
 										<div class="flex flex-col items-center gap-2">
 											<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
 												<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
