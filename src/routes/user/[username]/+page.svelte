@@ -351,7 +351,7 @@
 		</div>
 	</div>
 
-	<div class="max-w-2xl card gap-y-1.5">
+	<div class="max-w-2xl card gap-y-1.5 px-4 sm:px-6">
 		<div class="flex">
 			<h2 class="text-xl font-semibold mb-2">Picks</h2>
 		</div>
