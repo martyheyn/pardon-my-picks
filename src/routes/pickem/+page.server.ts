@@ -185,6 +185,7 @@ export const actions: Actions = {
 							completed: false,
 							pickTeam: pick?.pickTeam,
 							pickScore: pick?.pickScore,
+							gameDate: pick.gameDate,
 							private: false,
 							userId: user.id,
 							barstoolEmployee: false,

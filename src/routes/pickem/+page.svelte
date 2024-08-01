@@ -35,6 +35,7 @@
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
 	$: console.log('odds', odds);
+	$: console.log('usersPicks', usersPicks);
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
@@ -47,7 +48,8 @@
 		homeTeam: string,
 		awayTeam: string,
 		pickTeam?: string,
-		pickScore?: number
+		pickScore?: number,
+		gameDate?: string
 	) => {
 		// add this data
 		const userPick: PickForm = {
@@ -58,7 +60,8 @@
 			homeTeam: fullNameToMascot[homeTeam] as $Enums.NFLTeam,
 			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam,
 			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : undefined,
-			pickScore: pickScore
+			pickScore: pickScore,
+			gameDate: gameDate ? new Date(gameDate) : null
 		};
 
 		// check if the pick already exists
@@ -246,53 +249,56 @@
 								<p class="font-semibold">{pick.description}</p>
 							</div>
 
-							<div
-								class="flex flex-row gap-x-4"
-								in:slide={{ duration: 300 }}
-								out:slide={{ duration: 250 }}
-							>
-								<!-- {#if dbPicks} -->
-								<form
-									action="?/deletePick"
-									method="post"
-									use:enhance={({ cancel }) => {
-										console.log('dbPicks', dbPicks);
-										console.log('pick', pick);
-										const findPick = dbPicks.find((dbPick) => dbPick.id === pick.id) ? true : false;
-										console.log('findPick', findPick);
-
-										// scan for if id is in the DB
-
-										if (!findPick) {
-											console.log('here didnt make it to deleting');
-											removeUnsavedPick(pick.id);
-											cancel();
-										}
-
-										return async ({ result }) => {
-											console.log('result', result);
-											// `result` is an `ActionResult` object
-											if (result.type === 'success') {
-												await applyAction(result);
-												removeUnsavedPick(pick.id);
-											} else if (result.type === 'failure') {
-												await applyAction(result);
-											}
-										};
-									}}
+							{#if !pick.gameDate || pick.gameDate < new Date()}
+								<div
+									class="flex flex-row gap-x-4"
+									in:slide={{ duration: 300 }}
+									out:slide={{ duration: 250 }}
 								>
-									<input type="hidden" name="pickId" value={pick.id} />
-									<input type="hidden" name="usersPicks" bind:value={hiddenInput} />
+									<form
+										action="?/deletePick"
+										method="post"
+										use:enhance={({ cancel }) => {
+											console.log('dbPicks', dbPicks);
+											console.log('pick', pick);
+											const findPick = dbPicks.find((dbPick) => dbPick.id === pick.id)
+												? true
+												: false;
+											console.log('findPick', findPick);
 
-									<button
-										class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover
-										dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out"
-										type="submit"
+											// scan for if id is in the DB
+
+											if (!findPick) {
+												console.log('here didnt make it to deleting');
+												removeUnsavedPick(pick.id);
+												cancel();
+											}
+
+											return async ({ result }) => {
+												console.log('result', result);
+												// `result` is an `ActionResult` object
+												if (result.type === 'success') {
+													await applyAction(result);
+													removeUnsavedPick(pick.id);
+												} else if (result.type === 'failure') {
+													await applyAction(result);
+												}
+											};
+										}}
 									>
-										Remove
-									</button>
-								</form>
-							</div>
+										<input type="hidden" name="pickId" value={pick.id} />
+										<input type="hidden" name="usersPicks" bind:value={hiddenInput} />
+
+										<button
+											class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover
+										dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out"
+											type="submit"
+										>
+											Remove
+										</button>
+									</form>
+								</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -358,7 +364,8 @@
 															odd.home_team,
 															odd.away_team,
 															bets.key === 'spreads' ? outcome.name : undefined,
-															outcome.point
+															outcome.point,
+															odd.commence_time
 														);
 													}}
 												>

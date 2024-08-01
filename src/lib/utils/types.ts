@@ -102,4 +102,5 @@ export type PickForm = {
 	awayTeam: $Enums.NFLTeam;
 	pickTeam?: $Enums.NFLTeam;
 	pickScore?: number;
+	gameDate?: Date | null;
 };
