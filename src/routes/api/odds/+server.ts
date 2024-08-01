@@ -33,8 +33,8 @@ export async function GET({ locals }) {
 	const dbUserPicks = await getDbUserPicks(user.id);
 
 	// this will be the end of Friday or early Sunday
-	const betStart = new Date('2024-07-01T12:00:00Z');
-	const betEnd = new Date('2024-07-30T22:00:00Z');
+	const betStart = new Date('2024-07-31T12:00:00Z');
+	const betEnd = new Date('2024-08-15T22:00:00Z');
 
 	// can only bet games for the next 2 days
 	const date = new Date();

@@ -44,8 +44,19 @@
 
 	const onFileSelected = async (e: Event) => {
 		console.log('file selected', e);
-		let image = (e.target as HTMLInputElement)?.files?.[0];
+		let input = e.target as HTMLInputElement;
+		let image = input.files?.[0];
 		if (!image) return;
+
+		const maxSize = parseInt(input.dataset.maxSize || '1048576', 10);
+		if (image.size > maxSize) {
+			alert.set({
+				text: 'File size is too large. Please upload a file less than 1MB',
+				alertType: 'error'
+			});
+			return;
+		}
+
 		avatar = image;
 	};
 
@@ -127,6 +138,7 @@
 							disabled={editting}
 							type="file"
 							accept=".jpg, .jpeg, .png"
+							data-max-size="1048576"
 							on:change={(e) => onFileSelected(e)}
 						/>
 						<input type="hidden" name="photoKey" id="photoKey" bind:value={photoKey} />
@@ -161,7 +173,7 @@
 	</div>
 
 	{#if form?.uploadPic}
-		<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+		<div transition:fly={{ x: -50, duration: 300, delay: 50 }} class="max-w-2xl">
 			<AlertFlash />
 		</div>
 	{/if}
