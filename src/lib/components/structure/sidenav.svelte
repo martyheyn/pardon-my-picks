@@ -160,8 +160,8 @@
 					<div
 						class={`${
 							$sideNavCollasped
-								? 'opacity-0 delay-0'
-								: 'group-hover:opacity-100 group-hover:delay-300'
+								? 'hidden opacity-0 delay-0'
+								: 'block group-hover:opacity-100 group-hover:delay-300'
 						} transition-all duration-300 ease-in-out w-full z-[999]`}
 					>
 						<p class={`ml-6`}>
