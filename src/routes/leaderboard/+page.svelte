@@ -5,13 +5,22 @@
 
 	export let data: PageData;
 
-	$: console.log(data);
+	// $: console.log(data);
+	const { wins, tails, fades } = data;
 
-	let selectedStats = 'wins';
+	let selectedStats: 'wins' | 'tails' | 'fades' = 'wins';
+
+	const stats = {
+		wins: wins,
+		tails: tails,
+		fades: fades
+	};
+
+	$: console.log(stats[selectedStats]);
 </script>
 
 <div
-	class=""
+	class="max-w-2xl"
 	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
 	out:fade={{ duration: 150, easing: linear }}
 >
@@ -62,6 +71,38 @@
 			</div>
 		</div>
 
-		<div class="my-2 mx-4 flex justify-center items-center border border-white rounded-md">Dd</div>
+		<div
+			class="my-2 mx-4 p-2 flex flex-col justify-center items-center gap-y-2 border border-white rounded-md"
+		>
+			<h4 class="text-xl font-header mb-4">
+				{selectedStats.charAt(0).toUpperCase() + selectedStats.slice(1)} Leaderboard
+			</h4>
+			{#each stats[selectedStats] as stat, i}
+				<div class="flex justify-between items-center w-full max-w-md">
+					<div class="flex items-center gap-x-2">
+						<p>{i + 1}.</p>
+						<h4 class="font-semibold font-header">{stat.username}</h4>
+					</div>
+
+					<div class=" w-24 flex items-center justify-between">
+						<p class="text-lg font-paragraph">
+							{stat.wins} - {stat.losses}
+							{stat.pushes ? `${stat.pushes}` : ''}
+						</p>
+						<p
+							class={`${
+								stat.pct > 50
+									? 'text-green-500 dark:text-green-300'
+									: stat.pct < 50
+									? 'text-red-500 dark:text-red-300'
+									: 'text-yellow-500 dark:text-yellow-300'
+							}`}
+						>
+							{stat.pct}%
+						</p>
+					</div>
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>
