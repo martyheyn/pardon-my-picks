@@ -23,13 +23,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// this will be the end of Friday or early Sunday
 	// should it be hardcoded, it is not used anywhere else
-	// use 6 hours ahead to account for GMT time
 	const gameStart = new Date('2024-07-01T12:00:00Z');
 	const gameEnd = new Date('2024-07-28T22:00:00Z');
 
 	if (date > gameStart && date < gameEnd) {
 		const scoresLive = await getLiveGames({ year: params.year });
-		// console.log('scoresLive', scoresLive);
 
 		scoresLive.map(async (game: Scores) => {
 			const prismaPicks = await prisma.pick.updateMany({

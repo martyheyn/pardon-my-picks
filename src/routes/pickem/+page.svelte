@@ -51,6 +51,15 @@
 		pickScore?: number,
 		gameDate?: string
 	) => {
+		console.log(`gameDate`, gameDate);
+
+		let estGameDate: string = '';
+		if (gameDate) {
+			const tzoffset = new Date().getTimezoneOffset() * 60000;
+			const dt = new Date(gameDate);
+			estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
+		}
+
 		// add this data
 		const userPick: PickForm = {
 			id,
@@ -61,7 +70,8 @@
 			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam,
 			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : undefined,
 			pickScore: pickScore,
-			gameDate: gameDate ? new Date(gameDate) : null
+			gameDate: estGameDate,
+			marked: false
 		};
 
 		// check if the pick already exists
@@ -157,7 +167,10 @@
 		return description;
 	};
 
-	// const getPickScore = (type: string) => {};
+	// get EST for gameDate comparison
+	const date = new Date();
+	const tzoffset = new Date().getTimezoneOffset() * 60000;
+	const estDate = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 
 	let showModal = false;
 	beforeNavigate(({ cancel }) => {
@@ -246,10 +259,23 @@
 								<p class="">{pick.awayTeam} @ {pick.homeTeam}</p>
 							</div>
 							<div class="flex justify-start items-center">
-								<p class="font-semibold">{pick.description}</p>
+								<p
+									class={`text-lg dark:text-white ${
+										// pick.gameDate && pick.gameDate < new Date()
+										pick.marked === false
+											? ''
+											: pick.winner
+											? 'bg-lightGreen dark:bg-darkGreen px-3 py-2 shadow-lg rounded-md'
+											: pick.push
+											? 'bg-lightYellow dark:bg-darkYellow px-3 py-2 shadow-lg rounded-md'
+											: 'bg-lightRed dark:bg-darkRed px-3 py-2 shadow-lg rounded-md'
+									} w-fit flex justify-start items-center`}
+								>
+									{pick.description}
+								</p>
 							</div>
 
-							{#if !pick.gameDate || pick.gameDate < new Date()}
+							{#if pick.gameDate && pick.gameDate > estDate}
 								<div
 									class="flex flex-row gap-x-4"
 									in:slide={{ duration: 300 }}
@@ -259,12 +285,9 @@
 										action="?/deletePick"
 										method="post"
 										use:enhance={({ cancel }) => {
-											console.log('dbPicks', dbPicks);
-											console.log('pick', pick);
 											const findPick = dbPicks.find((dbPick) => dbPick.id === pick.id)
 												? true
 												: false;
-											console.log('findPick', findPick);
 
 											// scan for if id is in the DB
 
@@ -290,8 +313,8 @@
 										<input type="hidden" name="usersPicks" bind:value={hiddenInput} />
 
 										<button
-											class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover
-										dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out"
+											class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover dark:bg-darkRed
+											 dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out"
 											type="submit"
 										>
 											Remove
@@ -345,8 +368,6 @@
 													}`}
 													disabled={usersPicks.map((pick) => pick.id === outcome.id).includes(true)}
 													on:click={(e) => {
-														console.log('outcome', outcome);
-														console.log('bets', bets);
 														let outcomeId = generateId(15);
 														outcome.id = outcomeId;
 														e.preventDefault();

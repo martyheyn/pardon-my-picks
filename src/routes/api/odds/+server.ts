@@ -18,7 +18,9 @@ const getDbUserPicks = async (userId: string) => {
 			type: true,
 			description: true,
 			homeTeam: true,
-			awayTeam: true
+			awayTeam: true,
+			gameDate: true,
+			marked: true
 		}
 	});
 
@@ -37,6 +39,7 @@ export async function GET({ locals }) {
 	const betEnd = new Date('2024-08-15T22:00:00Z');
 
 	// can only bet games for the next 2 days
+	// time offset to Eastern Standard Time
 	const date = new Date();
 	const tzoffset = new Date().getTimezoneOffset() * 60000;
 	const commenceTimeFrom = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';

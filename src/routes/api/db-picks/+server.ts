@@ -16,7 +16,10 @@ const getDbUserPicks = async (userId: string) => {
 			description: true,
 			homeTeam: true,
 			awayTeam: true,
-			gameDate: true
+			gameDate: true,
+			winner: true,
+			push: true,
+			marked: true
 		}
 	});
 

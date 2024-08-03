@@ -25,8 +25,10 @@ const PickFormObjectSchema = z.object({
 	description: z.string(),
 	homeTeam: z.custom<$Enums.NFLTeam>(),
 	awayTeam: z.custom<$Enums.NFLTeam>(),
+	marked: z.boolean(),
 	pickTeam: z.custom<$Enums.NFLTeam>().optional(),
-	pickScore: z.number().optional()
+	pickScore: z.number().optional(),
+	gameDate: z.string().optional()
 });
 
 // // Define the schema for an array of PickForm objects
@@ -130,7 +132,6 @@ export const actions: Actions = {
 				});
 			}
 
-			// let newPicks: PickForm[] = [];
 			try {
 				picks.forEach(async (pick) => {
 					// get the game id from the db if it exists
@@ -183,9 +184,10 @@ export const actions: Actions = {
 							awayTeam: pick.awayTeam,
 							isLive: false,
 							completed: false,
+							marked: false,
 							pickTeam: pick?.pickTeam,
 							pickScore: pick?.pickScore,
-							gameDate: pick.gameDate,
+							gameDate: pick.gameDate ? new Date(pick.gameDate) : null,
 							private: false,
 							userId: user.id,
 							barstoolEmployee: false,
@@ -282,7 +284,8 @@ export const actions: Actions = {
 					type: true,
 					description: true,
 					homeTeam: true,
-					awayTeam: true
+					awayTeam: true,
+					marked: true
 				}
 			});
 
