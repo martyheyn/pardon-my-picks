@@ -1,4 +1,17 @@
-<script lang="ts"></script>
+<script lang="ts">
+	import type { PageData } from './$types';
+	import { slide } from 'svelte/transition';
+
+	import Icon from '$lib/components/icon.svelte';
+
+	export let data: PageData;
+
+	$: ({ yearsMaxWeek } = data);
+
+	// TODO:: get years from the db and lop through them
+	let selectedYear = 2023;
+	let dropdownOpen = true;
+</script>
 
 <div class="max-w-2xl">
 	<div
@@ -7,5 +20,36 @@
 		<h1 class="font-header">History</h1>
 	</div>
 
-	<div class="">D</div>
+	{#each yearsMaxWeek as yearWeek}
+		<div
+			class="my-4 flex flex-col gap-y-4 border border-black dark:border-white rounded-md px-4 py-2"
+		>
+			<div class="flex justify-between items-center">
+				<h4 class="font-header text-xl">{yearWeek.year}</h4>
+
+				<button on:click={() => (selectedYear = yearWeek.year)}>
+					<Icon
+						class={`${
+							selectedYear === yearWeek.year ? 'rotate-[270deg]' : 'rotate-90'
+						} transition-all duration-300 ease-in-out`}
+						width="28px"
+						height="28px"
+						iconName="arrow"
+					/>
+				</button>
+			</div>
+
+			{#if selectedYear === yearWeek.year}
+				<div class="grid grid-cols-4 gap-y-3" transition:slide={{ duration: 300 }}>
+					{#each Array.from({ length: yearWeek._max ? yearWeek._max.week : 3 }) as _, i}
+						<div class="font-paragraph dark:text-blue-100 hover:text-darkMuteTextColor">
+							<a href={`${yearWeek.year}/${i + 1}`}>
+								Week {i + 1}
+							</a>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	{/each}
 </div>
