@@ -33,9 +33,13 @@
 	const getBetTypeStats = (persona: string, type: string) => {
 		const betTypeStats = typeBets.filter(
 			(spread) => spread.person === persona && spread.type === type
-		)[0];
+		);
 
-		return betTypeStats.record;
+		if (betTypeStats.length === 0) {
+			return '0 - 0';
+		}
+
+		return betTypeStats[0].record;
 	};
 
 	let specialBetOpen: string[] | undefined = undefined;
@@ -119,15 +123,10 @@
 	// dropdown selector for stat aggregation
 	enum StatHeaders {
 		CURR_YEAR = '2023 NFL Season Stats',
-		ALLTIME = 'All Time Stats',
-		PREV_2023 = '2022 NFL Season Stats'
+		ALLTIME = 'All Time Stats'
 	}
 	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
-	const selectStatHeaders: StatHeaders[] = [
-		StatHeaders.CURR_YEAR,
-		StatHeaders.ALLTIME,
-		StatHeaders.PREV_2023
-	];
+	const selectStatHeaders: StatHeaders[] = [StatHeaders.CURR_YEAR, StatHeaders.ALLTIME];
 	let dropdownOpen = false;
 </script>
 
@@ -153,7 +152,8 @@
 	>
 		<button
 			class={`w-full transition-all duration-300 ease-in-out py-2 pl-4 pr-2 flex gap-x-3 
-			justify-between border border-black border-opacity-20 group cursor-auto`}
+			justify-between border border-black border-opacity-20 group cursor-auto 
+			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
 			<h2 class="">{selectedStat}</h2>
 			<button
@@ -187,7 +187,7 @@
 								dropdownOpen = false;
 							}}>{stat}</button
 						>
-						<input type="hidden" name="year" id="year" value={selectedStat} />
+						<input type="hidden" name="year" id="year" value={stat} />
 					</form>
 				{/each}
 			</div>

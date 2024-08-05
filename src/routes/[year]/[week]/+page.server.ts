@@ -6,6 +6,7 @@ import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
+	console.log('params', params);
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
 			week: parseInt(params.week),
