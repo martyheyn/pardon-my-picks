@@ -24,7 +24,6 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 
 	if (unMarkedGames.length > 0) {
 		console.log('here checking unmarked games');
-		// check odds api if the game finished
 		const gamesToMark = await Promise.all(
 			unMarkedGames.map(async (game) => {
 				// first check if the game has been marked somewhere else in the db by another user

@@ -139,7 +139,6 @@
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
 	// not sure if passing arguments through the url is the best way to do it
 	// do it as a form so it can have a zod schema
-	$: console.log('cardWidth', cardWidth);
 </script>
 
 <svelte:head>
@@ -152,9 +151,7 @@
 	>
 		<h1 class="font-header">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
-		{#if user}
-			<a href="/pickem" class="btn-primary">Make your picks</a>
-		{/if}
+		<a href="/pickem" class="btn-primary">Make your picks</a>
 	</div>
 
 	{#if form && !form.pickId}

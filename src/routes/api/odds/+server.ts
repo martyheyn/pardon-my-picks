@@ -29,10 +29,10 @@ const getDbUserPicks = async (userId: string) => {
 
 export async function GET({ locals }) {
 	const { user } = locals;
-	if (!user) {
-		return new Response(JSON.stringify({ success: false, message: 'No User' }));
+	let dbUserPicks: PickForm[] = [];
+	if (user) {
+		dbUserPicks = await getDbUserPicks(user.id);
 	}
-	const dbUserPicks = await getDbUserPicks(user.id);
 
 	// this will be the end of Friday or early Sunday
 	const betStart = new Date('2024-07-31T12:00:00Z');
@@ -78,6 +78,7 @@ export async function GET({ locals }) {
 									if (
 										pick.homeTeam === fullNameToMascot[game.home_team] &&
 										pick.awayTeam === fullNameToMascot[game.away_team] &&
+										pick.gameId === game.id &&
 										// TODO: need to change this so it is not dependent on the exact number as that might change
 										((pick.type === 'totals' &&
 											outcome.name ===

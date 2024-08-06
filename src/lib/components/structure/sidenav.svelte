@@ -122,7 +122,7 @@
 		{#each sideNavItems as navItem}
 			<li
 				class={`${
-					(navItem.label === 'Profile' || navItem.label === 'PickEm') && !user ? 'hidden' : 'block'
+					navItem.label === 'Profile' && !user ? 'hidden' : 'block'
 				} w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative 
 				group flex justify-between items-center h-full font-header`}
 			>

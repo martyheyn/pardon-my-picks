@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
 	import { fade, fly, slide } from 'svelte/transition';
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToMascot } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
@@ -14,7 +14,10 @@
 	import { beforeNavigate } from '$app/navigation';
 	import Modal from '$lib/components/modal.svelte';
 
+	export let data: PageData;
 	export let form: ActionData;
+
+	$: ({ user } = data);
 
 	const alert: Writable<Alert> = getContext('alert');
 
@@ -35,7 +38,6 @@
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
 	$: console.log('odds', odds);
-	$: console.log('usersPicks', usersPicks);
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
@@ -190,6 +192,13 @@
 		}
 		return;
 	};
+
+	const noUserAlert = () => {
+		alert.set({
+			text: 'You must be logged in to make picks',
+			alertType: 'error'
+		});
+	};
 	// alerts
 	$: form, updateAlert();
 </script>
@@ -203,6 +212,11 @@
 	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
 	out:fade={{ duration: 150, easing: linear }}
 >
+	{#if !user}
+		<div class={`px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg`}>
+			You must be logged in to make picks
+		</div>
+	{/if}
 	<div
 		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>
@@ -290,7 +304,6 @@
 												: false;
 
 											// scan for if id is in the DB
-
 											if (!findPick) {
 												console.log('here didnt make it to deleting');
 												removeUnsavedPick(pick.id);
@@ -362,11 +375,13 @@
 												<button
 													class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
 													${
-														usersPicks.map((pick) => pick.id === outcome.id).includes(true)
+														usersPicks.map((pick) => pick.id === outcome.id).includes(true) || !user
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
 															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
 													}`}
-													disabled={usersPicks.map((pick) => pick.id === outcome.id).includes(true)}
+													disabled={usersPicks
+														.map((pick) => pick.id === outcome.id)
+														.includes(true) || !user}
 													on:click={(e) => {
 														let outcomeId = generateId(15);
 														outcome.id = outcomeId;

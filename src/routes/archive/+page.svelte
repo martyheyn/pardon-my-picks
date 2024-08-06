@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import Icon from '$lib/components/icon.svelte';
+	import { quadInOut } from 'svelte/easing';
 
 	export let data: PageData;
 
@@ -13,7 +14,7 @@
 	let dropdownOpen = true;
 </script>
 
-<div class="max-w-2xl">
+<div class="max-w-2xl" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
 		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>

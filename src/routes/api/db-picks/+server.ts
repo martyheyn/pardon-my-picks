@@ -29,7 +29,7 @@ const getDbUserPicks = async (userId: string) => {
 export async function GET({ locals }) {
 	const { user } = locals;
 	if (!user) {
-		return new Response(JSON.stringify({ error: 'No user' }));
+		return new Response(JSON.stringify({ picks: [] }));
 	}
 	const dbUserPicks = await getDbUserPicks(user.id);
 

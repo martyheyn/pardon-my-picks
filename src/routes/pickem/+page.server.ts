@@ -41,9 +41,9 @@ const PickFormSchema = z.array(PickFormObjectSchema);
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
-	if (!user) {
-		redirect(303, '/');
-	}
+	return {
+		user: user ? true : false
+	};
 };
 
 export const actions: Actions = {
