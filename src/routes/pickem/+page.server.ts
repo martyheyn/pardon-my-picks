@@ -135,38 +135,41 @@ export const actions: Actions = {
 			try {
 				picks.forEach(async (pick) => {
 					// get the game id from the db if it exists
-					let gameId = '';
-					const dbGameIds = await prisma.pick.findMany({
-						select: {
-							gameId: true
-						},
-						where: {
-							week: parseInt(CURRENT_WEEK),
-							year: new Date().getFullYear(),
-							homeTeam: pick.homeTeam,
-							awayTeam: pick.awayTeam
+					let gameId = pick.gameId;
+
+					if (!gameId) {
+						const dbGameIds = await prisma.pick.findMany({
+							select: {
+								gameId: true
+							},
+							where: {
+								week: parseInt(CURRENT_WEEK),
+								year: new Date().getFullYear(),
+								homeTeam: pick.homeTeam,
+								awayTeam: pick.awayTeam
+							}
+						});
+						gameId = dbGameIds[0]?.gameId;
+
+						// can only bet games for the next 4 days
+						const date = new Date();
+						const commenceTimeTo =
+							new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';
+
+						// if the game was not picked by the fellas then search the odds api for it
+						// only do this if the game is not already in the db so I'm not making too many calls to the api
+						if (dbGameIds.length === 0) {
+							const oddsGameIds = await fetch(
+								`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
+							);
+							const oddsGameIdsData: Odds[] = await oddsGameIds.json();
+							const oddsGameId = oddsGameIdsData.find(
+								(game) =>
+									fullNameToMascot[game.away_team] === pick.awayTeam &&
+									fullNameToMascot[game.home_team] === pick.homeTeam
+							);
+							gameId = oddsGameId?.id || '';
 						}
-					});
-					gameId = dbGameIds[0]?.gameId;
-
-					// can only bet games for the next 4 days
-					const date = new Date();
-					const commenceTimeTo =
-						new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';
-
-					// if the game was not picked by the fellas then search the odds api for it
-					// only do this if the game is not already in the db so I'm not making too many calls to the api
-					if (dbGameIds.length === 0) {
-						const oddsGameIds = await fetch(
-							`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
-						);
-						const oddsGameIdsData: Odds[] = await oddsGameIds.json();
-						const oddsGameId = oddsGameIdsData.find(
-							(game) =>
-								fullNameToMascot[game.away_team] === pick.awayTeam &&
-								fullNameToMascot[game.home_team] === pick.homeTeam
-						);
-						gameId = oddsGameId?.id || '';
 					}
 
 					await prisma.pick.create({

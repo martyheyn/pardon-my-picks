@@ -85,6 +85,7 @@ export type Odds = {
 		}[];
 		title: string;
 	}[];
+	gameId: string;
 	commence_time: string;
 	home_team: string;
 	id: string;

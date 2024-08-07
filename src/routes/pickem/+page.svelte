@@ -37,7 +37,7 @@
 		usersPicks = dbPicksData.picks;
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
-	$: console.log('odds', odds);
+	// $: console.log('odds', odds);
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
@@ -45,6 +45,7 @@
 	const addPick = async (
 		id: string,
 		oddId: string,
+		gameId: string,
 		type: string,
 		description: string,
 		homeTeam: string,
@@ -53,8 +54,6 @@
 		pickScore?: number,
 		gameDate?: string
 	) => {
-		console.log(`gameDate`, gameDate);
-
 		let estGameDate: string = '';
 		if (gameDate) {
 			const tzoffset = new Date().getTimezoneOffset() * 60000;
@@ -65,6 +64,7 @@
 		// add this data
 		const userPick: PickForm = {
 			id,
+			gameId,
 			show: 'PMT',
 			type,
 			description: description,
@@ -389,6 +389,7 @@
 														addPick(
 															outcomeId,
 															odd.id,
+															odd.gameId,
 															bets.key === 'spreads' ? bets.key.slice(0, -1) : bets.key,
 															getDescription(
 																bets.key,
