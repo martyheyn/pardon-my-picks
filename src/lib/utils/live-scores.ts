@@ -17,7 +17,7 @@ export const getTeamScores = async (scores: Scores, teamName: string) => {
 export const getLiveGames = async ({ year }: { year: string }) => {
 	// get live scores if the games have already started (americanfootball_nfl)
 	const scores = await fetch(
-		`https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
+		`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
 	);
 	const scoresDataRaw: Scores[] = await scores.json();
 

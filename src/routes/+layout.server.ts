@@ -48,7 +48,7 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 
 				// if not already in the db we gotta query the odds api
 				const response = await fetch(
-					`https://api.the-odds-api.com/v4/sports/baseball_mlb/scores/?daysFrom=3&apiKey=${ODDS_API_KEY}&eventIds=${game.gameId}`
+					`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=3&apiKey=${ODDS_API_KEY}&eventIds=${game.gameId}`
 				);
 				const scoresDataRaw: Scores[] = await response.json();
 				const completedGames = scoresDataRaw.filter((score) => score.completed === true);

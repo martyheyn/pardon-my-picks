@@ -160,7 +160,7 @@ export const actions: Actions = {
 						// only do this if the game is not already in the db so I'm not making too many calls to the api
 						if (dbGameIds.length === 0) {
 							const oddsGameIds = await fetch(
-								`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
+								`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
 							);
 							const oddsGameIdsData: Odds[] = await oddsGameIds.json();
 							const oddsGameId = oddsGameIdsData.find(
