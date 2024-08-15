@@ -126,15 +126,5 @@ enum NFLTeam {
   seahawks
   buccaneers
   titans
-  commanders
-
-  // MLB for testing
-  orioles
-  padres
-  tigers
-  twins
-  blueJays
-  mets
-  guardians
-  
+  commanders  
 }

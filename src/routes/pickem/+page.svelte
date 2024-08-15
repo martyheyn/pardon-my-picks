@@ -195,12 +195,6 @@
 		return;
 	};
 
-	const noUserAlert = () => {
-		alert.set({
-			text: 'You must be logged in to make picks',
-			alertType: 'error'
-		});
-	};
 	// alerts
 	$: form, updateAlert();
 </script>
@@ -279,7 +273,7 @@
 								in:slide={{ duration: 300, delay: 250 }}
 								out:slide={{ duration: 250 }}
 							>
-								<div class="flex flex-row justify-between items-center max-w-52">
+								<div class="flex flex-row justify-between items-center max-w-[400px]">
 									<div class="">
 										<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
 										<p>{pick.awayTeam}</p>
@@ -295,7 +289,6 @@
 								<div class="flex justify-start items-center">
 									<p
 										class={`text-lg dark:text-white ${
-											// pick.gameDate && pick.gameDate < new Date()
 											pick.marked === false
 												? ''
 												: pick.winner
