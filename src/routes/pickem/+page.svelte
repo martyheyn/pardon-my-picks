@@ -44,6 +44,7 @@
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
 
+	// TODO: clean this function up, seems like there are way too many inputs and there is a better way to format this
 	const addPick = async (
 		id: string,
 		oddId: string,

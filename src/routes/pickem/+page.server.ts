@@ -1,10 +1,6 @@
-import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
-import { generateId } from 'lucia';
 import { z } from 'zod';
-// import { setError, superValidate } from 'sveltekit-superforms';
-// import { zod } from 'sveltekit-superforms/adapters';
 
 import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
@@ -41,6 +37,7 @@ const PickFormSchema = z.array(PickFormObjectSchema);
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
+
 	return {
 		user: user ? true : false
 	};
@@ -229,7 +226,7 @@ export const actions: Actions = {
 		const { user } = event.locals;
 		if (!user) {
 			return fail(401, {
-				message: 'Unauthorized!! Gotta create an account to make a pick buddy',
+				message: 'Unauthorized!! Go on and create an account',
 				success: false
 			});
 		}
@@ -261,6 +258,11 @@ export const actions: Actions = {
 		// if the pick does not exist fail
 		if (!pick) {
 			return fail(500, { message: 'Pick not found', success: false });
+		}
+
+		// if the user is not the owner of the pick fail
+		if (pick.userId !== user.id) {
+			return fail(401, { message: 'Unauthorized', success: false });
 		}
 
 		let picks: PickForm[] = [];

@@ -172,7 +172,7 @@
 
 				{#if navItem.subItems}
 					<button
-						on:click={() => (navItem.subItemsOpen = !navItem.subItemsOpen)}
+						on:click={() => !$sideNavCollasped && (navItem.subItemsOpen = !navItem.subItemsOpen)}
 						class={`${$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'} pr-3`}
 					>
 						<Icon
@@ -213,7 +213,8 @@
 
 							{#if subItem.subItems}
 								<button
-									on:click={() => (subItem.subItemsOpen = !subItem.subItemsOpen)}
+									on:click={() =>
+										!$sideNavCollasped && (subItem.subItemsOpen = !subItem.subItemsOpen)}
 									class={`${
 										$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'
 									} pr-3`}
