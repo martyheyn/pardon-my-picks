@@ -154,11 +154,11 @@
 		<a href="/pickem" class="btn-primary">Make your picks</a>
 	</div>
 
-	{#if form && !form.pickId}
+	<!-- {#if form && !form.pickId}
 		<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 			<AlertFlash />
 		</div>
-	{/if}
+	{/if} -->
 
 	<div
 		class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-6 md:gap-y-12 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
@@ -356,7 +356,11 @@
 										<div class="flex justify-between items-center px-2 gap-x-4">
 											<div class="h-full flex flex-col justify-center items-center gap-y-2">
 												<div class="flex flex-row justify-center items-center gap-x-2">
-													<form use:enhance action="?/tailPick&id={pick.id}" method="POST">
+													<form
+														use:enhance
+														action="?/tailPick&id={pick.id}&week={week}"
+														method="POST"
+													>
 														<button disabled={alertBool}>
 															<Icon
 																class={`transition-all duration-300 ease-in-out ${
@@ -367,6 +371,10 @@
 																	pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
 																		? 'fill-green-300 dark:fill-green-900'
 																		: 'fill-none'
+																} ${
+																	parseInt(week) !== $currWeek
+																		? 'cursor-not-allowed hover:fill-disabled'
+																		: ''
 																}`}
 																width="24px"
 																height="24px"
@@ -382,7 +390,11 @@
 
 											<div class="h-full flex flex-col justify-center items-center gap-y-2">
 												<div class="flex flex-row justify-center items-center gap-x-2">
-													<form use:enhance action="?/fadePick&id={pick.id}" method="POST">
+													<form
+														use:enhance
+														action="?/fadePick&id={pick.id}&week={week}"
+														method="POST"
+													>
 														<button disabled={alertBool}>
 															<Icon
 																class={`transition-all duration-300 ease-in-out ${
@@ -393,6 +405,10 @@
 																	pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
 																		? 'fill-red-300 dark:fill-red-900'
 																		: 'fill-none'
+																} ${
+																	parseInt(week) !== $currWeek
+																		? 'cursor-not-allowed hover:fill-disabled'
+																		: ''
 																}`}
 																width="24px"
 																height="24px"

@@ -14,9 +14,10 @@
 	import Topnav from '$lib/components/structure/topnav.svelte';
 	import type { Alert } from '$lib/utils/types';
 	import type { Page } from '@sveltejs/kit';
+	import { PUBLIC_CURRENT_WEEK } from '$env/static/public';
 
 	const sideNavCollasped = writable(true);
-	const currWeek = writable(18);
+	const currWeek = writable(PUBLIC_CURRENT_WEEK);
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);

@@ -4,6 +4,7 @@ import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
+import { CURRENT_WEEK } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
@@ -53,6 +54,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 export const actions: Actions = {
 	fadePick: async ({ url, locals }) => {
 		const id = url.searchParams.get('id');
+		const week = url.searchParams.get('week');
+
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -66,6 +69,14 @@ export const actions: Actions = {
 		if (!locals.user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to fade a pick buddy',
+				success: false,
+				pickId
+			});
+		}
+
+		if (week !== CURRENT_WEEK) {
+			return fail(401, {
+				message: 'Please only fade picks from this current week pal',
 				success: false,
 				pickId
 			});
@@ -136,6 +147,7 @@ export const actions: Actions = {
 
 	tailPick: async ({ url, locals }) => {
 		const id = url.searchParams.get('id');
+		const week = url.searchParams.get('week');
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -149,6 +161,14 @@ export const actions: Actions = {
 		if (!locals.user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to tail a pick big dawg',
+				success: false,
+				pickId
+			});
+		}
+
+		if (week !== CURRENT_WEEK) {
+			return fail(401, {
+				message: 'Please only tail picks from this current week pal',
 				success: false,
 				pickId
 			});
