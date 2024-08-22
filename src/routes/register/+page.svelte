@@ -69,7 +69,7 @@
 						bind:value={$form.username}
 					/>
 					{#if $errors.username}
-						<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
+						<p in:slide={{ duration: 300 }} class="mt-1 text-red-500 dark:text-red-300 text-xs">
 							{$errors.username}
 						</p>
 					{/if}
@@ -87,7 +87,7 @@
 						bind:value={$form.password}
 					/>
 					{#if $errors.password}
-						<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
+						<p in:slide={{ duration: 300 }} class="mt-1 text-red-500 dark:text-red-300 text-xs">
 							{$errors.password}
 						</p>
 					{/if}
@@ -105,7 +105,7 @@
 						bind:value={$form.confirmPassword}
 					/>
 					{#if $errors.confirmPassword}
-						<p in:slide={{ duration: 300 }} class="text-red-500 text-xs">
+						<p in:slide={{ duration: 300 }} class="mt-1 text-red-500 dark:text-red-300 text-xs">
 							{$errors.confirmPassword}
 						</p>
 					{/if}

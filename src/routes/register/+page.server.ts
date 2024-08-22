@@ -24,8 +24,14 @@ const limiter = new RateLimiter({
 });
 
 const RegisterFormSchema = z.object({
-	username: z.string().min(6),
-	password: z.string().min(6),
+	username: z
+		.string()
+		.min(6)
+		.refine((s) => !s.includes(' '), 'No Spaces!'),
+	password: z
+		.string()
+		.min(6)
+		.refine((s) => !s.includes(' '), 'No Spaces!'),
 	confirmPassword: z.string().min(6)
 });
 
