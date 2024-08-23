@@ -5,8 +5,9 @@
 	import type { Writable } from 'svelte/store';
 
 	const currWeek: Writable<number> = getContext('currWeek');
+	const currYear: Writable<number> = getContext('currYear');
 
 	onMount(async () => {
-		goto(`/2023/${$currWeek}`);
+		goto(`/${$currYear}/${$currWeek}`);
 	});
 </script>

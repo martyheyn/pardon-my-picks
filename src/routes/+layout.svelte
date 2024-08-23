@@ -14,10 +14,10 @@
 	import Topnav from '$lib/components/structure/topnav.svelte';
 	import type { Alert } from '$lib/utils/types';
 	import type { Page } from '@sveltejs/kit';
-	import { PUBLIC_CURRENT_WEEK } from '$env/static/public';
 
 	const sideNavCollasped = writable(true);
-	const currWeek = writable(PUBLIC_CURRENT_WEEK);
+	const currWeek = writable(1);
+	const currYear = writable(2024);
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);
@@ -37,6 +37,7 @@
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
+	setContext('currYear', currYear);
 	setContext('screenWidth', screenWidth);
 	setContext('active', active);
 	setContext('fullPageHeight', fullPageHeight);

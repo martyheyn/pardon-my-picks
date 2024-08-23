@@ -4,7 +4,7 @@ import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
-import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
@@ -55,6 +55,7 @@ export const actions: Actions = {
 	fadePick: async ({ url, locals }) => {
 		const id = url.searchParams.get('id');
 		const week = url.searchParams.get('week');
+		const year = url.searchParams.get('year');
 
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
@@ -74,7 +75,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (week !== CURRENT_WEEK) {
+		if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
 			return fail(401, {
 				message: 'Please only fade picks from this current week pal',
 				success: false,
@@ -148,6 +149,7 @@ export const actions: Actions = {
 	tailPick: async ({ url, locals }) => {
 		const id = url.searchParams.get('id');
 		const week = url.searchParams.get('week');
+		const year = url.searchParams.get('year');
 		if (!id) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -166,9 +168,9 @@ export const actions: Actions = {
 			});
 		}
 
-		if (week !== CURRENT_WEEK) {
+		if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
 			return fail(401, {
-				message: 'Please only tail picks from this current week pal',
+				message: 'Please only tail picks from this current week guy',
 				success: false,
 				pickId
 			});

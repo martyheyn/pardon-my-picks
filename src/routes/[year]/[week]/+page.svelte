@@ -24,6 +24,7 @@
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
+	const currYear: Writable<number> = getContext('currYear');
 	const alert: Writable<Alert> = getContext('alert');
 
 	let cardWidth: number;
@@ -358,13 +359,15 @@
 												<div class="flex flex-row justify-center items-center gap-x-2">
 													<form
 														use:enhance
-														action="?/tailPick&id={pick.id}&week={week}"
+														action="?/tailPick&id={pick.id}&week={week}&year={year}"
 														method="POST"
 													>
 														<button disabled={alertBool}>
 															<Icon
 																class={`transition-all duration-300 ease-in-out ${
-																	$currWeek === parseInt(week) && !alertBool
+																	$currWeek === parseInt(week) &&
+																	parseInt(year) === $currYear &&
+																	!alertBool
 																		? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
 																		: ''
 																} ${
@@ -372,8 +375,8 @@
 																		? 'fill-green-300 dark:fill-green-900'
 																		: 'fill-none'
 																} ${
-																	parseInt(week) !== $currWeek
-																		? 'cursor-not-allowed hover:fill-disabled'
+																	parseInt(week) !== $currWeek || parseInt(year) !== $currYear
+																		? ' hover:fill-gray-500'
 																		: ''
 																}`}
 																width="24px"
@@ -392,13 +395,15 @@
 												<div class="flex flex-row justify-center items-center gap-x-2">
 													<form
 														use:enhance
-														action="?/fadePick&id={pick.id}&week={week}"
+														action="?/fadePick&id={pick.id}&week={week}&year={year}"
 														method="POST"
 													>
 														<button disabled={alertBool}>
 															<Icon
 																class={`transition-all duration-300 ease-in-out ${
-																	$currWeek === parseInt(week) && !alertBool
+																	$currWeek === parseInt(week) &&
+																	parseInt(year) === $currYear &&
+																	!alertBool
 																		? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
 																		: ''
 																} ${
@@ -406,8 +411,8 @@
 																		? 'fill-red-300 dark:fill-red-900'
 																		: 'fill-none'
 																} ${
-																	parseInt(week) !== $currWeek
-																		? 'cursor-not-allowed hover:fill-disabled'
+																	parseInt(week) !== $currWeek || parseInt(year) !== $currYear
+																		? ' hover:fill-gray-500'
 																		: ''
 																}`}
 																width="24px"
