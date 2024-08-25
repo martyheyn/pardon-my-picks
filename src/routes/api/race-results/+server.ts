@@ -16,45 +16,57 @@ export type weeklyPersonDataType = {
 	};
 };
 
-let weeklyDataByPerson: weeklyPersonDataType = {
-	bigCat: {
-		img: personaAvatarPath('Big Cat'),
-		link: '/stats/#big-cat',
-		data: []
-	},
-	pft: {
-		img: personaAvatarPath('PFT'),
-		link: '/stats/#pft-commenter',
-		data: []
-	},
-	hank: {
-		img: personaAvatarPath('Hank'),
-		link: '/stats/#handsome-hank',
-		data: []
-	},
-	jake: {
-		img: personaAvatarPath('Jake'),
-		link: '/stats/#cake-marsh',
-		data: []
-	},
-	max: {
-		img: personaAvatarPath('Max'),
-		link: '/stats/#bat-girl',
-		data: []
-	},
-	memes: {
-		img: personaAvatarPath('Memes'),
-		link: '/stats/#memes',
-		data: []
-	}
+type raceResultsType = {
+	person: string;
+	week: number;
+	year: number;
+	wins: number;
+	losses: number;
+	pushes: number;
 };
 
 export async function GET({ url }) {
 	const week = Number(url.searchParams.get('week'));
 	const year = Number(url.searchParams.get('year'));
+	if (typeof year !== 'number') {
+		return new Response('Invalid query', { status: 400 });
+	}
+
+	let weeklyDataByPerson: weeklyPersonDataType = {
+		bigCat: {
+			img: personaAvatarPath('Big Cat'),
+			link: '/stats/#big-cat',
+			data: []
+		},
+		pft: {
+			img: personaAvatarPath('PFT'),
+			link: '/stats/#pft-commenter',
+			data: []
+		},
+		hank: {
+			img: personaAvatarPath('Hank'),
+			link: '/stats/#handsome-hank',
+			data: []
+		},
+		jake: {
+			img: personaAvatarPath('Jake'),
+			link: '/stats/#cake-marsh',
+			data: []
+		},
+		max: {
+			img: personaAvatarPath('Max'),
+			link: '/stats/#bat-girl',
+			data: []
+		},
+		memes: {
+			img: personaAvatarPath('Memes'),
+			link: '/stats/#memes',
+			data: []
+		}
+	};
 
 	try {
-		const raceResults: any[] = await prisma.$queryRaw`
+		const raceResults: raceResultsType[] = await prisma.$queryRaw`
 		WITH WeekAggregation AS (
 			SELECT
 				person,
@@ -83,8 +95,6 @@ export async function GET({ url }) {
 		ORDER BY
 			person, week;
 		`;
-
-		console.log(raceResults);
 
 		if (!raceResults) {
 			return new Response(JSON.stringify(raceResults));

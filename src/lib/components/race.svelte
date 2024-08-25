@@ -10,6 +10,9 @@
 
 	$: ({ week, year } = $page.params);
 
+	export let raceYear: number;
+	$: raceYear = year ? Number(year) : raceYear;
+
 	let screenWidth: Writable<number> = getContext('screenWidth');
 
 	let mainActWeeklyDataByPersonArr: weeklyPersonDataType[] = [];
@@ -19,7 +22,7 @@
 	let lastWeekWithData: number;
 
 	onMount(async () => {
-		const response = await fetch(`/api/race-results?week=${week}&year=${year}`);
+		const response = await fetch(`/api/race-results?week=${week}&year=${raceYear}`);
 		let data: weeklyPersonDataType = await response.json();
 
 		for (const x in data) {

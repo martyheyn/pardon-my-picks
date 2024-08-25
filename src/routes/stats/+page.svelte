@@ -13,7 +13,7 @@
 	import { linear, quadInOut } from 'svelte/easing';
 	import Icon from '$lib/components/icon.svelte';
 	import { enhance } from '$app/forms';
-	import Alert from '$lib/components/alert.svelte';
+	// import Alert from '$lib/components/alert.svelte';
 
 	export let data: PageData;
 	export let form;
@@ -125,6 +125,12 @@
 		CURR_YEAR = '2023 NFL Season Stats',
 		ALLTIME = 'All Time Stats'
 	}
+
+	const statsHeaderYearNum = {
+		'2023 NFL Season Stats': 2023,
+		'All Time Stats': 2024
+	};
+
 	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
 	const selectStatHeaders: StatHeaders[] = [StatHeaders.CURR_YEAR, StatHeaders.ALLTIME];
 	let dropdownOpen = false;
@@ -429,7 +435,7 @@
 		{/each}
 	</div>
 
-	<Race />
+	<Race raceYear={statsHeaderYearNum[selectedStat]} />
 </div>
 
 <AvatarModal bind:showModal imgSrc={profilePic} />
