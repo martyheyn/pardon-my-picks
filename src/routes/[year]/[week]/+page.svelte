@@ -161,7 +161,7 @@
 		</div>
 	{/if} -->
 	{#if picks.length === 0}
-		<div class="flex justify-center items-center my-8">
+		<div class="flex justify-start items-center my-8">
 			<p class="text-2xl">
 				No picks have been made for this week yet. Check back later or make your picks now
 			</p>

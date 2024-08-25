@@ -2,71 +2,15 @@
 	import { getContext, onMount } from 'svelte';
 	import { page } from '$app/stores';
 
-	import {
-		personaAvatarPath,
-		personasLabelToCamelCase,
-		camelCaseToLabel
-	} from '../utils/matching-format';
+	import { camelCaseToLabel } from '../utils/matching-format';
 	import type { Writable } from 'svelte/store';
 
 	import Icon from './icon.svelte';
+	import type { weeklyPersonDataType } from '../../routes/api/race-results/+server';
 
-	$: ({ week } = $page.params);
+	$: ({ week, year } = $page.params);
 
 	let screenWidth: Writable<number> = getContext('screenWidth');
-
-	type weeklyPersonDataType = {
-		[key: string]: {
-			img: string;
-			link: string;
-			data: any[];
-		};
-	};
-
-	let weeklyDataByPerson: weeklyPersonDataType = {
-		bigCat: {
-			img: personaAvatarPath('Big Cat'),
-			link: '/stats/#big-cat',
-			data: []
-		},
-		pft: {
-			img: personaAvatarPath('PFT'),
-			link: '/stats/#pft-commenter',
-			data: []
-		},
-		hank: {
-			img: personaAvatarPath('Hank'),
-			link: '/stats/#handsome-hank',
-			data: []
-		},
-		jake: {
-			img: personaAvatarPath('Jake'),
-			link: '/stats/#cake-marsh',
-			data: []
-		},
-		max: {
-			img: personaAvatarPath('Max'),
-			link: '/stats/#bat-girl',
-			data: []
-		},
-		memes: {
-			img: personaAvatarPath('Memes'),
-			link: '/stats/#memes',
-			data: []
-		}
-	};
-
-	type resWeeklyDataByPersonType = {
-		person: string;
-		week: number;
-		_count: {
-			winner: number;
-		};
-		_sum: {
-			push: number;
-			winner: number;
-		};
-	};
 
 	let mainActWeeklyDataByPersonArr: weeklyPersonDataType[] = [];
 	let mainActVar: weeklyPersonDataType[] = [];
@@ -75,52 +19,14 @@
 	let lastWeekWithData: number;
 
 	onMount(async () => {
-		const response = await fetch(`/api/race-results`);
-		let data: resWeeklyDataByPersonType[] = await response.json();
-		// console.log(data);
+		const response = await fetch(`/api/race-results?week=${week}&year=${year}`);
+		let data: weeklyPersonDataType = await response.json();
 
-		if (data) {
-			data.forEach((x) => {
-				// add the previous week's record to the current week
-				// TODO: could be a reduce function
-
-				let wins =
-					x.week === 1
-						? x._sum.winner
-						: x._sum.winner +
-						  weeklyDataByPerson[personasLabelToCamelCase(x.person)].data[x.week - 2].wins;
-				let losses =
-					x.week === 1
-						? x._count.winner - x._sum.winner - x._sum.push
-						: x._count.winner -
-						  (x._sum.winner + x._sum.push) +
-						  weeklyDataByPerson[personasLabelToCamelCase(x.person)].data[x.week - 2].losses;
-				let pushes =
-					x.week === 1
-						? x._sum.push
-						: x._sum.push +
-						  weeklyDataByPerson[personasLabelToCamelCase(x.person)].data[x.week - 2].pushes;
-				let record = `${wins}-${losses}-${pushes}`;
-				let points = wins + pushes * 0.5;
-
-				let recordByWeek = {
-					week: x.week,
-					wins: wins,
-					losses: losses,
-					pushes: pushes,
-					record: record,
-					points: points
-				};
-
-				weeklyDataByPerson[personasLabelToCamelCase(x.person)].data.push(recordByWeek);
-			});
-		}
-
-		for (const x in weeklyDataByPerson) {
+		for (const x in data) {
 			if (x === 'bigCat' || x === 'pft' || x === 'hank') {
-				mainActVar.push({ [x]: weeklyDataByPerson[x] });
+				mainActVar.push({ [x]: data[x] });
 			} else {
-				openerVar.push({ [x]: weeklyDataByPerson[x] });
+				openerVar.push({ [x]: data[x] });
 			}
 		}
 
@@ -149,11 +55,11 @@
 	class="rounded-md border border-black border-opacity-20 dark:border-white dark:border-opacity-100 shadow-lg px-4 md:px-8 py-4 md:col-span-3 flex flex-col gap-y-2 max-w-6xl overflow-x-auto"
 >
 	<div class="flex flex-col justify-center items-center w-full">
-		<h1 class="text-xl font-semibold font-header">Race to the Stage</h1>
+		<h1 class="text-xl font-semibold font-header">Race to the Bottom</h1>
 	</div>
 	<table class="w-full">
 		<caption
-			class={`text-lg font-semibold font-header ${
+			class={`text-lg font-semibold font-header mt-2 mb-4 ${
 				dataExpanded ? 'text-center mr-0' : 'text-right mr-12'
 			}`}>Week</caption
 		>

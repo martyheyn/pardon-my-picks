@@ -9,7 +9,7 @@ type badPick = {
 export const countPickByWeek = async () => {
 	const badPicks: badPick[] = await prisma.$queryRaw`
         SELECT userId, week, COUNT(*) as count
-        FROM Pick
+        FROM "Pick"
         GROUP BY userId, week
         HAVING COUNT(*) > 2;
 	`;
