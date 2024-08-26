@@ -4,12 +4,14 @@ import { generateId } from 'lucia';
 import { CURRENT_WEEK } from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 
+const currentWeek = Number(CURRENT_WEEK);
+
 const getDbUserPicks = async (userId: string) => {
 	const dbUserPicks: PickForm[] = await prisma.pick.findMany({
 		where: {
 			userId: userId,
 			year: new Date().getFullYear(),
-			week: parseInt(CURRENT_WEEK)
+			week: currentWeek
 		},
 		select: {
 			id: true,
@@ -35,7 +37,7 @@ export async function GET({ locals }) {
 	}
 
 	// this will be the end of Friday or early Sunday
-	console.log('day of the week', new Date().getDay());
+	// console.log('day of the week', new Date().getDay());
 	const dayOfWeek = new Date().getDay();
 	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
@@ -67,7 +69,7 @@ export async function GET({ locals }) {
 			`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}` // &commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}
 		);
 		const oddsData: Odds[] = await odds.json();
-		console.log('oddsData', oddsData);
+		// console.log('oddsData', oddsData);
 
 		const oddsDataFiltered = oddsData.filter(
 			(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1

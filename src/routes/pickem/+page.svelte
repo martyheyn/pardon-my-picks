@@ -359,14 +359,17 @@
 			font-paragraph transition-all duration-300 ease-in-out"
 			>
 				{#if odds !== undefined && odds.length > 0}
-					{#each odds as odd}
-						{#if errorId === odd.id && $alert.text}
-							<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
-								<AlertFlash />
-							</div>
-						{/if}
-
+					{#each odds as odd, i}
 						<div class="card pb-4 pt-2 min-w-[360px]">
+							{#if errorId === odd.id && $alert.text}
+								<div
+									class={`mt-2 lg:col-span-1`}
+									transition:fly={{ x: -50, duration: 300, delay: 50 }}
+								>
+									<AlertFlash />
+								</div>
+							{/if}
+
 							<div class="grid grid-cols-8 gap-x-4">
 								<div class="col-span-3 grid grid-rows-3 place-content-start w-full">
 									<div />

@@ -93,6 +93,14 @@ export const actions: Actions = {
 
 		// unfade the pick if the user has already faded it
 		if (fade.length > 0) {
+			if (locals.user.id !== fade[0].userId) {
+				return fail(401, {
+					message: 'Unauthorized!!',
+					success: false,
+					pickId
+				});
+			}
+
 			await prisma.fade.delete({
 				where: {
 					id: fade[0].id
@@ -186,6 +194,14 @@ export const actions: Actions = {
 
 		// untail the pick if the user has already tailed it
 		if (tail.length > 0) {
+			if (locals.user.id !== tail[0].userId) {
+				return fail(401, {
+					message: 'Unauthorized!!',
+					success: false,
+					pickId
+				});
+			}
+
 			await prisma.tail.delete({
 				where: {
 					id: tail[0].id

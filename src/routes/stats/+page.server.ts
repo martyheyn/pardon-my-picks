@@ -38,6 +38,7 @@ const getRecordPct = (total_picks: number, wins: number, pushes: number) => {
 };
 
 export const load: PageServerLoad = async () => {
+	let currYear = Number(CURRENT_YEAR);
 	// get all of the tail and fade data by person
 	const rawPersonData: RawPersonData[] = await prisma.$queryRaw`
 			SELECT p.person,
@@ -54,7 +55,7 @@ export const load: PageServerLoad = async () => {
 		   		SUM(p.winner) as wins,
 		   		SUM(p.push) as pushes
 				FROM "Pick" as p
-				WHERE p.year = 2023
+				WHERE p.year = ${currYear}
 				AND p.pmt_persona = true
 				AND p.barstool_employee = true
 				GROUP BY p.person
@@ -65,7 +66,7 @@ export const load: PageServerLoad = async () => {
 				FROM "Pick" as p
 				LEFT JOIN "Tail" as t
 				ON p.id = t.pick_id
-				WHERE p.year = 2023
+				WHERE p.year = ${currYear}
 				AND p.pmt_persona = true
 				AND p.barstool_employee = true
 				GROUP BY p.person
@@ -77,7 +78,7 @@ export const load: PageServerLoad = async () => {
 				FROM "Pick" as p
 				LEFT JOIN "Fade" as f
 				ON p.id = f.pick_id
-				WHERE p.year = 2023
+				WHERE p.year = ${currYear}
 				AND p.pmt_persona = true
 				AND p.barstool_employee = true
 				GROUP BY p.person
