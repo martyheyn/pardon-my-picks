@@ -1,4 +1,5 @@
 import type { LayoutServerLoad } from './$types';
+import { prisma } from '$lib/server/prisma';
 import { MAINTENANCE_MODE } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
 import { ODDS_API_KEY } from '$env/static/private';

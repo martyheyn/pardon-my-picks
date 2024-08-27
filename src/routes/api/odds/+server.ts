@@ -3,6 +3,7 @@ import { ODDS_API_KEY } from '$env/static/private';
 import { generateId } from 'lucia';
 import { CURRENT_WEEK } from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
+import { prisma } from '$lib/server/prisma';
 
 const currentWeek = Number(CURRENT_WEEK);
 

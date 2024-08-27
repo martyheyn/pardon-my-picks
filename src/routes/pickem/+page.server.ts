@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
+import { prisma } from '$lib/server/prisma';
 import { type $Enums } from '@prisma/client';
 import { type PickForm } from '$lib/utils/types';
 

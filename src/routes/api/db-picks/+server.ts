@@ -1,5 +1,6 @@
 import type { PickForm } from '$lib/utils/types';
 import { CURRENT_WEEK } from '$env/static/private';
+import { prisma } from '$lib/server/prisma';
 
 const getDbUserPicks = async (userId: string) => {
 	const dbUserPicks: PickForm[] = await prisma.pick.findMany({

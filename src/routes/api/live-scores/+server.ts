@@ -2,6 +2,7 @@
 import { json } from '@sveltejs/kit';
 import type { Scores } from '$lib/utils/types';
 import { markTailFade, markWinner } from '$lib/utils/marking';
+import { prisma } from '$lib/server/prisma';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }: { request: Request }) {
