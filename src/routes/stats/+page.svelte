@@ -131,7 +131,7 @@
 		'All Time Stats': 2024
 	};
 
-	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
+	let selectedStat: StatHeaders = StatHeaders.ALLTIME;
 	const selectStatHeaders: StatHeaders[] = [StatHeaders.CURR_YEAR, StatHeaders.ALLTIME];
 	let dropdownOpen = false;
 </script>

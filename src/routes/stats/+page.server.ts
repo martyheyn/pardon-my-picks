@@ -55,9 +55,9 @@ export const load: PageServerLoad = async () => {
 		   		SUM(p.winner) as wins,
 		   		SUM(p.push) as pushes
 				FROM "Pick" as p
-				WHERE p.year = ${currYear}
-				AND p.pmt_persona = true
+				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
+				-- AND p.year = ${currYear}
 				GROUP BY p.person
 			) p LEFT JOIN (
 				SELECT p.person,
@@ -66,9 +66,9 @@ export const load: PageServerLoad = async () => {
 				FROM "Pick" as p
 				LEFT JOIN "Tail" as t
 				ON p.id = t.pick_id
-				WHERE p.year = ${currYear}
-				AND p.pmt_persona = true
+				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
+				-- AND p.year = ${currYear}
 				GROUP BY p.person
 			) t ON p.person = t.person
 				LEFT JOIN (
@@ -78,9 +78,9 @@ export const load: PageServerLoad = async () => {
 				FROM "Pick" as p
 				LEFT JOIN "Fade" as f
 				ON p.id = f.pick_id
-				WHERE p.year = ${currYear}
-				AND p.pmt_persona = true
+				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
+				-- AND p.year = ${currYear}
 				GROUP BY p.person
 			) f ON p.person = f.person
 		`;
