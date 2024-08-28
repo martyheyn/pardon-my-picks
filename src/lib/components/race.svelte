@@ -10,7 +10,7 @@
 
 	$: ({ week, year } = $page.params);
 
-	export let raceYear: number;
+	export let raceYear: number | undefined;
 	$: raceYear = year ? Number(year) : raceYear;
 
 	let screenWidth: Writable<number> = getContext('screenWidth');

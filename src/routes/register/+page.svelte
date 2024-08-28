@@ -136,10 +136,12 @@
 					</p>
 				{/if}
 
-				<p class="text-xs text-gray-500 dark:text-white flex gap-x-2">
-					Got an account already?
-					<a href="/login" class=""> <p class="text-blue-500 dark:text-blue-200">Log In</p></a>
-				</p>
+				<div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
+					<p>Got an account already?</p>
+					<a href="/login" class="">
+						<span class="text-blue-500 dark:text-blue-200">Log In</span></a
+					>
+				</div>
 			</form>
 		</div>
 	</div>

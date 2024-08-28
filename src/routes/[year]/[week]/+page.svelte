@@ -140,6 +140,12 @@
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
 	// not sure if passing arguments through the url is the best way to do it
 	// do it as a form so it can have a zod schema
+
+	// ${
+	// parseInt(week) !== $currWeek || parseInt(year) !== $currYear
+	// 	? ' hover:fill-gray-500'
+	// 	: ''
+	// }
 </script>
 
 <svelte:head>
@@ -371,8 +377,8 @@
 															<button disabled={alertBool}>
 																<Icon
 																	class={`transition-all duration-300 ease-in-out ${
-																		$currWeek === parseInt(week) &&
-																		parseInt(year) === $currYear &&
+																		// $currWeek === parseInt(week) &&
+																		// parseInt(year) === $currYear &&
 																		!alertBool
 																			? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
 																			: ''
@@ -380,11 +386,7 @@
 																		pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
 																			? 'fill-green-300 dark:fill-green-900'
 																			: 'fill-none'
-																	} ${
-																		parseInt(week) !== $currWeek || parseInt(year) !== $currYear
-																			? ' hover:fill-gray-500'
-																			: ''
-																	}`}
+																	} `}
 																	width="24px"
 																	height="24px"
 																	iconName="thumbUp"
@@ -407,8 +409,8 @@
 															<button disabled={alertBool}>
 																<Icon
 																	class={`transition-all duration-300 ease-in-out ${
-																		$currWeek === parseInt(week) &&
-																		parseInt(year) === $currYear &&
+																		// $currWeek === parseInt(week) &&
+																		// parseInt(year) === $currYear &&
 																		!alertBool
 																			? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
 																			: ''
@@ -416,11 +418,7 @@
 																		pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
 																			? 'fill-red-300 dark:fill-red-900'
 																			: 'fill-none'
-																	} ${
-																		parseInt(week) !== $currWeek || parseInt(year) !== $currYear
-																			? ' hover:fill-gray-500'
-																			: ''
-																	}`}
+																	} `}
 																	width="24px"
 																	height="24px"
 																	iconName="thumbDown"
@@ -483,5 +481,5 @@
 		</div>
 	{/if}
 
-	<Race />
+	<Race raceYear={undefined} />
 </div>

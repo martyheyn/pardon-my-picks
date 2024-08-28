@@ -115,20 +115,20 @@
 					</p>
 				{/if}
 
-				<div class="flex flex-col gap-y-1">
-					<p class="text-xs text-gray-500 dark:text-white flex gap-x-2">
-						Don't have an account?
+				<div class="flex flex-col gap-y-1.5">
+					<div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
+						<p>Don't have an account?</p>
 						<a href="/register" class="">
-							<p class="text-blue-500 dark:text-blue-200">Sign Up</p></a
+							<span class="text-blue-500 dark:text-blue-200">Sign Up</span></a
 						>
-					</p>
+					</div>
 
-					<p class="text-xs text-gray-500 dark:text-white flex gap-x-2">
-						Forgot your password?
+					<!-- <div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
+						<p>Forgot your password??</p>
 						<a href="/reset-password" class="">
-							<p class="text-blue-500 dark:text-blue-200">Reset Password</p></a
+							<span class="text-blue-500 dark:text-blue-200">Reset Password</span></a
 						>
-					</p>
+					</div> -->
 				</div>
 			</form>
 		</div>
