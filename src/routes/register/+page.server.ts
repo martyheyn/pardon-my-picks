@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
 
 import type { Actions, PageServerLoad } from './$types';
+import { PEPPER } from '$env/static/private';
 
 const limiter = new RateLimiter({
 	// A rate is defined as [number, unit]
@@ -84,7 +85,10 @@ export const actions: Actions = {
 		}
 
 		const userId = generateId(15);
-		const passwordHash = await new Argon2id().hash(password);
+		const pass = password + PEPPER;
+		console.log('pass', pass);
+		console.log('password', password);
+		const passwordHash = await new Argon2id().hash(pass);
 
 		const userData = {
 			id: userId,

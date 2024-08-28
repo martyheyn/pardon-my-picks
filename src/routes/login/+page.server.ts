@@ -5,6 +5,7 @@ import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
+import { PEPPER } from '$env/static/private';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -82,7 +83,8 @@ export const actions: Actions = {
 			return setError(form, 'Incorrect username or password');
 		}
 
-		const validPassword = await new Argon2id().verify(existingUser.hashed_password, password);
+		const pass = password + PEPPER;
+		const validPassword = await new Argon2id().verify(existingUser.hashed_password, pass);
 		if (!validPassword) {
 			console.log('no user, or wrong credentials');
 
