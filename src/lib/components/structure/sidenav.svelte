@@ -68,12 +68,15 @@
 		'scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-primary dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
 	}`}
 >
-	<div
-		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
+	<button
+		class={`h-14 w-full flex items-center ${
+			$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'
+		} ${
 			mobile && $sideNavCollasped && scrollY > 10
 				? 'bg-primary dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141] translate-x-2 translate-y-2'
 				: ''
 		} transition-all duration-300 ease-in-out cursor-pointer relative`}
+		on:click={toggleSideNav}
 	>
 		{#if !$sideNavCollasped}
 			<p
@@ -86,7 +89,7 @@
 		{/if}
 
 		{#if mobile}
-			<button class={`cursor-pointer h-full flex items-center`} on:click={toggleSideNav}>
+			<button class={`cursor-pointer h-full flex items-center`}>
 				<Icon
 					class={`transition-all duration-300 ease-in-out fill-white`}
 					width="24px"
@@ -99,7 +102,6 @@
 				class={`cursor-pointer absolute top-1/2 -translate-y-1/2  ${
 					$sideNavCollasped ? 'right-1/2 translate-x-1/2' : 'right-3'
 				} transition-all duration-300 ease-in-out`}
-				on:click={toggleSideNav}
 			>
 				<Icon
 					class={`${
@@ -111,7 +113,7 @@
 				/>
 			</button>
 		{/if}
-	</div>
+	</button>
 
 	<ul
 		class={`list-none m-0 pt-[1px] flex flex-col items-center border-t border-t-white border-opacity-10 ${

@@ -65,20 +65,19 @@
 	inject({ mode: dev ? 'development' : 'production' });
 
 	let sidenavElement: HTMLElement;
-	const closeSideNave = () => {
+	onMount(() => {
 		const handleClickOutside = (event: MouseEvent) => {
+			if ($sideNavCollasped) return;
 			if (sidenavElement && !sidenavElement.contains(event.target as Node)) {
 				sideNavCollasped.set(true);
 			}
 		};
 
 		document.addEventListener('click', handleClickOutside);
-
-		onDestroy(() => {
+		return () => {
 			document.removeEventListener('click', handleClickOutside);
-		});
-	};
-	$: $sideNavCollasped, closeSideNave();
+		};
+	});
 </script>
 
 <svelte:head>
