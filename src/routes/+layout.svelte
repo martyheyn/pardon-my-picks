@@ -4,7 +4,7 @@
 	export let data: PageData;
 
 	// create store
-	import { setContext } from 'svelte';
+	import { onDestroy, onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
@@ -63,6 +63,22 @@
 
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });
+
+	let sidenavElement: HTMLElement;
+	const closeSideNave = () => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (sidenavElement && !sidenavElement.contains(event.target as Node)) {
+				sideNavCollasped.set(true);
+			}
+		};
+
+		document.addEventListener('click', handleClickOutside);
+
+		onDestroy(() => {
+			document.removeEventListener('click', handleClickOutside);
+		});
+	};
+	$: $sideNavCollasped, closeSideNave();
 </script>
 
 <svelte:head>
@@ -107,7 +123,9 @@
 	<div class="min-h-screen dark:text-white m-0 p-0">
 		<Topnav user={data.user} />
 
-		<Sidenav user={data.user} {scrollY} />
+		<div bind:this={sidenavElement}>
+			<Sidenav user={data.user} {scrollY} />
+		</div>
 
 		<div
 			class={` ${

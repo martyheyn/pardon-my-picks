@@ -77,7 +77,7 @@ export const actions: Actions = {
 		});
 
 		if (user) {
-			return setError(form, 'Username is already taken');
+			return setError(form, 'Username or password is already taken');
 		}
 
 		if (password !== confirmPassword) {
@@ -86,9 +86,20 @@ export const actions: Actions = {
 
 		const userId = generateId(15);
 		const pass = password + PEPPER;
-		console.log('pass', pass);
-		console.log('password', password);
 		const passwordHash = await new Argon2id().hash(pass);
+
+		const passwordUsed = await prisma.user.findUnique({
+			where: {
+				NOT: {
+					username: username
+				},
+				hashed_password: passwordHash
+			}
+		});
+
+		if (passwordUsed) {
+			return setError(form, 'Username or password is already taken');
+		}
 
 		const userData = {
 			id: userId,
