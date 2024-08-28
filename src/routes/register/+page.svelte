@@ -36,7 +36,7 @@
 
 <div class="w-full h-full flex justify-center">
 	<div
-		class="max-w-sm bg-slate-300 bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
+		class="max-w-sm bg-slate-300 dark:bg-[#3c3c3c] bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
 		in:fly={{
 			x: lastPage === '/login' || lastPage === '/reset-password' ? -100 : 0,
 			y: lastPage === '/login' || lastPage === '/reset-password' ? 0 : 50,
@@ -81,8 +81,13 @@
 						id="password"
 						name="password"
 						type="password"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
-						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
+						class={`mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
+						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out
+						${
+							$form.password.length > 0 && $form.password.length < 6
+								? 'focus:border-red-300 border-red-300'
+								: 'focus:border-blue-300'
+						}`}
 						aria-invalid={$errors.password ? 'true' : undefined}
 						bind:value={$form.password}
 					/>
@@ -99,8 +104,12 @@
 						id="confirmPassword"
 						name="confirmPassword"
 						type="password"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
-						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
+						class={`mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
+						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out ${
+							$form.confirmPassword !== $form.password
+								? 'focus:border-red-300 '
+								: 'focus:border-blue-300'
+						}`}
 						aria-invalid={$errors.confirmPassword ? 'true' : undefined}
 						bind:value={$form.confirmPassword}
 					/>
