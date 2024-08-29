@@ -11,26 +11,24 @@
 <div
 	class="bg-primary dark:bg-[#1f1f1f] ml-14 h-14 flex justify-center items-center relative text-white"
 >
-	<h2 class=" text-lg pr-12 lg:pr-24 font-header transition-all duration-300 ease-in-out">
+	<h2 class=" text-lg pr-20 lg:pr-24 font-header transition-all duration-300 ease-in-out">
 		Pardon My Picks
 	</h2>
 
 	<div
-		class="absolute right-4 lg:right-12 top-[8px] transition-all duration-300 ease-in-out flex gap-x-3"
+		class="absolute right-2 sm:right-4 lg:right-12 top-[12px] sm:top-[8px] transition-all duration-300 ease-in-out flex gap-x-3"
 	>
 		<form method="POST">
-			<!-- formaction={ && "/logout"} -->
-
 			{#if user}
 				<button
 					formaction="/logout"
-					class="border border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
+					class="border text-sm sm:text-base border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
 					>Logout</button
 				>
 			{:else}
 				<a href="/login">
 					<button
-						class="border border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
+						class="border text-sm sm:text-base border-white rounded-md px-4 py-1.5 hover:bg-primaryHover transition-all duration-200 ease-in-out"
 						>Login</button
 					></a
 				>

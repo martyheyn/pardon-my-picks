@@ -157,14 +157,14 @@
 		transition-all duration-300 ease-in-out"
 	>
 		<button
-			class={`w-full transition-all duration-300 ease-in-out py-2 pl-4 pr-2 flex gap-x-3 
-			justify-between border border-black border-opacity-20 group cursor-auto 
+			class={`w-full transition-all duration-300 ease-in-out py-1.5 sm:py-2 pl-3 sm:pl-4 pr-2 flex gap-x-3 
+			justify-between items-center border border-black border-opacity-20 group cursor-auto 
 			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
-			<h2 class="">{selectedStat}</h2>
+			<h2 class="text-base">{selectedStat}</h2>
 			<button
-				class={`transition-all duration-300 ease-in-out opacity-0 -translate-y-2 
-				group-hover:opacity-100 group-hover:translate-y-0 cursor-pointer`}
+				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2 
+				sm:group-hover:opacity-100 sm:group-hover:translate-y-0 cursor-pointer`}
 				on:click={() => (dropdownOpen = !dropdownOpen)}
 			>
 				<Icon
@@ -200,9 +200,11 @@
 		{/if}
 	</div>
 
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-4 mb-6 font-paragraph">
+	<div
+		class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-3 sm:mt-4 mb-6 font-paragraph"
+	>
 		{#each personData as persona}
-			<div class="card" id={personasLabelToslug(persona.person)}>
+			<div class="card px-4 sm:px-6" id={personasLabelToslug(persona.person)}>
 				<div class="flex justify-between items-start">
 					<a
 						href="/stats/{personasLabelToslug(persona.person)}"

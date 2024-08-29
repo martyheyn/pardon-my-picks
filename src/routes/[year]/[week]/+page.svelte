@@ -141,11 +141,14 @@
 	// not sure if passing arguments through the url is the best way to do it
 	// do it as a form so it can have a zod schema
 
+	// put in the thumbs up/ down class afer testing
 	// ${
 	// parseInt(week) !== $currWeek || parseInt(year) !== $currYear
 	// 	? ' hover:fill-gray-500'
 	// 	: ''
 	// }
+
+	$: console.log('picks', picks);
 </script>
 
 <svelte:head>
@@ -156,7 +159,7 @@
 	<div
 		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black dark:border-white border-opacity-10"
 	>
-		<h1 class="font-header">{year} Week: {week}</h1>
+		<h1 class="font-header text-2xl sm:text-3xl">{year} Week: {week}</h1>
 		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
 		<a href="/pickem" class="btn-primary">Make your picks</a>
 	</div>
@@ -167,10 +170,9 @@
 		</div>
 	{/if} -->
 	{#if picks.length === 0}
-		<div class="flex justify-start items-center my-8">
-			<p class="text-2xl">
-				No picks have been made for this week yet. Check back later or make your picks now
-			</p>
+		<div class="card max-w-6xl px-4 flex flex-col gap-y-6 items-start justify-center my-8 text-2xl">
+			<p>No picks have been made for this week yet.</p>
+			<p>Check back later or make your picks now</p>
 		</div>
 	{:else}
 		<div
@@ -380,7 +382,7 @@
 																		// $currWeek === parseInt(week) &&
 																		// parseInt(year) === $currYear &&
 																		!alertBool
-																			? 'hover:fill-green-300 dark:hover:fill-green-900 cursor-pointer'
+																			? 'sm:hover:fill-green-300 dark:sm:hover:fill-green-900 cursor-pointer'
 																			: ''
 																	} ${
 																		pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
@@ -412,7 +414,7 @@
 																		// $currWeek === parseInt(week) &&
 																		// parseInt(year) === $currYear &&
 																		!alertBool
-																			? 'hover:fill-red-300 dark:hover:fill-red-900 cursor-pointer'
+																			? 'sm:hover:fill-red-300 dark:sm:hover:fill-red-900 cursor-pointer '
 																			: ''
 																	} ${
 																		pick.fade && pick.fade.some((obj) => obj.userId === user?.id)

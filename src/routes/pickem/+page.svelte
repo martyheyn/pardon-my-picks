@@ -217,7 +217,7 @@
 	<div
 		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>
-		<h1 class="font-header">Place this weeks picks here</h1>
+		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
 	</div>
 
 	<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
@@ -276,14 +276,14 @@
 							>
 								<div class="flex flex-row justify-between items-center max-w-[400px]">
 									<div class="">
-										<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
+										<img src={logo[pick.awayTeam]} alt="helmet" class="w-6 sm:w-10 h-6 sm:h-10" />
 										<p>{pick.awayTeam}</p>
 									</div>
 
 									<p>@</p>
 
 									<div class="">
-										<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
+										<img src={logo[pick.homeTeam]} alt="helmet" class="w-6 sm:w-10 h-6 sm:h-10" />
 										<p>{pick.homeTeam}</p>
 									</div>
 								</div>
@@ -360,7 +360,8 @@
 			>
 				{#if odds !== undefined && odds.length > 0}
 					{#each odds as odd, i}
-						<div class="card pb-4 pt-2 min-w-[360px]">
+						<div class="card pb-4 pt-2 px-4 sm:px-6">
+							<!-- min-w-[360px] -->
 							{#if errorId === odd.id && $alert.text}
 								<div
 									class={`mt-2 lg:col-span-1`}
@@ -371,7 +372,7 @@
 							{/if}
 
 							<div class="grid grid-cols-8 gap-x-4">
-								<div class="col-span-3 grid grid-rows-3 place-content-start w-full">
+								<div class="col-span-3 grid grid-rows-3 gap-4 place-content-start w-full">
 									<div />
 									<div class="flex gap-x-4 justify-start items-center">
 										<img
@@ -379,7 +380,7 @@
 											alt="helmet"
 											class="w-10 h-10"
 										/>
-										<p class="">{odd.away_team}</p>
+										<p class="text-sm sm:text-base">{odd.away_team}</p>
 									</div>
 									<div class="flex gap-x-4 justify-start items-center">
 										<img
@@ -388,11 +389,11 @@
 											class="w-10 h-10"
 										/>
 
-										<p class="">{odd.home_team}</p>
+										<p class="text-sm sm:text-base">{odd.home_team}</p>
 									</div>
 								</div>
 
-								<div class="w-full col-span-5 flex flex-row gap-x-6 justify-end">
+								<div class="w-full col-span-5 flex flex-row gap-x-4 sm:gap-x-6 justify-end">
 									{#each odd.bookmakers[0].markets as bets}
 										<div class="grid grid-rows-3 gap-y-4 place-content-center">
 											<div
@@ -401,9 +402,9 @@
 												{bets.key.charAt(0).toUpperCase() + bets.key.slice(1)}
 											</div>
 											{#each bets.outcomes as outcome, outcomeIndex}
-												<div class="">
+												<div class="w-[60px] sm:w-full flex items-center">
 													<button
-														class={`w-full p-4 rounded-md transition-all duration-300 ease-in-out
+														class={`w-full py-3 px-0 sm:py-4 sm:px-4 rounded-md transition-all duration-300 ease-in-out text-xs sm:text-base
 													${
 														usersPicks.map((pick) => pick.id === outcome.id).includes(true) || !user
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
@@ -436,13 +437,15 @@
 															);
 														}}
 													>
-														{bets.key === 'spreads' && outcome.point > 0
-															? `+${outcome.point}`
-															: bets.key === 'spreads' && outcome.point < 0
-															? `${outcome.point}`
-															: bets.key === 'totals' && outcomeIndex % 2 === 0
-															? `O ${outcome.point}`
-															: `U ${outcome.point}`}
+														<span>
+															{bets.key === 'spreads' && outcome.point > 0
+																? `+${outcome.point}`
+																: bets.key === 'spreads' && outcome.point < 0
+																? `${outcome.point}`
+																: bets.key === 'totals' && outcomeIndex % 2 === 0
+																? `O ${outcome.point}`
+																: `U ${outcome.point}`}
+														</span>
 													</button>
 												</div>
 											{/each}
