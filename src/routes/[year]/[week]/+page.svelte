@@ -18,7 +18,7 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: ({ picks, user } = data);
+	$: ({ picks, user, bettingOpen } = data);
 
 	$: ({ year, week } = $page.params);
 
@@ -162,8 +162,12 @@
 	{/if} -->
 	{#if picks.length === 0}
 		<div class="card max-w-6xl px-4 flex flex-col gap-y-6 items-start justify-center my-8 text-2xl">
-			<p>No picks have been made for this week yet.</p>
-			<p>Check back later or make your picks now</p>
+			<p>This weeks picks have not yet been entered.</p>
+			{#if bettingOpen}
+				<p>Check back later or make your picks now</p>
+			{:else}
+				<p>Check back Friday for the boys picks or to make your own</p>
+			{/if}
 		</div>
 	{:else}
 		<div

@@ -20,14 +20,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	});
 
-	const date = new Date();
+	const dayOfWeek = new Date().getDay();
+	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
-	// this will be the end of Friday or early Sunday
-	// should it be hardcoded, it is not used anywhere else
-	const gameStart = new Date('2024-07-01T12:00:00Z');
-	const gameEnd = new Date('2024-07-28T22:00:00Z');
-
-	if (date > gameStart && date < gameEnd) {
+	// only get live scores on Sunday
+	if (dayOfWeek === 7) {
 		const scoresLive = await getLiveGames({ year: params.year });
 
 		scoresLive.map(async (game: Scores) => {
@@ -46,7 +43,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	return {
 		picks,
-		user: locals.user
+		user: locals.user,
+		bettingOpen
 	};
 };
 
