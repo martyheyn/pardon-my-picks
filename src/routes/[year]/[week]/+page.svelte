@@ -140,15 +140,6 @@
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
 	// not sure if passing arguments through the url is the best way to do it
 	// do it as a form so it can have a zod schema
-
-	// put in the thumbs up/ down class afer testing
-	// ${
-	// parseInt(week) !== $currWeek || parseInt(year) !== $currYear
-	// 	? ' hover:fill-gray-500'
-	// 	: ''
-	// }
-
-	$: console.log('picks', picks);
 </script>
 
 <svelte:head>
@@ -379,8 +370,8 @@
 															<button disabled={alertBool}>
 																<Icon
 																	class={`transition-all duration-300 ease-in-out ${
-																		// $currWeek === parseInt(week) &&
-																		// parseInt(year) === $currYear &&
+																		$currWeek === parseInt(week) &&
+																		parseInt(year) === $currYear &&
 																		!alertBool
 																			? 'sm:hover:fill-green-300 dark:sm:hover:fill-green-900 cursor-pointer'
 																			: ''
@@ -388,7 +379,11 @@
 																		pick.tail && pick.tail.some((obj) => obj.userId === user?.id)
 																			? 'fill-green-300 dark:fill-green-900'
 																			: 'fill-none'
-																	} `}
+																	} ${
+																		parseInt(week) !== $currWeek || parseInt(year) !== $currYear
+																			? ' hover:fill-gray-500'
+																			: ''
+																	}`}
 																	width="24px"
 																	height="24px"
 																	iconName="thumbUp"
@@ -411,8 +406,8 @@
 															<button disabled={alertBool}>
 																<Icon
 																	class={`transition-all duration-300 ease-in-out ${
-																		// $currWeek === parseInt(week) &&
-																		// parseInt(year) === $currYear &&
+																		$currWeek === parseInt(week) &&
+																		parseInt(year) === $currYear &&
 																		!alertBool
 																			? 'sm:hover:fill-red-300 dark:sm:hover:fill-red-900 cursor-pointer '
 																			: ''
@@ -420,7 +415,11 @@
 																		pick.fade && pick.fade.some((obj) => obj.userId === user?.id)
 																			? 'fill-red-300 dark:fill-red-900'
 																			: 'fill-none'
-																	} `}
+																	} ${
+																		parseInt(week) !== $currWeek || parseInt(year) !== $currYear
+																			? ' hover:fill-gray-500'
+																			: ''
+																	}`}
 																	width="24px"
 																	height="24px"
 																	iconName="thumbDown"
@@ -483,5 +482,5 @@
 		</div>
 	{/if}
 
-	<Race raceYear={undefined} />
+	<Race raceYear={Number(year)} />
 </div>

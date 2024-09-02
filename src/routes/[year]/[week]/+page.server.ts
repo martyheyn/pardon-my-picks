@@ -75,13 +75,13 @@ export const actions: Actions = {
 			});
 		}
 
-		// if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
-		// 	return fail(401, {
-		// 		message: 'Please only fade picks from this current week pal',
-		// 		success: false,
-		// 		pickId
-		// 	});
-		// }
+		if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
+			return fail(401, {
+				message: 'Please only fade picks from this current week pal',
+				success: false,
+				pickId
+			});
+		}
 
 		// check if user has already faded this pick
 		const fade = await prisma.fade.findMany({
@@ -176,13 +176,13 @@ export const actions: Actions = {
 			});
 		}
 
-		// if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
-		// 	return fail(401, {
-		// 		message: 'Please only tail picks from this current week guy',
-		// 		success: false,
-		// 		pickId
-		// 	});
-		// }
+		if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
+			return fail(401, {
+				message: 'Please only tail picks from this current week guy',
+				success: false,
+				pickId
+			});
+		}
 
 		// check if user has already tailed this pick
 		const tail = await prisma.tail.findMany({

@@ -1,3 +1,5 @@
+import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
+
 type subItems = {
 	label: string;
 	icon: string;
@@ -19,11 +21,11 @@ type sideNavItems = {
 }[];
 
 const currWeekSubNavArr: { label: string; icon: string; route: string }[] = [];
-for (let i = 1; i <= 18; i++) {
+for (let i = 1; i <= Number(PUBLIC_CURRENT_WEEK); i++) {
 	currWeekSubNavArr.push({
 		label: `Week ${i}`,
 		icon: 'calendar',
-		route: `/2023/${i}`
+		route: `/${PUBLIC_CURRENT_YEAR}/${i}`
 	});
 }
 
@@ -46,7 +48,7 @@ export const sideNavItems: sideNavItems = [
 	{
 		label: 'Week',
 		icon: 'calendar',
-		route: '/2023/18',
+		route: `/${PUBLIC_CURRENT_YEAR}/${PUBLIC_CURRENT_WEEK}`,
 		subItems: currWeekSubNavArr,
 		subItemsOpen: false
 	},
@@ -68,7 +70,7 @@ export const sideNavItems: sideNavItems = [
 			{
 				label: '2023',
 				icon: 'calendar',
-				route: `/2023/1`,
+				route: ``,
 				subItems: yearRoute(2023),
 				subItemsOpen: false
 			}

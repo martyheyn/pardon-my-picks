@@ -20,7 +20,6 @@
 	let openerWeeklyDataByPersonArr: weeklyPersonDataType[] = [];
 	let openerVar: weeklyPersonDataType[] = [];
 	let lastWeekWithData: number;
-	let emptyRace: boolean;
 
 	onMount(async () => {
 		const response = await fetch(`/api/race-results?week=${week}&year=${raceYear}`);
@@ -42,28 +41,6 @@
 		// had to change it because Max & Memes picked
 		lastWeekWithData = openerWeeklyDataByPersonArr[1].max.data.length;
 	});
-
-	const checkEmptyRace = () => {
-		let dataEmpty = 0;
-		mainActWeeklyDataByPersonArr.map((person) => {
-			if (person[Object.keys(person)[0]].data.length > 0) {
-				console.log('race is not empty');
-				dataEmpty += 1;
-				return;
-			}
-		});
-
-		openerWeeklyDataByPersonArr.map((person) => {
-			if (person[Object.keys(person)[0]].data.length > 0) {
-				dataEmpty += 1;
-				return;
-			}
-		});
-
-		emptyRace = dataEmpty > 0 ? false : true;
-	};
-
-	$: mainActWeeklyDataByPersonArr, openerWeeklyDataByPersonArr, checkEmptyRace();
 
 	let dataExpanded = false;
 
@@ -87,23 +64,21 @@
 		</h1>
 	</div>
 	<table class="w-full">
-		{#if !emptyRace}
-			<caption
-				class={`text-lg font-semibold font-header mt-2 mb-4 ${
-					dataExpanded ? 'text-center mr-0' : 'text-right mr-12'
-				}`}>Week</caption
-			>
-			<tr class="">
-				<th class="text-left font-paragraph" />
-				{#if $screenWidth < 600}
-					<th class="text-center pb-1" />
-				{/if}
+		<caption
+			class={`text-lg font-semibold font-header mt-2 mb-4 ${
+				dataExpanded ? 'text-center mr-0' : 'text-right mr-12'
+			}`}>Week</caption
+		>
+		<tr class="">
+			<th class="text-left font-paragraph" />
+			{#if $screenWidth < 600}
+				<th class="text-center pb-1" />
+			{/if}
 
-				{#each !dataExpanded && week ? [week] : !dataExpanded && !week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
-					<th class="text-center pb-1 min-w-[50px]">{i}</th>
-				{/each}
-			</tr>
-		{/if}
+			{#each !dataExpanded && week ? [week] : !dataExpanded && !week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
+				<th class="text-center pb-1 min-w-[50px]">{i}</th>
+			{/each}
+		</tr>
 
 		<tr>
 			<th class="text-left font-semibold text-lg font-header">Main Act</th>
@@ -121,47 +96,45 @@
 					<p class="">{camelCaseToLabel(Object.keys(mainActByPerson)[0])}</p>
 				</td>
 
-				{#if !emptyRace}
-					{#if $screenWidth < 600 && !dataExpanded}
-						<td
-							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100
+				{#if $screenWidth < 600 && !dataExpanded}
+					<td
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100
 							 rounded-md text-center min-w-[50px] cursor-pointer hover:font-bold transition-bold duration-200 ease-out"
-							on:click={() => (dataExpanded = true)}>. . .</td
-						>
-					{:else if $screenWidth < 600 && dataExpanded}
-						<td
-							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100
+						on:click={() => (dataExpanded = true)}>. . .</td
+					>
+				{:else if $screenWidth < 600 && dataExpanded}
+					<td
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100
 							 rounded-md text-center min-w-[50px] max-w-[52px]"
-							on:click={() => (dataExpanded = false)}
-						>
-							<Icon
-								class={`transition-all duration-300 ease-in-out fill-black cursor-pointer w-full flex justify-center hover:scale-110`}
-								width="24px"
-								height="24px"
-								iconName="arrow"
-							/>
-						</td>
-					{/if}
+						on:click={() => (dataExpanded = false)}
+					>
+						<Icon
+							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer w-full flex justify-center hover:scale-110`}
+							width="24px"
+							height="24px"
+							iconName="arrow"
+						/>
+					</td>
+				{/if}
 
-					{#if dataExpanded}
-						{#each week ? Object.values(mainActByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(mainActByPerson)[0].data as weekData}
-							<td
-								class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px] transition-all duration-300 ease-in-out`}
-							>
-								<p class="py-[2px] font-semibold">{weekData.points}</p>
-								<p class="py-[2px]">{weekData.record}</p>
-							</td>
-						{/each}
-					{:else}
-						{#each Object.values(mainActByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
-							<td
-								class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
-							>
-								<p class="py-[2px] font-semibold">{weekData.points}</p>
-								<p class="py-[2px]">{weekData.record}</p>
-							</td>
-						{/each}
-					{/if}
+				{#if dataExpanded}
+					{#each week ? Object.values(mainActByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(mainActByPerson)[0].data as weekData}
+						<td
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px] transition-all duration-300 ease-in-out`}
+						>
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
+						</td>
+					{/each}
+				{:else}
+					{#each Object.values(mainActByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
+						<td
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
+						>
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
+						</td>
+					{/each}
 				{/if}
 			</tr>
 		{/each}
@@ -183,45 +156,43 @@
 					<p>{camelCaseToLabel(Object.keys(openerByPerson)[0])}</p>
 				</td>
 
-				{#if !emptyRace}
-					{#if $screenWidth < 600 && !dataExpanded}
+				{#if $screenWidth < 600 && !dataExpanded}
+					<td
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] cursor-pointer hover:font-bold transition-bold duration-200 ease-out"
+						on:click={() => (dataExpanded = true)}>. . .</td
+					>
+				{:else if $screenWidth < 600 && dataExpanded}
+					<td
+						class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
+						on:click={() => (dataExpanded = false)}
+					>
+						<Icon
+							class={`transition-all duration-300 ease-in-out fill-black cursor-pointer w-full flex justify-center hover:scale-110`}
+							width="24px"
+							height="24px"
+							iconName="arrow"
+						/>
+					</td>
+				{/if}
+
+				{#if dataExpanded}
+					{#each week ? Object.values(openerByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(openerByPerson)[0].data as weekData}
 						<td
-							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] cursor-pointer hover:font-bold transition-bold duration-200 ease-out"
-							on:click={() => (dataExpanded = true)}>. . .</td
+							class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 						>
-					{:else if $screenWidth < 600 && dataExpanded}
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
+						</td>
+					{/each}
+				{:else}
+					{#each Object.values(openerByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
 						<td
 							class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
-							on:click={() => (dataExpanded = false)}
 						>
-							<Icon
-								class={`transition-all duration-300 ease-in-out fill-black cursor-pointer w-full flex justify-center hover:scale-110`}
-								width="24px"
-								height="24px"
-								iconName="arrow"
-							/>
+							<p class="py-[2px] font-semibold">{weekData.points}</p>
+							<p class="py-[2px]">{weekData.record}</p>
 						</td>
-					{/if}
-
-					{#if dataExpanded}
-						{#each week ? Object.values(openerByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(openerByPerson)[0].data as weekData}
-							<td
-								class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
-							>
-								<p class="py-[2px] font-semibold">{weekData.points}</p>
-								<p class="py-[2px]">{weekData.record}</p>
-							</td>
-						{/each}
-					{:else}
-						{#each Object.values(openerByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
-							<td
-								class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
-							>
-								<p class="py-[2px] font-semibold">{weekData.points}</p>
-								<p class="py-[2px]">{weekData.record}</p>
-							</td>
-						{/each}
-					{/if}
+					{/each}
 				{/if}
 			</tr>
 		{/each}

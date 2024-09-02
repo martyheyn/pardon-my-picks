@@ -437,7 +437,7 @@
 		{/each}
 	</div>
 
-	<Race raceYear={2023} />
+	<Race raceYear={statsHeaderYearNum[selectedStat]} />
 </div>
 
 <AvatarModal bind:showModal imgSrc={profilePic} />
