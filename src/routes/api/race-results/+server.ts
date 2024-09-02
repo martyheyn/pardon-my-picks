@@ -100,7 +100,6 @@ export async function GET({ url }) {
 			return new Response(JSON.stringify(raceResults));
 		}
 
-		// console.log(raceResults);
 		raceResults.forEach((x) => {
 			// add the previous week's record to the current week
 			// TODO: could be a reduce function

@@ -24,7 +24,6 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 	});
 
 	if (unMarkedGames.length > 0) {
-		console.log('here checking unmarked games');
 		const gamesToMark = await Promise.all(
 			unMarkedGames.map(async (game) => {
 				// first check if the game has been marked somewhere else in the db by another user
@@ -37,7 +36,6 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 						marked: true
 					}
 				});
-				console.log('gameAlreadyMarked', gameAlreadyMarked);
 
 				if (gameAlreadyMarked.length > 0) {
 					return {
@@ -54,7 +52,6 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 				const scoresDataRaw: Scores[] = await response.json();
 				const completedGames = scoresDataRaw.filter((score) => score.completed === true);
 				if (completedGames.length === 0) return [];
-				console.log('api scores', completedGames);
 
 				let homeTeamScore = null;
 				let awayTeamScore = null;

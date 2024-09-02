@@ -39,7 +39,6 @@
 		usersPicks = dbPicksData.picks;
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
-	// $: console.log('odds', odds);
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
@@ -319,13 +318,11 @@
 
 												// scan for if id is in the DB
 												if (!findPick) {
-													console.log('here didnt make it to deleting');
 													removeUnsavedPick(pick.id);
 													cancel();
 												}
 
 												return async ({ result }) => {
-													console.log('result', result);
 													// `result` is an `ActionResult` object
 													if (result.type === 'success') {
 														await applyAction(result);

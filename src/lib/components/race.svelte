@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import { page } from '$app/stores';
 
 	import { camelCaseToLabel } from '../utils/matching-format';
@@ -21,7 +21,9 @@
 	let openerVar: weeklyPersonDataType[] = [];
 	let lastWeekWithData: number;
 
-	onMount(async () => {
+	const getRaceData = async () => {
+		mainActVar = [];
+		openerVar = [];
 		const response = await fetch(`/api/race-results?week=${week}&year=${raceYear}`);
 		let data: weeklyPersonDataType = await response.json();
 
@@ -40,7 +42,7 @@
 		// TODO: Make this more dynamic
 		// had to change it because Max & Memes picked
 		lastWeekWithData = openerWeeklyDataByPersonArr[1].max.data.length;
-	});
+	};
 
 	let dataExpanded = false;
 
@@ -50,6 +52,8 @@
 	} else {
 		dataExpanded = true;
 	}
+
+	$: year, week, getRaceData();
 
 	// TODO: do it by points down instead of record when small
 </script>

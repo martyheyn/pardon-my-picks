@@ -4,11 +4,12 @@
 	export let data: PageData;
 
 	// create store
-	import { onDestroy, onMount, setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
 	import { page } from '$app/stores';
+	import { sideNavItems } from '$lib/utils/sidenav-tree';
 
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
@@ -66,9 +67,29 @@
 
 	let sidenavElement: HTMLElement;
 	onMount(() => {
+		// close sidenav subitems onmount if open
+		sideNavItems.forEach((navItem, i) => {
+			if (navItem.subItemsOpen) {
+				navItem.subItemsOpen = false;
+				sideNavItems[i].subItemsOpen = false;
+			}
+		});
+
 		const handleClickOutside = (event: MouseEvent) => {
 			if ($sideNavCollasped) return;
 			if (sidenavElement && !sidenavElement.contains(event.target as Node)) {
+				sideNavItems.forEach((navItem, i) => {
+					if (navItem.subItemsOpen) {
+						sideNavItems[i].subItemsOpen = false;
+						if (navItem.subItems) {
+							navItem.subItems.forEach((subItem) => {
+								if (subItem.subItemsOpen) {
+									subItem.subItemsOpen = false;
+								}
+							});
+						}
+					}
+				});
 				sideNavCollasped.set(true);
 			}
 		};
@@ -123,7 +144,7 @@
 		<Topnav user={data.user} />
 
 		<div bind:this={sidenavElement}>
-			<Sidenav user={data.user} {scrollY} />
+			<Sidenav user={data.user} {scrollY} {sideNavItems} />
 		</div>
 
 		<div

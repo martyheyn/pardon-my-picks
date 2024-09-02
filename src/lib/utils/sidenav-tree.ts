@@ -1,6 +1,6 @@
 import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
 
-type subItems = {
+export type subItems = {
 	label: string;
 	icon: string;
 	route: string;
@@ -12,7 +12,7 @@ type subItems = {
 	subItemsOpen?: boolean;
 };
 
-type sideNavItems = {
+export type sideNavItems = {
 	label: string;
 	icon: string;
 	route: string;

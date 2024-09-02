@@ -43,7 +43,6 @@
 	};
 
 	const onFileSelected = async (e: Event) => {
-		console.log('file selected', e);
 		let input = e.target as HTMLInputElement;
 		let image = input.files?.[0];
 		if (!image) return;

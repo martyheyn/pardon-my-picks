@@ -5,9 +5,9 @@
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
 	import { quintInOut } from 'svelte/easing';
+	import { type sideNavItems } from '$lib/utils/sidenav-tree';
 
 	import Icon from '../icon.svelte';
-	import { sideNavItems } from '$lib/utils/sidenav-tree';
 	import Tooltip from '../tooltip.svelte';
 
 	export let user: User | null;
@@ -20,6 +20,7 @@
 	$: mobile = $screenWidth && $screenWidth < 640;
 
 	export let scrollY: number;
+	export let sideNavItems: sideNavItems;
 
 	const toggleSideNav = () => {
 		sideNavCollasped.update((value) => !value);
@@ -28,6 +29,7 @@
 		if (sideNavCollasped) {
 			sideNavItems.forEach((navItem, i) => {
 				if (navItem.subItemsOpen) {
+					navItem.subItemsOpen = false;
 					sideNavItems[i].subItemsOpen = false;
 				}
 			});
@@ -45,6 +47,7 @@
 			if (sideNavCollasped) {
 				sideNavItems.forEach((navItem, i) => {
 					if (navItem.subItemsOpen) {
+						navItem.subItemsOpen = false;
 						sideNavItems[i].subItemsOpen = false;
 					}
 				});
@@ -52,6 +55,7 @@
 			sideNavCollasped.set(true);
 		}
 	};
+	$: console.log('sideNavItems', sideNavItems);
 </script>
 
 <div

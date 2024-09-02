@@ -41,7 +41,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 					awayTeamScore: await getTeamScores(game, game.away_team)
 				}
 			});
-			console.log('prismaPicks', prismaPicks);
 		});
 	}
 

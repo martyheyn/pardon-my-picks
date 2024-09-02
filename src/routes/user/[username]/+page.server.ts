@@ -53,7 +53,6 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 	// Upload photo to S3
 	try {
 		const data = await s3Client.send(command);
-		console.log('Successfully uploaded photo:', data);
 		const photoUrl = `https://${params.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${params.Key}`; // Return the URL of the uploaded photo
 		return params.Key;
 	} catch (err) {
@@ -220,7 +219,6 @@ export const actions: Actions = {
 
 			try {
 				const data = await s3Client.send(new DeleteObjectCommand(deleteParams));
-				console.log('Successfully deleted photo:', data);
 			} catch (err) {
 				console.error('Error deleting photo:', err);
 				return {
