@@ -101,14 +101,7 @@ export const fullNameToMascot: { [key: string]: string } = {
 	'Seattle Seahawks': 'seahawks',
 	'Tampa Bay Buccaneers': 'buccaneers',
 	'Tennessee Titans': 'titans',
-	'Washington Commanders': 'commanders',
-	'Baltimore Orioles': 'orioles',
-	'San Diego Padres': 'padres',
-	'Detroit Tigers': 'tigers',
-	'Minnesota Twins': 'twins',
-	'Toronto Blue Jays': 'blueJays',
-	'New York Mets': 'mets',
-	'Cleveland Guardians': 'guardians'
+	'Washington Commanders': 'commanders'
 };
 
 export const personaImgPath = (person: string) => {
@@ -125,6 +118,8 @@ export const personaImgPath = (person: string) => {
 			return '/personas/sad-max-pmt.png';
 		case 'Memes':
 			return '/personas/zach-wilson-bench-no-bg.png';
+		case 'Huey':
+			return '/personas/huey.png';
 		default:
 			return '/personas/sad-max-pmt.png';
 	}
@@ -144,6 +139,8 @@ export const personaAvatarPath = (person: string) => {
 			return '/avatars/max-avatar.jpg';
 		case 'Memes':
 			return '/avatars/zach-wilson-mirror.jpg';
+		case 'Huey':
+			return '/avatars/huey_avatar.jpg';
 		default:
 			return '/avatars/sad-max-pmt.png';
 	}
@@ -163,6 +160,8 @@ export const personasLabelToCamelCase = (person: string) => {
 			return 'max';
 		case 'Memes':
 			return 'memes';
+		case 'Huey':
+			return 'huey';
 		default:
 			return 'big-cat';
 	}
@@ -182,6 +181,8 @@ export const camelCaseToLabel = (person: string) => {
 			return 'Max';
 		case 'memes':
 			return 'Memes';
+		case 'huey':
+			return 'Huey';
 		default:
 			return 'Big Cat';
 	}
@@ -201,6 +202,8 @@ export const personasLabelToslug = (person: string) => {
 			return 'bat-girl';
 		case 'Memes':
 			return 'memes';
+		case 'Huey':
+			return 'huey';
 		default:
 			return 'big-cat';
 	}
@@ -220,6 +223,8 @@ export const sluglToPersona = (person: string) => {
 			return 'Max';
 		case 'memes':
 			return 'Memes';
+		case 'huey':
+			return 'Huey';
 		default:
 			return 'Big Cat';
 	}
@@ -231,7 +236,8 @@ export const sortOrder = {
 	Hank: 3,
 	Jake: 4,
 	Max: 5,
-	Memes: 6
+	Memes: 6,
+	Huey: 7
 };
 
 export type SpecialBetKey =

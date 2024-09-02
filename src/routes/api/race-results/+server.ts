@@ -26,44 +26,48 @@ type raceResultsType = {
 };
 
 export async function GET({ url }) {
-	const week = Number(url.searchParams.get('week'));
 	const year = Number(url.searchParams.get('year'));
 	if (typeof year !== 'number') {
 		return new Response('Invalid query', { status: 400 });
 	}
 
-	let weeklyDataByPerson: weeklyPersonDataType = {
-		bigCat: {
-			img: personaAvatarPath('Big Cat'),
-			link: '/stats/#big-cat',
-			data: []
-		},
-		pft: {
-			img: personaAvatarPath('PFT'),
-			link: '/stats/#pft-commenter',
-			data: []
-		},
-		hank: {
-			img: personaAvatarPath('Hank'),
-			link: '/stats/#handsome-hank',
-			data: []
-		},
-		jake: {
-			img: personaAvatarPath('Jake'),
-			link: '/stats/#cake-marsh',
-			data: []
-		},
-		max: {
-			img: personaAvatarPath('Max'),
-			link: '/stats/#bat-girl',
-			data: []
-		},
-		memes: {
-			img: personaAvatarPath('Memes'),
-			link: '/stats/#memes',
-			data: []
-		}
-	};
+	// let weeklyDataByPerson: weeklyPersonDataType = {
+	// 	bigCat: {
+	// 		img: personaAvatarPath('Big Cat'),
+	// 		link: '/stats/#big-cat',
+	// 		data: []
+	// 	},
+	// 	pft: {
+	// 		img: personaAvatarPath('PFT'),
+	// 		link: '/stats/#pft-commenter',
+	// 		data: []
+	// 	},
+	// 	hank: {
+	// 		img: personaAvatarPath('Hank'),
+	// 		link: '/stats/#handsome-hank',
+	// 		data: []
+	// 	},
+	// 	jake: {
+	// 		img: personaAvatarPath('Jake'),
+	// 		link: '/stats/#cake-marsh',
+	// 		data: []
+	// 	},
+	// 	max: {
+	// 		img: personaAvatarPath('Max'),
+	// 		link: '/stats/#bat-girl',
+	// 		data: []
+	// 	},
+	// 	memes: {
+	// 		img: personaAvatarPath('Memes'),
+	// 		link: '/stats/#memes',
+	// 		data: []
+	// 	},
+	// 	huey: {
+	// 		img: personaAvatarPath('Huey'),
+	// 		link: '/stats/#huey',
+	// 		data: []
+	// 	}
+	// };
 
 	try {
 		const raceResults: raceResultsType[] = await prisma.$queryRaw`
@@ -100,6 +104,7 @@ export async function GET({ url }) {
 			return new Response(JSON.stringify(raceResults));
 		}
 
+		let weeklyDataByPerson: weeklyPersonDataType = {};
 		raceResults.forEach((x) => {
 			// add the previous week's record to the current week
 			// TODO: could be a reduce function
@@ -113,7 +118,16 @@ export async function GET({ url }) {
 				record: record,
 				points: points
 			};
-			weeklyDataByPerson[personasLabelToCamelCase(x.person)].data.push(recordByWeek);
+			// console.log('x.person', x.person);
+			// console.log(personasLabelToCamelCase(x.person));
+			// weeklyDataByPerson[personasLabelToCamelCase(x.person)].data.push(recordByWeek);
+			weeklyDataByPerson[personasLabelToCamelCase(x.person)] = {
+				img: personaAvatarPath(x.person),
+				link: `/stats/#${personasLabelToCamelCase(x.person)}`,
+				data: weeklyDataByPerson[personasLabelToCamelCase(x.person)]
+					? [...weeklyDataByPerson[personasLabelToCamelCase(x.person)].data, recordByWeek]
+					: [recordByWeek]
+			};
 		});
 
 		return new Response(JSON.stringify(weeklyDataByPerson));

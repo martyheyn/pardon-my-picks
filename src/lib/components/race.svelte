@@ -41,6 +41,8 @@
 
 		// TODO: Make this more dynamic
 		// had to change it because Max & Memes picked
+		console.log(openerWeeklyDataByPersonArr);
+		if (openerWeeklyDataByPersonArr.length < 1) return;
 		lastWeekWithData = openerWeeklyDataByPersonArr[1].max.data.length;
 	};
 
