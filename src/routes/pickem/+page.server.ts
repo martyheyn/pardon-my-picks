@@ -187,6 +187,7 @@ export const actions: Actions = {
 							completed: false,
 							marked: false,
 							pickTeam: pick?.pickTeam,
+							pickTotalType: pick?.pickTotalType,
 							pickScore: pick?.pickScore,
 							gameDate: pick.gameDate ? new Date(pick.gameDate) : null,
 							private: false,

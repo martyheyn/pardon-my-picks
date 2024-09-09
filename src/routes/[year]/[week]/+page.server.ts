@@ -132,7 +132,7 @@ export const actions: Actions = {
 
 			await prisma.fade.create({
 				data: {
-					id: generateId(15),
+					id: generateId(36),
 					userId: locals.user.id,
 					pickId: pickId,
 					winner: pick?.winner ? (pick?.winner ? 0 : 1) : null,
@@ -234,7 +234,7 @@ export const actions: Actions = {
 			// TODO:: make a function to go back and update the tail winner if the pick wins
 			await prisma.tail.create({
 				data: {
-					id: generateId(15),
+					id: generateId(36),
 					userId: locals.user.id,
 					pickId: pickId,
 					winner: pick?.winner ? (pick?.winner === 1 ? 1 : 0) : null,

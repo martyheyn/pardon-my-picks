@@ -53,6 +53,7 @@
 		homeTeam: string,
 		awayTeam: string,
 		pickTeam?: string,
+		pickTotalType?: string,
 		pickScore?: number,
 		gameDate?: string
 	) => {
@@ -62,6 +63,8 @@
 			const dt = new Date(gameDate);
 			estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 		}
+
+		const pTType = pickTotalType === 'over' ? 'over' : 'under' ? 'under' : undefined;
 
 		// add this data
 		const userPick: PickForm = {
@@ -73,6 +76,7 @@
 			homeTeam: fullNameToMascot[homeTeam] as $Enums.NFLTeam,
 			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam,
 			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : undefined,
+			pickTotalType: pTType,
 			pickScore: pickScore,
 			gameDate: estGameDate,
 			marked: false
@@ -209,12 +213,14 @@
 	out:fade={{ duration: 150, easing: linear }}
 >
 	{#if !user}
-		<div class={`px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg`}>
+		<div
+			class={`px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg max-w-6xl`}
+		>
 			You must be logged in to make picks
 		</div>
 	{/if}
 	<div
-		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
+		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100 max-w-6xl"
 	>
 		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
 	</div>
@@ -429,6 +435,7 @@
 																odd.home_team,
 																odd.away_team,
 																bets.key === 'spreads' ? outcome.name : undefined,
+																bets.key === '' ? outcome.name : undefined,
 																outcome.point,
 																odd.commence_time
 															);

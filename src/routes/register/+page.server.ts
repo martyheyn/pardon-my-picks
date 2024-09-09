@@ -84,7 +84,7 @@ export const actions: Actions = {
 			return setError(form, 'Password does not match');
 		}
 
-		const userId = generateId(15);
+		const userId = generateId(36);
 		const pass = password + PEPPER;
 		const passwordHash = await new Argon2id().hash(pass);
 

@@ -1,8 +1,8 @@
 //kit.svelte.dev/docs/routing#server
 import { json } from '@sveltejs/kit';
 import type { Scores } from '$lib/utils/types';
-import { markTailFade, markWinner } from '$lib/utils/marking';
 import { prisma } from '$lib/server/prisma';
+import { ODDS_API_KEY } from '$env/static/private';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }: { request: Request }) {
@@ -21,9 +21,10 @@ export async function POST({ request }: { request: Request }) {
 
 	// get live scores if the games have already started (americanfootball_nfl)
 	const scores = await fetch(
-		'https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
+		`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
 	);
 	const scoresDataRaw: Scores[] = await scores.json();
+	if (!scoresDataRaw) return [];
 
 	// only pull games that are currently being played
 	const scoresLive: Scores[] = scoresDataRaw.filter(
@@ -68,42 +69,6 @@ export async function POST({ request }: { request: Request }) {
 			}
 		}
 	});
-
-	// mark em done if they are complete
-	if (scoresLive.length > 0) {
-		const gamesToMark = await prisma.pick.findMany({
-			where: {
-				year: parseInt(year),
-				winner: null,
-				marked: false,
-				gameId: {
-					in: scoresLive.map((game) => game.id)
-				}
-			}
-		});
-
-		if (gamesToMark.length > 0) {
-			// call the marking function
-			// get data of all completedGames in gamesToMark
-			const gamesToMarkData = gamesToMark.map((game) => {
-				return {
-					id: game.id,
-					gameId: game.gameId,
-					type: game.type,
-					description: game.description,
-					homeTeam: game.homeTeam,
-					awayTeam: game.awayTeam,
-					homeTeamScore: game.homeTeamScore,
-					awayTeamScore: game.awayTeamScore,
-					pickTeam: game.pickTeam,
-					pickScore: game.pickScore
-				};
-			});
-
-			markWinner(gamesToMarkData);
-			markTailFade();
-		}
-	}
 
 	return json({ homeLiveScore, awayLiveScore });
 }

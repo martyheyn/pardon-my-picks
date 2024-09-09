@@ -112,7 +112,7 @@ export async function GET({ locals }) {
 
 				return {
 					...game,
-					id: generateId(15),
+					id: generateId(36),
 					gameId: game.id,
 					commence_time: new Date(game.commence_time).toLocaleString('en-US', {
 						timeZone: 'America/New_York'
@@ -125,6 +125,6 @@ export async function GET({ locals }) {
 		}
 	}
 
-	const res = { odds: oddsDataClean, bettingOpen: true };
+	const res = { odds: oddsDataClean, bettingOpen };
 	return new Response(JSON.stringify(res));
 }
