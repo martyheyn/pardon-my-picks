@@ -13,6 +13,7 @@ export async function GET({ url }: { url: URL }) {
 	try {
 		const bets = await prisma.pick.findMany({
 			select: {
+				year: true,
 				week: true,
 				person: true,
 				description: true,

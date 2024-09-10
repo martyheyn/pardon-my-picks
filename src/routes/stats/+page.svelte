@@ -26,8 +26,6 @@
 		);
 	});
 
-	const tableHeaders = ['2023 NFL Season', 'Spread', 'Totals'];
-
 	// TODO:: indexing would be more efficeint format
 	// { "Big Cat": { spread: '11 - 5 -3', total: '11 - 6' } } on the server side
 	const getBetTypeStats = (persona: string, type: string) => {
@@ -108,6 +106,7 @@
 				person: string;
 				result: string;
 				week: number;
+				year: number;
 			}[] = await res.json();
 
 			return data;
@@ -122,18 +121,26 @@
 
 	// dropdown selector for stat aggregation
 	enum StatHeaders {
-		CURR_YEAR = '2023 NFL Season Stats',
+		CURR_YEAR = '2024 NFL Season Stats',
+		STATS_2023 = '2023 NFL Season Stats',
 		ALLTIME = 'All Time Stats'
 	}
 
 	const statsHeaderYearNum = {
+		'2024 NFL Season Stats': 2024,
 		'2023 NFL Season Stats': 2023,
 		'All Time Stats': 2024
 	};
 
-	let selectedStat: StatHeaders = StatHeaders.ALLTIME;
-	const selectStatHeaders: StatHeaders[] = [StatHeaders.CURR_YEAR, StatHeaders.ALLTIME];
+	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
+	const selectStatHeaders: StatHeaders[] = [
+		StatHeaders.CURR_YEAR,
+		StatHeaders.STATS_2023,
+		StatHeaders.ALLTIME
+	];
 	let dropdownOpen = false;
+
+	let yearByYearOpen = false;
 </script>
 
 <svelte:head>
@@ -182,15 +189,20 @@
 				class={`transition-all duration-300 ease-in-out	flex flex-col text-left`}
 				transition:slide={{ duration: 300 }}
 			>
-				{#each selectStatHeaders.filter((stat) => stat !== selectedStat) as stat}
-					<form action="" method="POST" use:enhance class="w-full">
+				{#each selectStatHeaders.filter((stat) => stat !== selectedStat) as stat, i}
+					<form action="?/selectStats" method="POST" use:enhance class="w-full">
 						<button
-							class="w-full text-left py-2 px-4 border border-black border-opacity-20
-							hover:bg-gray-200 transition-all duration-300 ease-in-out"
+							class={`w-full text-left py-2 px-4 ${
+								i !== selectStatHeaders.length - 1
+									? 'border-b border-black border-opacity-20 dark:border-white'
+									: ''
+							}
+							hover:bg-gray-200 transition-all duration-300 ease-in-out`}
 							type="submit"
 							on:click={() => {
 								selectedStat = stat;
 								dropdownOpen = false;
+								yearByYearOpen = false;
 							}}>{stat}</button
 						>
 						<input type="hidden" name="year" id="year" value={stat} />
@@ -249,9 +261,27 @@
 								dark:bg-gray-700 text-muteTextColor dark:text-darkMuteTextColor"
 							>
 								<tr>
-									{#each tableHeaders as header}
-										<th scope="col" class="font-extrabold px-4 py-3">{header}</th>
-									{/each}
+									<th
+										scope="col"
+										class={`font-extrabold px-4 ${
+											selectedStat === 'All Time Stats' ? 'py-1.5' : 'py-3'
+										} flex items-center gap-x-6`}
+									>
+										{selectedStat}
+										{#if selectedStat === 'All Time Stats'}
+											<span>
+												<form method="POST" action="?/yearByYear" use:enhance>
+													<button
+														class="ml-4 btn-primary text-xs py-1 px-2 cursor-pointer"
+														on:click={() => (yearByYearOpen = !yearByYearOpen)}
+														>Year by Year
+													</button>
+												</form>
+											</span>
+										{/if}
+									</th>
+									<th scope="col" class="font-extrabold px-4 py-3">Spreads</th>
+									<th scope="col" class="font-extrabold px-4 py-3">Totals</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -259,16 +289,36 @@
 									class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-200
 							 	even:dark:bg-gray-800 text-xs"
 								>
-									<th
-										scope="row"
-										class="min-w-[82px] px-4 py-3 font-medium text-black
+									{#if yearByYearOpen}
+										<th
+											scope="row"
+											class="min-w-[82px] px-4 py-3 font-medium text-black
 										whitespace-nowrap dark:text-white border-r">{persona.record}</th
-									>
-									<td class="min-w-[82px] px-4 py-3 border-r"
-										>{getBetTypeStats(persona.person, 'spread')}</td
-									>
-									<td class="min-w-[82px] px-4 py-3">{getBetTypeStats(persona.person, 'totals')}</td
-									>
+										>
+										<th
+											scope="row"
+											class="min-w-[82px] px-4 py-3 font-medium text-black
+										whitespace-nowrap dark:text-white border-r">{persona.record}</th
+										>
+										<td class="min-w-[82px] px-4 py-3 border-r"
+											>{getBetTypeStats(persona.person, 'spread')}</td
+										>
+										<td class="min-w-[82px] px-4 py-3"
+											>{getBetTypeStats(persona.person, 'totals')}</td
+										>
+									{:else}
+										<th
+											scope="row"
+											class="min-w-[82px] px-4 py-3 font-medium text-black
+										whitespace-nowrap dark:text-white border-r">{persona.record}</th
+										>
+										<td class="min-w-[82px] px-4 py-3 border-r"
+											>{getBetTypeStats(persona.person, 'spread')}</td
+										>
+										<td class="min-w-[82px] px-4 py-3"
+											>{getBetTypeStats(persona.person, 'totals')}</td
+										>
+									{/if}
 								</tr>
 							</tbody>
 						</table>
@@ -413,9 +463,16 @@
 																			class="w-full flex justify-between items-center gap-x-6 text-xs"
 																		>
 																			<p class="w-1/3 font-semibold">{betDetail.description}</p>
-																			<p class="w-2/3">
-																				Week {betDetail.week}: {betDetail.result}
-																			</p>
+																			{#if selectedStat === 'All Time Stats'}
+																				<p class="w-2/3">
+																					<span class="mr-0.5">({betDetail.year})</span>
+																					Week {betDetail.week}: {betDetail.result}
+																				</p>
+																			{:else}
+																				<p class="w-2/3">
+																					Week {betDetail.week}: {betDetail.result}
+																				</p>
+																			{/if}
 																		</div>
 																	{/each}
 																</div>

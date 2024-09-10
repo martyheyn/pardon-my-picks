@@ -45,19 +45,18 @@
 			// TODO: Make this more dynamic
 			// had to change it because Max & Memes picked
 			if (openerWeeklyDataByPersonArr.length < 3) return;
-			lastWeekWithData = openerWeeklyDataByPersonArr[1].max.data.length;
+			lastWeekWithData = openerWeeklyDataByPersonArr[1]['hank'].data.length;
 		}
 
 		if (raceYear === 2024) {
 			for (const x in data) {
 				groupVar.push({ [x]: data[x] });
 			}
-
 			fullGroupData = groupVar;
 
 			// had to change it because Max & Memes picked
 			if (fullGroupData.length < 3) return;
-			lastWeekWithData = fullGroupData[1].max.data.length;
+			lastWeekWithData = fullGroupData[1]['hank'].data.length;
 		}
 	};
 

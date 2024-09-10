@@ -26,6 +26,7 @@ type PersonData = {
 };
 
 type BetData = {
+	year?: number;
 	person: string;
 	type: string;
 	wins: string;
@@ -57,7 +58,7 @@ export const load: PageServerLoad = async () => {
 				FROM "Pick" as p
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
-				-- AND p.year = ${currYear}
+				AND p.year = ${currYear}
 				GROUP BY p.person
 			) p LEFT JOIN (
 				SELECT p.person,
@@ -68,7 +69,7 @@ export const load: PageServerLoad = async () => {
 				ON p.id = t.pick_id
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
-				-- AND p.year = ${currYear}
+				AND p.year = ${currYear}
 				GROUP BY p.person
 			) t ON p.person = t.person
 				LEFT JOIN (
@@ -80,7 +81,7 @@ export const load: PageServerLoad = async () => {
 				ON p.id = f.pick_id
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
-				-- AND p.year = ${currYear}
+				AND p.year = ${currYear}
 				GROUP BY p.person
 			) f ON p.person = f.person
 		`;
@@ -137,40 +138,45 @@ export const load: PageServerLoad = async () => {
 		});
 	});
 
+	const specialBets = await prisma.pick.groupBy({
+		by: ['person', 'specialBet'],
+		_sum: {
+			winner: true,
+			push: true
+		},
+		_count: {
+			winner: true
+		},
+		where: {
+			specialBet: {
+				not: undefined || ''
+			},
+			pmtPersona: true,
+			barstoolEmployee: true,
+			year: Number(CURRENT_YEAR)
+		}
+	});
+
 	return {
 		personData: personData,
 		typeBets: typeBetData,
-
-		specialBets: await prisma.pick.groupBy({
-			by: ['person', 'specialBet'],
-			_sum: {
-				winner: true,
-				push: true
-			},
-			_count: {
-				winner: true
-			},
-			where: {
-				pmtPersona: true,
-				barstoolEmployee: true,
-				specialBet: {
-					not: undefined || ''
-				},
-				year: 2023
-			}
-		})
+		specialBets: specialBets
 	};
 };
 
 const yearHeaderMap = {
+	'2024 NFL Season Stats': 2024,
 	'2023 NFL Season Stats': 2023,
 	'All Time Stats': 'all-time'
 };
 
 export const actions: Actions = {
-	default: async (event) => {
+	selectStats: async (event) => {
 		const form = await event.request.formData();
-		const year = form.get('year') as '2023 NFL Season Stats' | 'All Time Stats';
+		const year = form.get('year') as
+			| '2024 NFL Season Stats'
+			| '2023 NFL Season Stats'
+			| 'All Time Stats';
 		const yearHeader = yearHeaderMap[year];
 
 		// get data based on year of alltime
@@ -324,28 +330,125 @@ export const actions: Actions = {
 			});
 		});
 
+		const specialBets = await prisma.pick.groupBy({
+			by: ['person', 'specialBet'],
+			_sum: {
+				winner: true,
+				push: true
+			},
+			_count: {
+				winner: true
+			},
+			where: {
+				specialBet: {
+					not: undefined || ''
+				},
+				pmtPersona: true,
+				barstoolEmployee: true,
+				year: typeof yearHeader === 'number' ? yearHeader : { not: undefined }
+			}
+		});
+
 		return {
 			personData: personData,
 			typeBets: typeBetData,
+			specialBets: specialBets
+		};
+	},
 
-			specialBets: await prisma.pick.groupBy({
-				by: ['person', 'specialBet'],
-				_sum: {
-					winner: true,
-					push: true
+	yearByYear: async () => {
+		const rawPersonYearData: RawPersonData[] = await prisma.$queryRaw`
+				SELECT p.person, p.year,
+					p.total_picks,
+					p.wins,
+					p.pushes
+		   		FROM (
+					SELECT p.person, p.year,
+					COUNT(p.id) as total_picks,
+		   			SUM(p.winner) as wins,
+		   			SUM(p.push) as pushes
+					FROM "Pick" as p
+					WHERE p.pmt_persona = true
+					AND p.barstool_employee = true
+					GROUP BY p.person, p.year
+				) p
+				`;
+
+		const personData: PersonData[] = [];
+		rawPersonYearData.map((person) => {
+			personData.push({
+				person: person.person,
+				wins: Number(person.wins).toString(),
+				pushes: Number(person.pushes).toString(),
+				record: `${person.wins} - ${
+					Number(person.total_picks) - Number(person.wins) - Number(person.pushes)
+				} - ${Number(person.pushes)}`,
+				record_pct: getRecordPct(
+					Number(person.total_picks),
+					Number(person.wins),
+					Number(person.pushes)
+				).toString(),
+				total_tails: Number(person.total_tails).toString(),
+				tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100).toString(),
+				total_fades: Number(person.total_fades).toString(),
+				fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100).toString()
+			});
+		});
+
+		const typeBetData: BetData[] = [];
+		// TODO:: 2023 || 2024 not sustainable
+		const typeBet = await prisma.pick.groupBy({
+			by: ['person', 'type', 'year'],
+			_sum: {
+				winner: true,
+				push: true
+			},
+			_count: {
+				winner: true
+			},
+			where: {
+				pmtPersona: true,
+				barstoolEmployee: true
+			}
+		});
+
+		typeBet.map((bet) => {
+			let winCount = bet._sum.winner ? bet._sum.winner : 0;
+			let pushCount = bet._sum.push ? bet._sum.push : 0;
+			typeBetData.push({
+				year: bet.year,
+				person: bet.person,
+				type: bet.type,
+				wins: winCount ? winCount.toString() : '0',
+				pushes: pushCount ? pushCount.toString() : '0',
+				record: `${bet._sum.winner} - ${bet._count.winner - winCount - pushCount} - ${
+					bet._sum.push
+				}`
+			});
+		});
+
+		const specialBets = await prisma.pick.groupBy({
+			by: ['person', 'specialBet', 'year'],
+			_sum: {
+				winner: true,
+				push: true
+			},
+			_count: {
+				winner: true
+			},
+			where: {
+				specialBet: {
+					not: undefined || ''
 				},
-				_count: {
-					winner: true
-				},
-				where: {
-					specialBet: {
-						not: undefined || ''
-					},
-					pmtPersona: true,
-					barstoolEmployee: true,
-					year: typeof yearHeader === 'number' ? yearHeader : { not: undefined }
-				}
-			})
+				pmtPersona: true,
+				barstoolEmployee: true
+			}
+		});
+
+		return {
+			personData: personData,
+			typeBets: typeBetData,
+			specialBets: specialBets
 		};
 	}
 };
