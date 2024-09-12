@@ -1,4 +1,4 @@
-import type { Odds, PickForm } from '$lib/utils/types';
+import type { Odds, PickData } from '$lib/utils/types';
 import { ODDS_API_KEY } from '$env/static/private';
 import { generateId } from 'lucia';
 import { CURRENT_WEEK } from '$env/static/private';
@@ -8,7 +8,7 @@ import { prisma } from '$lib/server/prisma';
 const currentWeek = Number(CURRENT_WEEK);
 
 const getDbUserPicks = async (userId: string) => {
-	const dbUserPicks: PickForm[] = await prisma.pick.findMany({
+	const dbUserPicks: PickData[] = await prisma.pick.findMany({
 		where: {
 			userId: userId,
 			year: new Date().getFullYear(),
@@ -32,14 +32,14 @@ const getDbUserPicks = async (userId: string) => {
 
 export async function GET({ locals }) {
 	const { user } = locals;
-	let dbUserPicks: PickForm[] = [];
+	let dbUserPicks: PickData[] = [];
 	if (user) {
 		dbUserPicks = await getDbUserPicks(user.id);
 	}
 
 	// this will be the end of Friday or early Sunday
 	const dayOfWeek = new Date().getDay();
-	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
+	const bettingOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
 
 	// times for testing
 	// create 2 javascript dates for 9-8-2024 and 9-9-2024 in the format of 2024-09-08T00:00:00Z

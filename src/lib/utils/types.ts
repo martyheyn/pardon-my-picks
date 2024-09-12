@@ -93,7 +93,7 @@ export type Odds = {
 	sport_title: string;
 };
 
-export type PickForm = {
+export type PickData = {
 	id: string;
 	gameId?: string | null;
 	show: string;
@@ -108,4 +108,11 @@ export type PickForm = {
 	winner?: number | null;
 	push?: number | null;
 	marked: boolean;
+};
+
+export type AddPickForm = {
+	id: string;
+	gameId: string;
+	type: string;
+	pickName: string;
 };

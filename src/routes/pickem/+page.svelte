@@ -7,8 +7,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext, onMount } from 'svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
-	import { type Alert, type Odds } from '$lib/utils/types';
-	import { type PickForm } from '$lib/utils/types';
+	import { type PickData, type AddPickForm, type Alert, type Odds } from '$lib/utils/types';
 	import { type $Enums } from '@prisma/client';
 	import { generateId } from 'lucia';
 	import { beforeNavigate } from '$app/navigation';
@@ -23,8 +22,9 @@
 
 	let odds: Odds[];
 	let bettingOpen: boolean;
-	let dbPicks: PickForm[];
-	let usersPicks: PickForm[] = [];
+	let dbPicks: PickData[];
+	let usersPicks: PickData[] = [];
+
 	let stoppedToSave = 0;
 	onMount(async () => {
 		console.log('fetching data');
@@ -64,10 +64,8 @@
 			estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 		}
 
-		const pTType = pickTotalType === 'over' ? 'over' : 'under' ? 'under' : undefined;
-
 		// add this data
-		const userPick: PickForm = {
+		const userPick: PickData = {
 			id,
 			gameId,
 			show: 'PMT',
@@ -76,7 +74,7 @@
 			homeTeam: fullNameToMascot[homeTeam] as $Enums.NFLTeam,
 			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam,
 			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : undefined,
-			pickTotalType: pTType,
+			pickTotalType: pickTotalType?.toLocaleLowerCase() as 'over' | 'under' | undefined,
 			pickScore: pickScore,
 			gameDate: estGameDate,
 			marked: false
@@ -280,16 +278,16 @@
 								out:slide={{ duration: 250 }}
 							>
 								<div class="flex flex-row justify-between items-center max-w-[400px]">
-									<div class="">
+									<div class="flex flex-col justify-center items-center">
 										<img src={logo[pick.awayTeam]} alt="helmet" class="w-6 sm:w-10 h-6 sm:h-10" />
-										<p>{pick.awayTeam}</p>
+										<p>{pick.awayTeam.slice(0, 1).toUpperCase()}{pick.awayTeam.slice(1)}</p>
 									</div>
 
 									<p>@</p>
 
-									<div class="">
+									<div class="flex flex-col justify-center items-center">
 										<img src={logo[pick.homeTeam]} alt="helmet" class="w-6 sm:w-10 h-6 sm:h-10" />
-										<p>{pick.homeTeam}</p>
+										<p>{pick.homeTeam.slice(0, 1).toUpperCase()}{pick.homeTeam.slice(1)}</p>
 									</div>
 								</div>
 								<div class="flex justify-start items-center">
@@ -435,7 +433,7 @@
 																odd.home_team,
 																odd.away_team,
 																bets.key === 'spreads' ? outcome.name : undefined,
-																bets.key === '' ? outcome.name : undefined,
+																bets.key === 'totals' ? outcome.name : undefined,
 																outcome.point,
 																odd.commence_time
 															);

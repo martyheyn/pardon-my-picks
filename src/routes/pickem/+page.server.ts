@@ -6,15 +6,15 @@ import { ODDS_API_KEY } from '$env/static/private';
 import type { Odds } from '$lib/utils/types';
 import { prisma } from '$lib/server/prisma';
 import { type $Enums } from '@prisma/client';
-import { type PickForm } from '$lib/utils/types';
+import { type PickData } from '$lib/utils/types';
 
 import { fullNameToMascot } from '$lib/utils/matching-format';
 
 import { CURRENT_WEEK } from '$env/static/private';
 
 // TODO: make the teams emuns and the type 'spread' or 'total'
-// Define the schema for the PickForm object
-const PickFormObjectSchema = z.object({
+// Define the schema for the PickData object
+const PickDataObjectSchema = z.object({
 	id: z.string(),
 	gameId: z.string().optional(),
 	show: z.string(),
@@ -25,16 +25,43 @@ const PickFormObjectSchema = z.object({
 	marked: z.boolean(),
 	pickTeam: z.custom<$Enums.NFLTeam>().optional(),
 	pickScore: z.number().optional(),
+	pickTotalType: z.enum(['over', 'under']).optional(),
 	gameDate: z.string().optional()
 });
 
-// // Define the schema for an array of PickForm objects
-const PickFormSchema = z.array(PickFormObjectSchema);
+// // Define the schema for an array of PickData objects
+const PickDataSchema = z.array(PickDataObjectSchema);
 
 // const DeletePickSchema = z.object({
 // 	pickId: z.string(),
-// 	usersPicks: z.array(PickFormObjectSchema)
+// 	usersPicks: z.array(PickDataObjectSchema)
 // });
+
+const getDescription = (
+	type: string,
+	betNumber: number,
+	homeTeam: string,
+	awayTeam: string,
+	betTeam?: string,
+	overUnder?: string
+) => {
+	let description = '';
+	if (betNumber) {
+	}
+
+	switch (type) {
+		case 'spreads' || 'spread':
+			description = `${betTeam} ${betNumber > 0 ? `+${betNumber}` : betNumber}`;
+			break;
+		case 'totals':
+			description = `${homeTeam} vs ${awayTeam} ${overUnder} ${betNumber}`;
+			break;
+		default:
+			description = 'No description';
+			break;
+	}
+	return description;
+};
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
@@ -70,7 +97,7 @@ export const actions: Actions = {
 
 		// Validate the data using Zod
 		try {
-			const result = PickFormSchema.safeParse(parsedPicks);
+			const result = PickDataSchema.safeParse(parsedPicks);
 			if (!result.success) {
 				return {
 					status: 400,
@@ -78,7 +105,7 @@ export const actions: Actions = {
 				};
 			}
 
-			const picks: PickForm[] = result.data;
+			const picks: PickData[] = result.data;
 
 			// check if user has already made either pick
 			let userDbPicks = await prisma.user.findUnique({
@@ -102,16 +129,6 @@ export const actions: Actions = {
 				});
 			}
 
-			// make sure 1 pick is spread and 1 pick is total
-			const spreadPicks = picks.filter((pick) => pick.type === 'spread');
-			const totalPicks = picks.filter((pick) => pick.type === 'totals');
-			if (spreadPicks.length !== 1 || totalPicks.length !== 1) {
-				return fail(400, {
-					message: 'One pick must be a spread and one pick must be a total',
-					success: false
-				});
-			}
-
 			// if user has already made picks, clear em out
 			if (userDbPicks.picks.length > 0) {
 				await prisma.pick.deleteMany({
@@ -131,72 +148,74 @@ export const actions: Actions = {
 			}
 
 			try {
-				picks.forEach(async (pick) => {
-					// get the game id from the db if it exists
-					let gameId = pick.gameId;
+				for (let i = 0; i < picks.length; i++) {
+					// add in data from odds api
+					const gameOddsRes = await fetch(
+						`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&eventIds=${picks[i].gameId}`
+					);
+					const gameOddsJson: Odds[] = await gameOddsRes.json();
+					const gameOdds = gameOddsJson[0];
 
-					if (!gameId) {
-						const dbGameIds = await prisma.pick.findMany({
-							select: {
-								gameId: true
-							},
-							where: {
-								week: parseInt(CURRENT_WEEK),
-								year: new Date().getFullYear(),
-								homeTeam: pick.homeTeam,
-								awayTeam: pick.awayTeam
-							}
-						});
-						gameId = dbGameIds[0]?.gameId;
+					const tzoffset = new Date().getTimezoneOffset() * 60000;
+					const dt = new Date(gameOdds.commence_time);
+					let estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 
-						// can only bet games for the next 4 days
-						const date = new Date();
-						const commenceTimeTo =
-							new Date(date.setDate(date.getDate() + 1)).toISOString().split('.')[0] + 'Z';
-
-						// if the game was not picked by the fellas then search the odds api for it
-						// only do this if the game is not already in the db so I'm not making too many calls to the api
-						if (dbGameIds.length === 0) {
-							const oddsGameIds = await fetch(
-								`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeTo=${commenceTimeTo}`
-							);
-							const oddsGameIdsData: Odds[] = await oddsGameIds.json();
-							const oddsGameId = oddsGameIdsData.find(
-								(game) =>
-									fullNameToMascot[game.away_team] === pick.awayTeam &&
-									fullNameToMascot[game.home_team] === pick.homeTeam
-							);
-							gameId = oddsGameId?.id || '';
-						}
+					if (new Date(estGameDate) < new Date()) {
+						return fail(400, { message: 'Game has already started', success: false });
 					}
+
+					const pickType = picks[i].type === 'spread' ? 'spreads' : 'totals';
+					const betTypeData = gameOdds.bookmakers[0].markets.find(
+						(market) => market.key === pickType
+					);
+					if (!betTypeData) {
+						return fail(400, { message: 'Invalid pick', success: false });
+					}
+
+					const betData = betTypeData?.outcomes.find((outcome) => {
+						return betTypeData.key === 'spreads'
+							? fullNameToMascot[outcome.name] === picks[i].pickTeam
+							: outcome.name.toLocaleLowerCase() === picks[i].pickTotalType?.toLocaleLowerCase();
+					});
+					if (!betData) {
+						return fail(400, { message: 'Invalid pick', success: false });
+					}
+
+					const description = getDescription(
+						pickType,
+						betData?.point,
+						gameOdds.home_team,
+						gameOdds.away_team,
+						picks[i].pickTeam
+					);
 
 					await prisma.pick.create({
 						data: {
-							id: pick.id,
-							gameId: gameId || '',
+							id: picks[i].id,
+							gameId: gameOdds.id,
 							year: new Date().getFullYear(),
 							show: 'PMT',
 							week: parseInt(CURRENT_WEEK),
 							person: user.username,
-							type: pick.type,
-							description: pick.description,
+							type: pickType,
+							description: description,
 							league: 'NFL',
-							homeTeam: pick.homeTeam,
-							awayTeam: pick.awayTeam,
+							homeTeam: fullNameToMascot[gameOdds.home_team] as $Enums.NFLTeam,
+							awayTeam: fullNameToMascot[gameOdds.away_team] as $Enums.NFLTeam,
 							isLive: false,
 							completed: false,
 							marked: false,
-							pickTeam: pick?.pickTeam,
-							pickTotalType: pick?.pickTotalType,
-							pickScore: pick?.pickScore,
-							gameDate: pick.gameDate ? new Date(pick.gameDate) : null,
+							pickTeam: picks[i]?.pickTeam,
+							pickTotalType: picks[i]?.pickTotalType,
+							pickScore: betData?.point,
+							gameDate: estGameDate,
 							private: false,
 							userId: user.id,
 							barstoolEmployee: false,
 							pmtPersona: false
 						}
 					});
-				});
+				}
 
 				return {
 					message: 'You have made this weeks picks! Good luck and godspeed',
@@ -240,7 +259,7 @@ export const actions: Actions = {
 		if (typeof usersPicksRaw !== 'string') {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
-		const usersPicks: PickForm[] = JSON.parse(usersPicksRaw);
+		const usersPicks: PickData[] = JSON.parse(usersPicksRaw);
 
 		if (!pickId) {
 			return fail(400, { message: 'Invalid request', success: false });
@@ -267,7 +286,7 @@ export const actions: Actions = {
 			return fail(401, { message: 'Unauthorized', success: false });
 		}
 
-		let picks: PickForm[] = [];
+		let picks: PickData[] = [];
 
 		try {
 			console.log('deletingggg pick from db');
