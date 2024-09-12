@@ -41,22 +41,10 @@ export async function GET({ locals }) {
 	const dayOfWeek = new Date().getDay();
 	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
-	// can only bet games for the next 2 days
-	// time offset to Eastern Standard Time
-	const date = new Date();
-	const tzoffset = new Date().getTimezoneOffset() * 60000;
-	// const commenceTimeFrom = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
-	// const commenceTimeTo =
-	// 	new Date(
-	// 		new Date(date.getTime() - tzoffset).setDate(new Date(date.getTime() - tzoffset).getDate() + 2)
-	// 	)
-	// 		.toISOString()
-	// 		.split('.')[0] + 'Z';
-
 	// times for testing
 	// create 2 javascript dates for 9-8-2024 and 9-9-2024 in the format of 2024-09-08T00:00:00Z
-	const commenceTimeFrom = '2024-09-08T00:00:00Z';
-	const commenceTimeTo = '2024-09-10T00:00:00Z';
+	const commenceTimeFrom = '2024-09-15T00:00:00Z';
+	const commenceTimeTo = '2024-09-17T00:00:00Z';
 
 	let oddsDataClean: Odds[] = [];
 
