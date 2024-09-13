@@ -86,8 +86,6 @@ export const actions: Actions = {
 		const pass = password + PEPPER;
 		const validPassword = await new Argon2id().verify(existingUser.hashed_password, pass);
 		if (!validPassword) {
-			console.log('no user, or wrong credentials');
-
 			return setError(form, 'Incorrect username or password');
 		}
 

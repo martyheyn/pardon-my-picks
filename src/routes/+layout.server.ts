@@ -9,7 +9,6 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 		throw redirect(302, targetPath);
 	}
 
-	// 404's for crazy pages
 	if (!url.pathname.includes('user') && url.pathname.split('/').length > 2) {
 		let year = url.pathname.split('/')[1];
 		let week = url.pathname.split('/')[2];

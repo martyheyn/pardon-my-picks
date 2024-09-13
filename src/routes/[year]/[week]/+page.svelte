@@ -95,7 +95,6 @@
 				}
 			});
 			const data = await res.json();
-			console.log('data', data);
 
 			animateScore = true;
 			liveScores[pickId] = {

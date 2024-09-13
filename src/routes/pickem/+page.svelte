@@ -27,7 +27,6 @@
 
 	let stoppedToSave = 0;
 	onMount(async () => {
-		console.log('fetching data');
 		const oddsRes = await fetch(`/api/odds`);
 		let oddsData = await oddsRes.json();
 		odds = oddsData.odds;
