@@ -227,11 +227,22 @@
 
 		{#if raceYear === 2024}
 			<table class="w-full mb-2">
-				<tr>
-					<th class="text-left font-semibold text-lg font-header whitespace-nowrap"
-						>Most Likely Hank will lose</th
-					>
+				<caption
+					class={`text-lg font-semibold font-header mt-2 mb-4 ${
+						dataExpanded ? 'text-center mr-0' : 'text-right mr-12'
+					}`}>Week</caption
+				>
+				<tr class="">
+					<th class="text-left font-paragraph" />
+					<!-- {#if $screenWidth < 600}
+						<th class="text-center pb-1" />
+					{/if} -->
+
+					{#each !dataExpanded && week ? [week] : !dataExpanded && !week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
+						<th class="text-center pb-1 min-w-[50px]">{i}</th>
+					{/each}
 				</tr>
+				<th class="text-center pb-2" />
 
 				{#each fullGroupData as personRecord, i}
 					<tr class="">
