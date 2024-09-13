@@ -222,6 +222,10 @@
 		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
 	</div>
 
+	<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+		<AlertFlash />
+	</div>
+
 	{#if bettingOpen === false}
 		<div class="my-4 rounded-md flex flex-col gap-y-4 font-paragraph">
 			<h2 class="text-2xl">Betting is currently on vacation with Hank</h2>

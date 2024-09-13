@@ -198,7 +198,7 @@ export const actions: Actions = {
 							week: parseInt(CURRENT_WEEK),
 							person: user.username,
 							type: pickType,
-							description: description,
+							description: picks[i].description || description,
 							league: 'NFL',
 							homeTeam: fullNameToMascot[gameOdds.home_team] as $Enums.NFLTeam,
 							awayTeam: fullNameToMascot[gameOdds.away_team] as $Enums.NFLTeam,
