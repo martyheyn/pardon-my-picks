@@ -1,5 +1,9 @@
 import { prisma } from '$lib/server/prisma';
-import { personaAvatarPath, personasLabelToCamelCase } from '../../../lib/utils/matching-format';
+import {
+	personaAvatarPath,
+	personasLabelToCamelCase,
+	sortOrder
+} from '$lib/utils/matching-format.js';
 
 export type weeklyPersonDataType = {
 	[key: string]: {
@@ -30,44 +34,6 @@ export async function GET({ url }) {
 	if (typeof year !== 'number') {
 		return new Response('Invalid query', { status: 400 });
 	}
-
-	// let weeklyDataByPerson: weeklyPersonDataType = {
-	// 	bigCat: {
-	// 		img: personaAvatarPath('Big Cat'),
-	// 		link: '/stats/#big-cat',
-	// 		data: []
-	// 	},
-	// 	pft: {
-	// 		img: personaAvatarPath('PFT'),
-	// 		link: '/stats/#pft-commenter',
-	// 		data: []
-	// 	},
-	// 	hank: {
-	// 		img: personaAvatarPath('Hank'),
-	// 		link: '/stats/#handsome-hank',
-	// 		data: []
-	// 	},
-	// 	jake: {
-	// 		img: personaAvatarPath('Jake'),
-	// 		link: '/stats/#cake-marsh',
-	// 		data: []
-	// 	},
-	// 	max: {
-	// 		img: personaAvatarPath('Max'),
-	// 		link: '/stats/#bat-girl',
-	// 		data: []
-	// 	},
-	// 	memes: {
-	// 		img: personaAvatarPath('Memes'),
-	// 		link: '/stats/#memes',
-	// 		data: []
-	// 	},
-	// 	huey: {
-	// 		img: personaAvatarPath('Huey'),
-	// 		link: '/stats/#huey',
-	// 		data: []
-	// 	}
-	// };
 
 	try {
 		const raceResults: raceResultsType[] = await prisma.$queryRaw`
@@ -118,9 +84,7 @@ export async function GET({ url }) {
 				record: record,
 				points: points
 			};
-			// console.log('x.person', x.person);
-			// console.log(personasLabelToCamelCase(x.person));
-			// weeklyDataByPerson[personasLabelToCamelCase(x.person)].data.push(recordByWeek);
+
 			weeklyDataByPerson[personasLabelToCamelCase(x.person)] = {
 				img: personaAvatarPath(x.person),
 				link: `/stats/#${personasLabelToCamelCase(x.person)}`,

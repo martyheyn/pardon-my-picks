@@ -1,17 +1,9 @@
-import type { Actions, PageServerLoad } from './$types';
-import { generateId } from 'lucia';
+import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 
-type YearMaxWeekType = {
-	year: number;
-	_max: {
-		week: number;
-	};
-};
-
-export const load: PageServerLoad = async ({ params, locals }) => {
-	const yearsWeeks: YearMaxWeekType[] = await prisma.pick.groupBy({
+export const load: PageServerLoad = async () => {
+	const yearsWeeks = await prisma.pick.groupBy({
 		by: ['year'],
 		_max: {
 			week: true

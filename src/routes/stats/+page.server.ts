@@ -122,7 +122,7 @@ export const load: PageServerLoad = async () => {
 		where: {
 			pmtPersona: true,
 			barstoolEmployee: true,
-			year: 2023
+			year: currYear
 		}
 	});
 

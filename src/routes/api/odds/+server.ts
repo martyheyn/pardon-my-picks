@@ -39,7 +39,7 @@ export async function GET({ locals }) {
 
 	// this will be the end of Friday or early Sunday
 	const dayOfWeek = new Date().getDay();
-	const bettingOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
 	// times for testing
 	// create 2 javascript dates for 9-8-2024 and 9-9-2024 in the format of 2024-09-08T00:00:00Z

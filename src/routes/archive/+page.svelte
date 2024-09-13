@@ -8,6 +8,7 @@
 	export let data: PageData;
 
 	$: ({ yearsMaxWeek } = data);
+	$: console.log(yearsMaxWeek);
 
 	// TODO:: get years from the db and lop through them
 	let selectedYear = 2023;
@@ -42,7 +43,7 @@
 
 			{#if selectedYear === yearWeek.year}
 				<div class="grid grid-cols-4 gap-y-3" transition:slide={{ duration: 300 }}>
-					{#each Array.from({ length: yearWeek._max ? yearWeek._max.week : 3 }) as _, i}
+					{#each Array.from({ length: yearWeek._max.week ? yearWeek._max.week : 18 }) as _, i}
 						<div class="font-paragraph dark:text-blue-100 hover:text-darkMuteTextColor">
 							<a href={`${yearWeek.year}/${i + 1}`}>
 								Week {i + 1}

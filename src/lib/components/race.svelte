@@ -45,7 +45,7 @@
 			// TODO: Make this more dynamic
 			// had to change it because Max & Memes picked
 			if (openerWeeklyDataByPersonArr.length < 3) return;
-			lastWeekWithData = openerWeeklyDataByPersonArr[1]['hank'].data.length;
+			lastWeekWithData = openerWeeklyDataByPersonArr[1]['max'].data.length;
 		}
 
 		if (raceYear === 2024) {
@@ -232,15 +232,15 @@
 					>
 				</tr>
 
-				{#each openerWeeklyDataByPersonArr as openerByPerson, i}
+				{#each fullGroupData as personRecord, i}
 					<tr class="">
 						<td
 							class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm w-[120px]"
 						>
-							<a href={Object.values(openerByPerson)[0].link} class="w-8 h-8">
-								<img src={Object.values(openerByPerson)[0].img} alt="avatar" class="rounded-full" />
+							<a href={Object.values(personRecord)[0].link} class="w-8 h-8">
+								<img src={Object.values(personRecord)[0].img} alt="avatar" class="rounded-full" />
 							</a>
-							<p>{camelCaseToLabel(Object.keys(openerByPerson)[0])}</p>
+							<p>{camelCaseToLabel(Object.keys(personRecord)[0])}</p>
 						</td>
 
 						{#if $screenWidth < 600 && !dataExpanded}
@@ -263,7 +263,7 @@
 						{/if}
 
 						{#if dataExpanded}
-							{#each week ? Object.values(openerByPerson)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(openerByPerson)[0].data as weekData}
+							{#each week ? Object.values(personRecord)[0].data.slice(0, week ? parseInt(week) : lastWeekWithData) : Object.values(personRecord)[0].data as weekData}
 								<td
 									class={`text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px]`}
 								>
@@ -272,7 +272,7 @@
 								</td>
 							{/each}
 						{:else}
-							{#each Object.values(openerByPerson)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
+							{#each Object.values(personRecord)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
 								<td
 									class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
 								>
