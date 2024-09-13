@@ -304,12 +304,13 @@
 						class={`text-lg font-semibold ml-2 leading-4 ${
 							(stats?.tails.wins / stats.tails.total) * 100 > 50
 								? 'text-green-500 dark:text-green-300'
-								: (stats?.tails.wins / stats.tails.total) * 100 < 50
+								: (stats?.tails.wins > 0 || stats?.tails.losses > 0) &&
+								  (stats?.tails.wins / stats.tails.total) * 100 < 50
 								? 'text-red-500 dark:text-red-300'
 								: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
-						{stats?.tails.total
+						{stats?.tails.total && (stats?.tails.wins > 0 || stats?.tails.losses > 0)
 							? `${((stats?.tails.wins / stats.tails.total) * 100).toFixed(2)} %`
 							: 'NA'}
 					</span>
@@ -336,12 +337,13 @@
 						class={`text-lg font-semibold ml-2 leading-4 ${
 							(stats?.fades.wins / stats.fades.total) * 100 > 50
 								? 'text-green-500 dark:text-green-300'
-								: (stats?.fades.wins / stats.fades.total) * 100 < 50
+								: (stats?.fades.wins > 0 || stats?.fades.losses > 0) &&
+								  (stats?.fades.wins / stats.fades.total) * 100 < 50
 								? 'text-red-500 dark:text-red-300'
 								: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
-						{stats?.fades.total
+						{stats?.fades.total && (stats?.fades.wins > 0 || stats?.fades.losses > 0)
 							? `${((stats?.fades.wins / stats.fades.total) * 100).toFixed(2)} %`
 							: 'NA'}
 					</span>

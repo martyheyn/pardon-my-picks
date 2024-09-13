@@ -98,22 +98,30 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 	// get the statsssss
 	const tails = existingUser.tail;
+	const markedTails = tails.filter((tail) => tail.winner !== null);
 	const fades = existingUser.fade;
+	const markedFades = fades.filter((fade) => fade.winner !== null);
 
 	return {
 		user: locals.user,
 		stats: {
 			tails: {
 				total: tails.length,
-				wins: tails.filter((tail) => tail.winner).length,
-				pushes: tails.filter((tail) => tail.push).length,
-				losses: tails.length > 0 ? tails.filter((tail) => !tail.winner && !tail.push).length : 0
+				wins: markedTails.length > 0 ? markedTails.filter((tail) => tail.winner).length : 0,
+				pushes: markedTails.length > 0 ? markedTails.filter((tail) => tail.push).length : 0,
+				losses:
+					markedTails.length > 0
+						? markedTails.filter((tail) => !tail.winner && !tail.push).length
+						: 0
 			},
 			fades: {
 				total: fades.length,
-				wins: fades.filter((fade) => fade.winner).length,
-				pushes: fades.filter((fade) => fade.push).length,
-				losses: fades.length > 0 ? fades.filter((fade) => !fade.winner && !fade.push).length : 0
+				wins: markedFades.length > 0 ? markedFades.filter((fade) => fade.winner).length : 0,
+				pushes: markedFades.length > 0 ? markedFades.filter((fade) => fade.push).length : 0,
+				losses:
+					markedFades.length > 0
+						? markedFades.filter((fade) => !fade.winner && !fade.push).length
+						: 0
 			}
 		},
 		picks: existingUser.picks,
