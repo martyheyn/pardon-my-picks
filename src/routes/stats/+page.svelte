@@ -166,7 +166,9 @@
 			justify-between items-center border border-black border-opacity-20 group cursor-auto 
 			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
-			<h2 class="text-base">{selectedStat}</h2>
+			<h2 class="text-base">
+				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023 & 2024)' : selectedStat}
+			</h2>
 			<button
 				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2 
 				sm:group-hover:opacity-100 sm:group-hover:translate-y-0 cursor-pointer`}

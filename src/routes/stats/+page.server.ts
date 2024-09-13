@@ -59,6 +59,7 @@ export const load: PageServerLoad = async () => {
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
 				AND p.year = ${currYear}
+				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) p LEFT JOIN (
 				SELECT p.person,
@@ -70,6 +71,7 @@ export const load: PageServerLoad = async () => {
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
 				AND p.year = ${currYear}
+				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) t ON p.person = t.person
 				LEFT JOIN (
@@ -82,6 +84,7 @@ export const load: PageServerLoad = async () => {
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
 				AND p.year = ${currYear}
+				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) f ON p.person = f.person
 		`;
@@ -200,6 +203,7 @@ export const actions: Actions = {
 					FROM "Pick" as p
 					WHERE p.pmt_persona = true
 					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
 					GROUP BY p.person
 				) p
 				LEFT JOIN (
@@ -211,6 +215,7 @@ export const actions: Actions = {
 					ON p.id = t.pick_id
 					WHERE p.pmt_persona = true
 					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
 					GROUP BY p.person
 				) t ON p.person = t.person
 				LEFT JOIN (
@@ -222,6 +227,7 @@ export const actions: Actions = {
 					ON p.id = f.pick_id
 					WHERE p.pmt_persona = true
 					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
 					GROUP BY p.person
 				) f ON p.person = f.person`;
 				break;
@@ -244,6 +250,7 @@ export const actions: Actions = {
 					WHERE p.year = (${yearHeader})
 					AND p.pmt_persona = true
 					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
 					GROUP BY p.person
 					) p
 					LEFT JOIN (
@@ -256,6 +263,7 @@ export const actions: Actions = {
 					WHERE p.year = (${yearHeader})
 					AND p.pmt_persona = true
 					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
 					GROUP BY p.person
 					) t ON p.person = t.person
 					LEFT JOIN (
@@ -268,6 +276,7 @@ export const actions: Actions = {
 		   			WHERE p.year = (${yearHeader})
 					AND p.pmt_persona = true
 					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
 					GROUP BY p.person
 					) f ON p.person = f.person
 			`;

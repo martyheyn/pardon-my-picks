@@ -8,7 +8,6 @@
 	export let data: PageData;
 
 	$: ({ yearsMaxWeek } = data);
-	$: console.log(yearsMaxWeek);
 
 	// TODO:: get years from the db and lop through them
 	let selectedYear = 2023;

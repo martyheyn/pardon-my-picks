@@ -48,6 +48,7 @@ export async function GET({ url }) {
 			FROM
 				"Pick"
 			WHERE pmt_persona = true
+			AND winner IS NOT NULL
 			GROUP BY
 				person, week, year
 		)
