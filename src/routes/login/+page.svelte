@@ -37,7 +37,7 @@
 
 <div class="w-full h-full flex justify-center">
 	<div
-		class="max-w-sm bg-slate-300 bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
+		class="max-w-sm bg-slate-300 dark:bg-[#3c3c3c] bg-opacity-50 rounded-md flex-auto flex flex-col gap-y-2 h-full px-12 py-6"
 		in:fly={{
 			x: lastPage === '/register' || lastPage === '/reset-password' ? 100 : 0,
 			y: lastPage === '/register' || lastPage === '/reset-password' ? 0 : 50,
@@ -51,18 +51,20 @@
 		<div class="font-paragraph mt-2">
 			<p class="text-sm">Log in to do stuff.</p>
 
-			<div class="pt-2">
-				<AlertFlash />
-			</div>
+			{#if $errors && $errors._errors}
+				<div class="pt-2" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+					<AlertFlash />
+				</div>
+			{/if}
 
-			<form class="flex flex-col gap-y-2 mt-2" method="post" use:enhance>
-				<label for="username" class="block text-sm font-medium text-gray-600"
+			<form class="flex flex-col gap-y-3 mt-4" method="post" use:enhance>
+				<label for="username" class="block text-sm font-medium text-gray-600 dark:text-white"
 					><span class="pl-[2px]">Username</span>
 					<input
 						id="username"
 						name="username"
 						type="text"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none
+						class="mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
 						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out"
 						aria-invalid={$errors.username ? 'true' : undefined}
 						bind:value={$form.username}
@@ -74,15 +76,19 @@
 					{/if}
 				</label>
 
-				<label for="password" class="block text-sm font-medium text-gray-600"
+				<label for="password" class="block text-sm font-medium text-gray-600 dark:text-white"
 					><span class="pl-[2px]">Password</span>
 					<input
 						id="password"
 						name="password"
 						type="password"
-						class="mt-[2px] py-2 indent-2 border focus:outline-none
-						focus:border-blue-300 w-full rounded-md transition duration-150 ease-in-out
-						"
+						class={`mt-[2px] py-2 indent-2 border focus:outline-none dark:text-dark
+						 w-full rounded-md transition duration-150 ease-in-out
+						${
+							$form.password.length > 0 && $form.password.length < 6
+								? 'focus:border-red-300 border-red-300'
+								: 'focus:border-blue-300'
+						}`}
 						aria-invalid={$errors.password ? 'true' : undefined}
 						bind:value={$form.password}
 					/>
@@ -109,16 +115,20 @@
 					</p>
 				{/if}
 
-				<div class="flex flex-col gap-y-1">
-					<p class="text-xs text-gray-500 flex gap-x-2">
-						Don't have an account?
-						<a href="/register" class=""> <p class="text-blue-500">Sign Up</p></a>
-					</p>
+				<div class="flex flex-col gap-y-1.5">
+					<div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
+						<p>Don't have an account?</p>
+						<a href="/register" class="">
+							<span class="text-blue-500 dark:text-blue-200">Sign Up</span></a
+						>
+					</div>
 
-					<p class="text-xs text-gray-500 flex gap-x-2">
-						Forgot your password?
-						<a href="/reset-password" class=""> <p class="text-blue-500">Reset Password</p></a>
-					</p>
+					<!-- <div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
+						<p>Forgot your password??</p>
+						<a href="/reset-password" class="">
+							<span class="text-blue-500 dark:text-blue-200">Reset Password</span></a
+						>
+					</div> -->
 				</div>
 			</form>
 		</div>

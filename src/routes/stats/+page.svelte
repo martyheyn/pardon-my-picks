@@ -13,7 +13,7 @@
 	import { linear, quadInOut } from 'svelte/easing';
 	import Icon from '$lib/components/icon.svelte';
 	import { enhance } from '$app/forms';
-	import Alert from '$lib/components/alert.svelte';
+	// import Alert from '$lib/components/alert.svelte';
 
 	export let data: PageData;
 	export let form;
@@ -26,16 +26,18 @@
 		);
 	});
 
-	const tableHeaders = ['2023 NFL Season', 'Spread', 'Totals'];
-
 	// TODO:: indexing would be more efficeint format
 	// { "Big Cat": { spread: '11 - 5 -3', total: '11 - 6' } } on the server side
 	const getBetTypeStats = (persona: string, type: string) => {
 		const betTypeStats = typeBets.filter(
 			(spread) => spread.person === persona && spread.type === type
-		)[0];
+		);
 
-		return betTypeStats.record;
+		if (betTypeStats.length === 0) {
+			return '0 - 0';
+		}
+
+		return betTypeStats[0].record;
 	};
 
 	let specialBetOpen: string[] | undefined = undefined;
@@ -55,6 +57,17 @@
 		}[];
 	};
 
+	$: tailFadeOpen = personData
+		.filter((person) => parseInt(person.total_tails) > 0 || parseInt(person.total_fades) > 0)
+		.map((person) => person.person);
+	const handleTailFadeOpen = (person: string) => {
+		if (tailFadeOpen?.includes(person)) {
+			tailFadeOpen = tailFadeOpen?.filter((p) => p !== person);
+			return;
+		}
+		tailFadeOpen = tailFadeOpen ? [...tailFadeOpen, person] : [person];
+	};
+
 	// want this indexed so it can be easily accessed in the loop for jsx
 	$: specialBetsData = specialBets.reduce((acc: SpecialBet, bet: any) => {
 		const { person } = bet;
@@ -68,8 +81,6 @@
 		acc[person].push(betData);
 		return acc;
 	}, {});
-
-	$: console.log(specialBetsData);
 
 	const getSpecialBetRecord = (person: string) => {
 		const betRecord = specialBetsData[person].reduce(
@@ -95,6 +106,7 @@
 				person: string;
 				result: string;
 				week: number;
+				year: number;
 			}[] = await res.json();
 
 			return data;
@@ -109,15 +121,22 @@
 
 	// dropdown selector for stat aggregation
 	enum StatHeaders {
-		CURR_YEAR = '2023 NFL Season Stats',
-		ALLTIME = 'All Time Stats',
-		PREV_2023 = '2022 NFL Season Stats'
+		CURR_YEAR = '2024 NFL Season Stats',
+		STATS_2023 = '2023 NFL Season Stats',
+		ALLTIME = 'All Time Stats'
 	}
+
+	const statsHeaderYearNum = {
+		'2024 NFL Season Stats': 2024,
+		'2023 NFL Season Stats': 2023,
+		'All Time Stats': 2024
+	};
+
 	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
 	const selectStatHeaders: StatHeaders[] = [
 		StatHeaders.CURR_YEAR,
-		StatHeaders.ALLTIME,
-		StatHeaders.PREV_2023
+		StatHeaders.STATS_2023,
+		StatHeaders.ALLTIME
 	];
 	let dropdownOpen = false;
 </script>
@@ -143,13 +162,16 @@
 		transition-all duration-300 ease-in-out"
 	>
 		<button
-			class={`w-full transition-all duration-300 ease-in-out py-2 pl-4 pr-2 flex gap-x-3 
-			justify-between border border-black border-opacity-20 group cursor-auto`}
+			class={`w-full transition-all duration-300 ease-in-out py-1.5 sm:py-2 pl-3 sm:pl-4 pr-2 flex gap-x-3 
+			justify-between items-center border border-black border-opacity-20 group cursor-auto 
+			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
-			<h2 class="">{selectedStat}</h2>
+			<h2 class="text-base">
+				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023 & 2024)' : selectedStat}
+			</h2>
 			<button
-				class={`transition-all duration-300 ease-in-out opacity-0 -translate-y-2 
-				group-hover:opacity-100 group-hover:translate-y-0 cursor-pointer`}
+				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2 
+				sm:group-hover:opacity-100 sm:group-hover:translate-y-0 cursor-pointer`}
 				on:click={() => (dropdownOpen = !dropdownOpen)}
 			>
 				<Icon
@@ -167,27 +189,33 @@
 				class={`transition-all duration-300 ease-in-out	flex flex-col text-left`}
 				transition:slide={{ duration: 300 }}
 			>
-				{#each selectStatHeaders.filter((stat) => stat !== selectedStat) as stat}
-					<form action="" method="POST" use:enhance class="w-full">
+				{#each selectStatHeaders.filter((stat) => stat !== selectedStat) as stat, i}
+					<form action="?/selectStats" method="POST" use:enhance class="w-full">
 						<button
-							class="w-full text-left py-2 px-4 border border-black border-opacity-20
-							hover:bg-gray-200 transition-all duration-300 ease-in-out"
+							class={`w-full text-left py-2 px-4 ${
+								i !== selectStatHeaders.length - 1
+									? 'border-b border-black border-opacity-20 dark:border-white'
+									: ''
+							}
+							hover:bg-gray-200 transition-all duration-300 ease-in-out`}
 							type="submit"
 							on:click={() => {
 								selectedStat = stat;
 								dropdownOpen = false;
 							}}>{stat}</button
 						>
-						<input type="hidden" name="year" id="year" value={selectedStat} />
+						<input type="hidden" name="year" id="year" value={stat} />
 					</form>
 				{/each}
 			</div>
 		{/if}
 	</div>
 
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-4 mb-6 font-paragraph">
+	<div
+		class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 max-w-6xl mt-3 sm:mt-4 mb-6 font-paragraph"
+	>
 		{#each personData as persona}
-			<div class="card" id={personasLabelToslug(persona.person)}>
+			<div class="card px-4 sm:px-6" id={personasLabelToslug(persona.person)}>
 				<div class="flex justify-between items-start">
 					<a
 						href="/stats/{personasLabelToslug(persona.person)}"
@@ -232,9 +260,9 @@
 								dark:bg-gray-700 text-muteTextColor dark:text-darkMuteTextColor"
 							>
 								<tr>
-									{#each tableHeaders as header}
-										<th scope="col" class="font-extrabold px-4 py-3">{header}</th>
-									{/each}
+									<th scope="col" class="font-extrabold px-4 py-3">{selectedStat}</th>
+									<th scope="col" class="font-extrabold px-4 py-3">Spreads</th>
+									<th scope="col" class="font-extrabold px-4 py-3">Totals</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -260,72 +288,75 @@
 					{#if parseInt(persona.total_tails) > 0 || parseInt(persona.total_fades) > 0}
 						<div class="flex flex-row justify-start gap-x-3 mt-2 px-1">
 							<h2 class="text-md pl-1">Tail / Fade</h2>
-							<button class="pr-3">
+							<button class="pr-3" on:click={() => handleTailFadeOpen(persona.person)}>
 								<Icon
-									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[270deg]
-							 hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit`}
+									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer
+							 			hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit
+										${tailFadeOpen?.includes(persona.person) ? 'rotate-[270deg]' : 'rotate-90'}`}
 									width="24px"
 									height="24px"
 									iconName="arrow"
 								/>
 							</button>
 						</div>
-						<div transition:slide={{ duration: 300 }}>
-							<div class="w-full overflow-x-auto rounded-md border">
-								<table
-									class="w-full text-sm text-left rtl:text-right text-gray-600
+						{#if tailFadeOpen?.includes(persona.person)}
+							<div transition:slide={{ duration: 300 }}>
+								<div class="w-full overflow-x-auto rounded-md border">
+									<table
+										class="w-full text-sm text-left rtl:text-right text-gray-600
 										dark:text-gray-300"
-								>
-									<thead
-										class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
-										dark:bg-gray-700 border-b"
 									>
-										<th scope="col" class="font-extrabold px-4 py-3"># Tailed</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
-										<th scope="col" class="font-extrabold px-4 py-3"># Faded</th>
-										<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
-									</thead>
-									<tbody>
-										<tr
-											class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
-							 				even:dark:bg-gray-800 text-xs"
+										<thead
+											class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
+										dark:bg-gray-700 border-b"
 										>
-											<th
-												scope="row"
-												class="px-4 py-3 font-medium text-black
+											<th scope="col" class="font-extrabold px-4 py-3">Times Tailed</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Times Faded</th>
+											<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
+										</thead>
+										<tbody>
+											<tr
+												class="w-full odd:bg-white odd:dark:bg-gray-900 even:bg-gray-100
+							 				even:dark:bg-gray-800 text-xs"
+											>
+												<th
+													scope="row"
+													class="px-4 py-3 font-medium text-black
 										whitespace-nowrap dark:text-white border-r">{persona.total_tails}</th
-											>
-											<td
-												class={`text-sm font-semibold leading-4 ${
-													parseInt(persona.tails_pct) > 50
-														? 'text-green-500 dark:text-green-300'
-														: parseInt(persona.tails_pct) < 50
-														? 'text-red-500 dark:text-red-300'
-														: 'text-yellow-500 dark:text-yellow-300'
-												} px-4 py-3 border-r`}
-												>{persona.tails_pct === 'NaN'
-													? 'NA'
-													: persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</td
-											>
-											<td class="px-4 py-3 border-r">{persona.total_fades}</td>
-											<td
-												class={`text-sm font-semibold leading-4 ${
-													parseInt(persona.fades_pct) > 50
-														? 'text-green-500 dark:text-green-300'
-														: parseInt(persona.fades_pct) < 50
-														? 'text-red-500 dark:text-red-300'
-														: 'text-yellow-500 dark:text-yellow-300'
-												} px-4 py-3`}
-											>
-												{persona.fades_pct === 'NaN'
-													? 'NA'
-													: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}
-											</td>
-										</tr>
-									</tbody>
-								</table>
+												>
+												<td
+													class={`text-sm font-semibold leading-4 ${
+														parseInt(persona.tails_pct) > 50
+															? 'text-green-500 dark:text-green-300'
+															: parseInt(persona.tails_pct) < 50
+															? 'text-red-500 dark:text-red-300'
+															: 'text-yellow-500 dark:text-yellow-300'
+													} px-4 py-3 border-r`}
+													>{persona.tails_pct === 'NaN'
+														? 'NA'
+														: persona.tails_pct}{persona.tails_pct !== 'NaN' ? '%' : ''}</td
+												>
+												<td class="px-4 py-3 border-r">{persona.total_fades}</td>
+												<td
+													class={`text-sm font-semibold leading-4 ${
+														parseInt(persona.fades_pct) > 50
+															? 'text-green-500 dark:text-green-300'
+															: parseInt(persona.fades_pct) < 50
+															? 'text-red-500 dark:text-red-300'
+															: 'text-yellow-500 dark:text-yellow-300'
+													} px-4 py-3`}
+												>
+													{persona.fades_pct === 'NaN'
+														? 'NA'
+														: persona.fades_pct}{persona.fades_pct !== 'NaN' ? '%' : ''}
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
 							</div>
-						</div>
+						{/if}
 					{/if}
 
 					{#if specialBetsData[persona.person]}
@@ -393,9 +424,16 @@
 																			class="w-full flex justify-between items-center gap-x-6 text-xs"
 																		>
 																			<p class="w-1/3 font-semibold">{betDetail.description}</p>
-																			<p class="w-2/3">
-																				Week {betDetail.week}: {betDetail.result}
-																			</p>
+																			{#if selectedStat === 'All Time Stats'}
+																				<p class="w-2/3">
+																					<span>({betDetail.year})</span>
+																					Week {betDetail.week}: {betDetail.result}
+																				</p>
+																			{:else}
+																				<p class="w-2/3">
+																					Week {betDetail.week}: {betDetail.result}
+																				</p>
+																			{/if}
 																		</div>
 																	{/each}
 																</div>
@@ -417,7 +455,7 @@
 		{/each}
 	</div>
 
-	<Race />
+	<Race raceYear={statsHeaderYearNum[selectedStat]} />
 </div>
 
 <AvatarModal bind:showModal imgSrc={profilePic} />

@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
 
 import type { Actions, PageServerLoad } from './$types';
+import { PEPPER } from '$env/static/private';
 
 const limiter = new RateLimiter({
 	// A rate is defined as [number, unit]
@@ -24,8 +25,14 @@ const limiter = new RateLimiter({
 });
 
 const RegisterFormSchema = z.object({
-	username: z.string().min(6),
-	password: z.string().min(6),
+	username: z
+		.string()
+		.min(6)
+		.refine((s) => !s.includes(' '), 'No Spaces!'),
+	password: z
+		.string()
+		.min(6)
+		.refine((s) => !s.includes(' '), 'No Spaces!'),
 	confirmPassword: z.string().min(6)
 });
 
@@ -70,15 +77,29 @@ export const actions: Actions = {
 		});
 
 		if (user) {
-			return setError(form, 'Username is already taken');
+			return setError(form, 'Username or password is already taken');
 		}
 
 		if (password !== confirmPassword) {
 			return setError(form, 'Password does not match');
 		}
 
-		const userId = generateId(15);
-		const passwordHash = await new Argon2id().hash(password);
+		const userId = generateId(36);
+		const pass = password + PEPPER;
+		const passwordHash = await new Argon2id().hash(pass);
+
+		const passwordUsed = await prisma.user.findUnique({
+			where: {
+				NOT: {
+					username: username
+				},
+				hashed_password: passwordHash
+			}
+		});
+
+		if (passwordUsed) {
+			return setError(form, 'Username or password is already taken');
+		}
 
 		const userData = {
 			id: userId,

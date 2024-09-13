@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
-import { raw } from '@prisma/client/runtime/library';
+import { CURRENT_YEAR } from '$env/static/private';
 
 type RawPersonData = {
 	person: string;
@@ -26,6 +26,7 @@ type PersonData = {
 };
 
 type BetData = {
+	year?: number;
 	person: string;
 	type: string;
 	wins: string;
@@ -38,22 +39,55 @@ const getRecordPct = (total_picks: number, wins: number, pushes: number) => {
 };
 
 export const load: PageServerLoad = async () => {
+	let currYear = Number(CURRENT_YEAR);
 	// get all of the tail and fade data by person
 	const rawPersonData: RawPersonData[] = await prisma.$queryRaw`
-	SELECT p.person, 
-       COUNT(p.winner) as total_picks,
-       SUM(p.winner) as wins, 
-       SUM(p.push) as pushes,
-       COUNT(t.id) as total_tails,
-       SUM(CASE WHEN t.winner THEN 1 ELSE 0 END) as tail_wins,
-       COUNT(f.id) as total_fades,
-       SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
-	   FROM "Pick" as p
-	   LEFT JOIN "Tail" as t ON p.id = t.pick_id
-	   LEFT JOIN "Fade" as f ON p.id = f.pick_id
-	   WHERE p.year = 2023
-	   GROUP BY p.person;
-	`;
+			SELECT p.person,
+				p.total_picks,
+				p.wins,
+				p.pushes,
+				t.total_tails,
+				t.tail_wins,
+				f.total_fades,
+				f.fade_wins
+		   	FROM (
+				SELECT p.person,
+				COUNT(p.id) as total_picks,
+		   		SUM(p.winner) as wins,
+		   		SUM(p.push) as pushes
+				FROM "Pick" as p
+				WHERE p.pmt_persona = true
+				AND p.barstool_employee = true
+				AND p.year = ${currYear}
+				AND p.winner IS NOT NULL
+				GROUP BY p.person
+			) p LEFT JOIN (
+				SELECT p.person,
+				COUNT(t.id) as total_tails,
+		   		SUM(t.winner) as tail_wins
+				FROM "Pick" as p
+				LEFT JOIN "Tail" as t
+				ON p.id = t.pick_id
+				WHERE p.pmt_persona = true
+				AND p.barstool_employee = true
+				AND p.year = ${currYear}
+				AND p.winner IS NOT NULL
+				GROUP BY p.person
+			) t ON p.person = t.person
+				LEFT JOIN (
+				SELECT p.person,
+				COUNT(f.id) as total_fades,
+		   		SUM(f.winner) as fade_wins
+				FROM "Pick" as p
+				LEFT JOIN "Fade" as f
+				ON p.id = f.pick_id
+				WHERE p.pmt_persona = true
+				AND p.barstool_employee = true
+				AND p.year = ${currYear}
+				AND p.winner IS NOT NULL
+				GROUP BY p.person
+			) f ON p.person = f.person
+		`;
 
 	const personData: PersonData[] = [];
 	rawPersonData.map((person) => {
@@ -89,7 +123,9 @@ export const load: PageServerLoad = async () => {
 			winner: true
 		},
 		where: {
-			year: 2023
+			pmtPersona: true,
+			barstoolEmployee: true,
+			year: currYear
 		}
 	});
 
@@ -105,42 +141,45 @@ export const load: PageServerLoad = async () => {
 		});
 	});
 
+	const specialBets = await prisma.pick.groupBy({
+		by: ['person', 'specialBet'],
+		_sum: {
+			winner: true,
+			push: true
+		},
+		_count: {
+			winner: true
+		},
+		where: {
+			specialBet: {
+				not: undefined || ''
+			},
+			pmtPersona: true,
+			barstoolEmployee: true,
+			year: Number(CURRENT_YEAR)
+		}
+	});
+
 	return {
 		personData: personData,
 		typeBets: typeBetData,
-
-		specialBets: await prisma.pick.groupBy({
-			by: ['person', 'specialBet'],
-			_sum: {
-				winner: true,
-				push: true
-			},
-			_count: {
-				winner: true
-			},
-			where: {
-				specialBet: {
-					not: undefined || ''
-				},
-				year: 2023
-			}
-		})
+		specialBets: specialBets
 	};
 };
 
 const yearHeaderMap = {
+	'2024 NFL Season Stats': 2024,
 	'2023 NFL Season Stats': 2023,
-	'All Time Stats': 'all-time',
-	'2022 NFL Season Stats': 2022
+	'All Time Stats': 'all-time'
 };
 
 export const actions: Actions = {
-	default: async (event) => {
+	selectStats: async (event) => {
 		const form = await event.request.formData();
 		const year = form.get('year') as
+			| '2024 NFL Season Stats'
 			| '2023 NFL Season Stats'
-			| 'All Time Stats'
-			| '2022 NFL Season Stats';
+			| 'All Time Stats';
 		const yearHeader = yearHeaderMap[year];
 
 		// get data based on year of alltime
@@ -149,35 +188,99 @@ export const actions: Actions = {
 			case 'all-time':
 				rawPersonData = await prisma.$queryRaw`
 				SELECT p.person,
-		   		COUNT(p.winner) as total_picks,
-		   		SUM(p.winner) as wins,
-		   		SUM(p.push) as pushes,
-		   		COUNT(t.id) as total_tails,
-		   		SUM(CASE WHEN t.winner THEN 1 ELSE 0 END) as tail_wins,
-		   		COUNT(f.id) as total_fades,
-		   		SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
-		   		FROM "Pick" as p
-		   		LEFT JOIN "Tail" as t ON p.id = t.pick_id
-		   		LEFT JOIN "Fade" as f ON p.id = f.pick_id
-		   		GROUP BY p.person;
-			`;
+					p.total_picks,
+					p.wins,
+					p.pushes,
+					t.total_tails,
+					t.tail_wins,
+					f.total_fades,
+					f.fade_wins
+		   		FROM (
+					SELECT p.person,
+					COUNT(p.id) as total_picks,
+		   			SUM(p.winner) as wins,
+		   			SUM(p.push) as pushes
+					FROM "Pick" as p
+					WHERE p.pmt_persona = true
+					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
+					GROUP BY p.person
+				) p
+				LEFT JOIN (
+					SELECT p.person,
+					COUNT(t.id) as total_tails,
+		   			SUM(t.winner) as tail_wins
+					FROM "Pick" as p
+					LEFT JOIN "Tail" as t
+					ON p.id = t.pick_id
+					WHERE p.pmt_persona = true
+					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
+					GROUP BY p.person
+				) t ON p.person = t.person
+				LEFT JOIN (
+					SELECT p.person,
+					COUNT(f.id) as total_fades,
+		   			SUM(f.winner) as fade_wins
+					FROM "Pick" as p
+					LEFT JOIN "Fade" as f
+					ON p.id = f.pick_id
+					WHERE p.pmt_persona = true
+					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
+					GROUP BY p.person
+				) f ON p.person = f.person`;
 				break;
 			default:
 				rawPersonData = await prisma.$queryRaw`
-				SELECT p.person,
-		   		COUNT(p.winner) as total_picks,
-		   		SUM(p.winner) as wins,
-		   		SUM(p.push) as pushes,
-		   		COUNT(t.id) as total_tails,
-		   		SUM(CASE WHEN t.winner THEN 1 ELSE 0 END) as tail_wins,
-		   		COUNT(f.id) as total_fades,
-		   		SUM(CASE WHEN f.winner THEN 1 ELSE 0 END) as fade_wins
-		   		FROM "Pick" as p
-		   		LEFT JOIN "Tail" as t ON p.id = t.pick_id
-		   		LEFT JOIN "Fade" as f ON p.id = f.pick_id
-		   		WHERE p.year = (${yearHeader})
-		   		GROUP BY p.person;
+					SELECT p.person,
+					p.total_picks,
+					p.wins,
+					p.pushes,
+					t.total_tails,
+					t.tail_wins,
+					f.total_fades,
+					f.fade_wins
+		   			FROM (
+					SELECT p.person,
+					COUNT(p.id) as total_picks,
+		   			SUM(p.winner) as wins,
+		   			SUM(p.push) as pushes
+					FROM "Pick" as p
+					WHERE p.year = (${yearHeader})
+					AND p.pmt_persona = true
+					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
+					GROUP BY p.person
+					) p
+					LEFT JOIN (
+					SELECT p.person,
+					COUNT(t.id) as total_tails,
+		   			SUM(t.winner) as tail_wins
+					FROM "Pick" as p
+					LEFT JOIN "Tail" as t
+					ON p.id = t.pick_id
+					WHERE p.year = (${yearHeader})
+					AND p.pmt_persona = true
+					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
+					GROUP BY p.person
+					) t ON p.person = t.person
+					LEFT JOIN (
+					SELECT p.person,
+					COUNT(f.id) as total_fades,
+		   			SUM(f.winner) as fade_wins
+					FROM "Pick" as p
+					LEFT JOIN "Fade" as f
+					ON p.id = f.pick_id
+		   			WHERE p.year = (${yearHeader})
+					AND p.pmt_persona = true
+					AND p.barstool_employee = true
+					AND p.winner IS NOT NULL
+					GROUP BY p.person
+					) f ON p.person = f.person
 			`;
+				break;
 		}
 
 		const personData: PersonData[] = [];
@@ -204,6 +307,8 @@ export const actions: Actions = {
 		// TODO: rawSQL query to find fades and tails and % by bet type
 		// get type bet  data
 		const typeBetData: BetData[] = [];
+		const yearWh = yearHeader === 'all-time' ? 2023 || 2024 : Number(yearHeader);
+		// TODO:: 2023 || 2024 not sustainable
 		const typeBet = await prisma.pick.groupBy({
 			by: ['person', 'type'],
 			_sum: {
@@ -214,7 +319,9 @@ export const actions: Actions = {
 				winner: true
 			},
 			where: {
-				...(typeof yearHeader === 'number' && { year: yearHeader })
+				pmtPersona: true,
+				barstoolEmployee: true,
+				year: yearWh
 			}
 		});
 
@@ -232,26 +339,29 @@ export const actions: Actions = {
 			});
 		});
 
+		const specialBets = await prisma.pick.groupBy({
+			by: ['person', 'specialBet'],
+			_sum: {
+				winner: true,
+				push: true
+			},
+			_count: {
+				winner: true
+			},
+			where: {
+				specialBet: {
+					not: undefined || ''
+				},
+				pmtPersona: true,
+				barstoolEmployee: true,
+				year: typeof yearHeader === 'number' ? yearHeader : { not: undefined }
+			}
+		});
+
 		return {
 			personData: personData,
 			typeBets: typeBetData,
-
-			specialBets: await prisma.pick.groupBy({
-				by: ['person', 'specialBet'],
-				_sum: {
-					winner: true,
-					push: true
-				},
-				_count: {
-					winner: true
-				},
-				where: {
-					specialBet: {
-						not: undefined || ''
-					},
-					...(typeof yearHeader === 'number' && { year: yearHeader })
-				}
-			})
+			specialBets: specialBets
 		};
 	}
 };

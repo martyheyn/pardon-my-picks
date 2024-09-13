@@ -50,10 +50,10 @@ export const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
 export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
 
 export type Scores = {
-	away_team: string;
+	away_team: $Enums.NFLTeam;
 	commence_time: string;
 	completed: boolean;
-	home_team: string;
+	home_team: $Enums.NFLTeam;
 	id: string;
 	last_update: string;
 	scores:
@@ -85,6 +85,7 @@ export type Odds = {
 		}[];
 		title: string;
 	}[];
+	gameId: string;
 	commence_time: string;
 	home_team: string;
 	id: string;
@@ -92,12 +93,26 @@ export type Odds = {
 	sport_title: string;
 };
 
-export type PickForm = {
+export type PickData = {
 	id: string;
 	gameId?: string | null;
 	show: string;
 	type: string;
 	description: string;
-	homeTeam: string;
-	awayTeam: string;
+	homeTeam: $Enums.NFLTeam;
+	awayTeam: $Enums.NFLTeam;
+	pickTeam?: $Enums.NFLTeam;
+	pickTotalType?: 'over' | 'under' | null;
+	pickScore?: number;
+	gameDate?: Date | string | null;
+	winner?: number | null;
+	push?: number | null;
+	marked: boolean;
+};
+
+export type AddPickForm = {
+	id: string;
+	gameId: string;
+	type: string;
+	pickName: string;
 };

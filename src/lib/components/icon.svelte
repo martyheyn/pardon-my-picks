@@ -37,8 +37,8 @@
 		arrow: {
 			box: 24,
 			svg: `<path
+					class="stroke-black dark:stroke-white"
 					d="M10 7L15 12L10 17"
-					stroke="#fff"
 					stroke-width="1.5"
 					stroke-linecap="round"
 					stroke-linejoin="round"

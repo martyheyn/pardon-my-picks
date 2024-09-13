@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import type { User } from 'lucia';
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
 	import { quintInOut } from 'svelte/easing';
+	import { type sideNavItems } from '$lib/utils/sidenav-tree';
 
 	import Icon from '../icon.svelte';
-	import { sideNavItems } from '$lib/utils/sidenav-tree';
 	import Tooltip from '../tooltip.svelte';
 
 	export let user: User | null;
@@ -20,6 +20,7 @@
 	$: mobile = $screenWidth && $screenWidth < 640;
 
 	export let scrollY: number;
+	export let sideNavItems: sideNavItems;
 
 	const toggleSideNav = () => {
 		sideNavCollasped.update((value) => !value);
@@ -28,6 +29,7 @@
 		if (sideNavCollasped) {
 			sideNavItems.forEach((navItem, i) => {
 				if (navItem.subItemsOpen) {
+					navItem.subItemsOpen = false;
 					sideNavItems[i].subItemsOpen = false;
 				}
 			});
@@ -45,6 +47,7 @@
 			if (sideNavCollasped) {
 				sideNavItems.forEach((navItem, i) => {
 					if (navItem.subItemsOpen) {
+						navItem.subItemsOpen = false;
 						sideNavItems[i].subItemsOpen = false;
 					}
 				});
@@ -68,12 +71,15 @@
 		'scrollbar-thin scrollbar-thumb-[#8690a3] scrollbar-track-primary dark:scrollbar-thumb-[#8690a3] dark:scrollbar-track-[#1f1f1f]'
 	}`}
 >
-	<div
-		class={`h-14 w-full flex ${$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'} ${
+	<button
+		class={`h-14 w-full flex items-center ${
+			$sideNavCollasped ? 'justify-center' : 'justify-end pr-3'
+		} ${
 			mobile && $sideNavCollasped && scrollY > 10
 				? 'bg-primary dark:bg-[#1f1f1f] rounded-full border-2 border-slate-300 hover:bg-[#2a4f7b] hover:dark:bg-[#424141] translate-x-2 translate-y-2'
 				: ''
 		} transition-all duration-300 ease-in-out cursor-pointer relative`}
+		on:click={toggleSideNav}
 	>
 		{#if !$sideNavCollasped}
 			<p
@@ -86,7 +92,7 @@
 		{/if}
 
 		{#if mobile}
-			<button class={`cursor-pointer h-full flex items-center`} on:click={toggleSideNav}>
+			<button class={`cursor-pointer h-full flex items-center`}>
 				<Icon
 					class={`transition-all duration-300 ease-in-out fill-white`}
 					width="24px"
@@ -99,7 +105,6 @@
 				class={`cursor-pointer absolute top-1/2 -translate-y-1/2  ${
 					$sideNavCollasped ? 'right-1/2 translate-x-1/2' : 'right-3'
 				} transition-all duration-300 ease-in-out`}
-				on:click={toggleSideNav}
 			>
 				<Icon
 					class={`${
@@ -111,7 +116,7 @@
 				/>
 			</button>
 		{/if}
-	</div>
+	</button>
 
 	<ul
 		class={`list-none m-0 pt-[1px] flex flex-col items-center border-t border-t-white border-opacity-10 ${
@@ -122,7 +127,7 @@
 		{#each sideNavItems as navItem}
 			<li
 				class={`${
-					(navItem.label === 'Profile' || navItem.label === 'PickEm') && !user ? 'hidden' : 'block'
+					navItem.label === 'Profile' && !user ? 'hidden' : 'block'
 				} w-full py-2 hover:bg-[#b9bab6] hover:dark:bg-[#424141] relative 
 				group flex justify-between items-center h-full font-header`}
 			>
@@ -132,12 +137,17 @@
 
 				<a
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
-					href={navItem.route}
-					on:click={() => handleItemClick(navItem.label)}
+					href={navItem.label === 'Profile' && user
+						? `${navItem.route}/${user.username}`
+						: navItem.route}
 				>
 					<div
 						class={`w-2 h-full bg-yellow-400 absolute left-0 top-0 rounded-r-md transition-all duration-300 ease-in-out ${
-							$active === navItem.label ? 'opacity-100' : 'opacity-0'
+							$active === navItem.route
+								? 'opacity-100'
+								: $active === '/week' && navItem.label === 'Week'
+								? 'opacity-100'
+								: 'opacity-0'
 						}`}
 					/>
 
@@ -155,8 +165,8 @@
 					<div
 						class={`${
 							$sideNavCollasped
-								? 'opacity-0 delay-0'
-								: 'group-hover:opacity-100 group-hover:delay-300'
+								? 'hidden opacity-0 delay-0'
+								: 'block group-hover:opacity-100 group-hover:delay-300'
 						} transition-all duration-300 ease-in-out w-full z-[999]`}
 					>
 						<p class={`ml-6`}>
@@ -167,7 +177,7 @@
 
 				{#if navItem.subItems}
 					<button
-						on:click={() => (navItem.subItemsOpen = !navItem.subItemsOpen)}
+						on:click={() => !$sideNavCollasped && (navItem.subItemsOpen = !navItem.subItemsOpen)}
 						class={`${$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'} pr-3`}
 					>
 						<Icon
@@ -208,7 +218,8 @@
 
 							{#if subItem.subItems}
 								<button
-									on:click={() => (subItem.subItemsOpen = !subItem.subItemsOpen)}
+									on:click={() =>
+										!$sideNavCollasped && (subItem.subItemsOpen = !subItem.subItemsOpen)}
 									class={`${
 										$sideNavCollasped ? 'opacity-0 delay-0' : 'opacity-100 delay-300'
 									} pr-3`}

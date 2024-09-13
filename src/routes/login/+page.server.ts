@@ -5,6 +5,7 @@ import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
+import { PEPPER } from '$env/static/private';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
 
 import type { Actions, PageServerLoad } from './$types';
@@ -82,7 +83,8 @@ export const actions: Actions = {
 			return setError(form, 'Incorrect username or password');
 		}
 
-		const validPassword = await new Argon2id().verify(existingUser.hashed_password, password);
+		const pass = password + PEPPER;
+		const validPassword = await new Argon2id().verify(existingUser.hashed_password, pass);
 		if (!validPassword) {
 			console.log('no user, or wrong credentials');
 
@@ -90,12 +92,9 @@ export const actions: Actions = {
 		}
 
 		// secure flag for security duh
-		// console.log('security', event.request.secure);
-
 		const session = await lucia.createSession(existingUser.id, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		sessionCookie.attributes.secure = true;
-		// console.log('sessionCookie', sessionCookie);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.',
 			...sessionCookie.attributes

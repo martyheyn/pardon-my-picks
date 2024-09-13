@@ -1,6 +1,6 @@
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
-import { setError, superValidate } from 'sveltekit-superforms';
+import { superValidate } from 'sveltekit-superforms';
 import { generateId } from 'lucia';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
@@ -53,7 +53,6 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 	// Upload photo to S3
 	try {
 		const data = await s3Client.send(command);
-		console.log('Successfully uploaded photo:', data);
 		const photoUrl = `https://${params.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${params.Key}`; // Return the URL of the uploaded photo
 		return params.Key;
 	} catch (err) {
@@ -61,24 +60,37 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 	}
 };
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!locals.user) {
 		redirect(303, '/');
+	}
+
+	let usersProfile: boolean = false;
+	const { username } = params;
+
+	if (locals.user.username === username) {
+		usersProfile = true;
 	}
 
 	// make sure it is the right user
 	const existingUser = await prisma.user.findUnique({
 		where: {
-			id: locals.user.id
+			username: username
 		},
 		include: {
 			fade: true,
-			tail: true
+			tail: true,
+			picks: {
+				orderBy: {
+					week: 'desc'
+				}
+			}
 		}
 	});
 
 	if (!existingUser) {
-		redirect(303, '/login');
+		redirect(303, '/');
+		// set message to user that profile does not exist in alert
 	}
 
 	// initialize forms
@@ -104,6 +116,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 				losses: fades.length > 0 ? fades.filter((fade) => !fade.winner && !fade.push).length : 0
 			}
 		},
+		picks: existingUser.picks,
+		usersProfile,
 		form
 	};
 };
@@ -205,7 +219,6 @@ export const actions: Actions = {
 
 			try {
 				const data = await s3Client.send(new DeleteObjectCommand(deleteParams));
-				console.log('Successfully deleted photo:', data);
 			} catch (err) {
 				console.error('Error deleting photo:', err);
 				return {

@@ -1,15 +1,12 @@
 //kit.svelte.dev/docs/routing#server
 import { json } from '@sveltejs/kit';
 import type { Scores } from '$lib/utils/types';
-
-// export async function GET(event: Event) {
-// put rate limiter in here
-// 	return new Response(JSON.stringify('Hello GET'));
-// }
+import { prisma } from '$lib/server/prisma';
+import { ODDS_API_KEY } from '$env/static/private';
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }: { request: Request }) {
-	const { pickId } = await request.json();
+	const { pickId, year } = await request.json();
 
 	// if pick add homeScore and awayScore to pick
 	const pick = await prisma.pick.findUnique({
@@ -24,9 +21,10 @@ export async function POST({ request }: { request: Request }) {
 
 	// get live scores if the games have already started (americanfootball_nfl)
 	const scores = await fetch(
-		'https://api.the-odds-api.com/v4/sports/basketball_nba/scores/?daysFrom=1&apiKey=fafd95c74a4b8c7284ecd93cb09ef8a3'
+		`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
 	);
 	const scoresDataRaw: Scores[] = await scores.json();
+	if (!scoresDataRaw) return [];
 
 	// only pull games that are currently being played
 	const scoresLive: Scores[] = scoresDataRaw.filter(

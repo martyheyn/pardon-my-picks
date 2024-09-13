@@ -4,18 +4,21 @@
 	export let data: PageData;
 
 	// create store
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
 	import { page } from '$app/stores';
+	import { sideNavItems } from '$lib/utils/sidenav-tree';
 
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
 	import type { Alert } from '$lib/utils/types';
+	import type { Page } from '@sveltejs/kit';
 
 	const sideNavCollasped = writable(true);
-	const currWeek = writable(18);
+	const currWeek = writable(2);
+	const currYear = writable(2024);
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);
@@ -35,6 +38,7 @@
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
+	setContext('currYear', currYear);
 	setContext('screenWidth', screenWidth);
 	setContext('active', active);
 	setContext('fullPageHeight', fullPageHeight);
@@ -44,12 +48,57 @@
 
 	$: mobile = $screenWidth < 640;
 
+	const setSidenavActive = (page: Page<Record<string, string>, string | null>) => {
+		const route = $page.route.id;
+		if (route && !page.params.year && !page.params.week) {
+			active.set(route);
+			return;
+		}
+
+		if (page.params && page.params.year && page.params.week) {
+			active.set(`/week`);
+			return;
+		}
+	};
+	$: $page.route.id, setSidenavActive($page);
+
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });
 
-	function onMount(arg0: () => Promise<void>) {
-		throw new Error('Function not implemented.');
-	}
+	let sidenavElement: HTMLElement;
+	onMount(() => {
+		// close sidenav subitems onmount if open
+		sideNavItems.forEach((navItem, i) => {
+			if (navItem.subItemsOpen) {
+				navItem.subItemsOpen = false;
+				sideNavItems[i].subItemsOpen = false;
+			}
+		});
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if ($sideNavCollasped) return;
+			if (sidenavElement && !sidenavElement.contains(event.target as Node)) {
+				sideNavItems.forEach((navItem, i) => {
+					if (navItem.subItemsOpen) {
+						sideNavItems[i].subItemsOpen = false;
+						if (navItem.subItems) {
+							navItem.subItems.forEach((subItem) => {
+								if (subItem.subItemsOpen) {
+									subItem.subItemsOpen = false;
+								}
+							});
+						}
+					}
+				});
+				sideNavCollasped.set(true);
+			}
+		};
+
+		document.addEventListener('click', handleClickOutside);
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 </script>
 
 <svelte:head>
@@ -91,26 +140,29 @@
 
 <!-- only render app if screen width is not undefined, not have jumpy navbar -->
 {#if $screenWidth}
-	<div class="min-h-screen dark:text-white">
+	<div class="min-h-screen dark:text-white m-0 p-0">
 		<Topnav user={data.user} />
 
-		<Sidenav user={data.user} {scrollY} />
+		<div bind:this={sidenavElement}>
+			<Sidenav user={data.user} {scrollY} {sideNavItems} />
+		</div>
 
 		<div
-			class={`${
+			class={` ${
 				$sideNavCollasped
 					? 'w-[calc(100vw - 64px)]'
 					: 'w-[calc(100vw - 64px)] lg:w-[calc(100vw - 224px)] lg:ml-40'
 			} ${
 				mobile ? 'ml-0' : 'ml-14 '
-			}z-0 relative top-0 transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden`}
+			} z-0 relative transition-all duration-500 ease-in-out bg-opacity-5 overflow-x-hidden `}
 		>
 			<div
 				class={`${
 					$page.route.id?.includes('register') || $page.route.id?.includes('login')
 						? 'p-4'
 						: 'p-4 sm:p-8'
-				} bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out z-0`}
+				} bg-slate-100 dark:bg-[#2d2d2d] transition-all duration-500 ease-in-out z-0
+				 scroll-smooth h-full overflow-y-auto`}
 				style="min-height: calc(100vh - 56px);"
 			>
 				<slot />

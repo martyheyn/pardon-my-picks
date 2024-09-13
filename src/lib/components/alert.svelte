@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
 	import type { Writable } from 'svelte/store';
 	import { getContext, onDestroy } from 'svelte';
 	import type { Alert } from '$lib/utils/types';
+	import { fly } from 'svelte/transition';
 
 	const alert: Writable<Alert> = getContext('alert');
 
@@ -14,10 +14,10 @@
 
 	$: switch ($alert.alertType) {
 		case 'error':
-			color = 'bg-red-100 text-red-800 ';
+			color = 'bg-lightRed dark:bg-darkRed dark:text-white';
 			break;
 		case 'success':
-			color = 'bg-green-100 text-green-800';
+			color = 'bg-lightGreen dark:bg-darkGreen dark:text-white';
 			break;
 		default:
 			color = 'bg-gray-100 text-gray-800';
@@ -30,7 +30,7 @@
 			// hide Alert if message is empty
 			visible = false;
 		} else {
-			visible = true; // show alert
+			visible = true;
 			if (ms > 0)
 				timeout = window.setTimeout(() => {
 					alert.set({ text: undefined, alertType: undefined });

@@ -64,7 +64,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			console.log('reset password');
 			// optionally invalidate all existing tokens
 			const tokenId = generateId(40);
 			const tokenHash = await new Argon2id().hash(tokenId);

@@ -17,11 +17,13 @@
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		on:click|stopPropagation
-		class="px-1.5 py-2 md:pb-8 md:px-8 md:py-8 w-full h-full transition-all duration-300 ease-in-out"
+		class="px-1.5 py-2 md:pb-8 md:px-8 md:py-8 w-full h-full transition-all duration-300 ease-in-out
+		dark:border dark:border-slate-100 dark:bg-darkSecondary dark:text-white rounded-md"
 	>
 		<!-- svelte-ignore a11y-autofocus -->
 		<button
-			class=" absolute top-2.5 right-2.5 fill-slate-700 hover:fill-slate-600 hover:scale-[1.04] transition-all duration-1500 ease-linear"
+			class=" absolute top-2.5 right-2.5 fill-slate-700 hover:fill-slate-600
+			hover:scale-[1.04] transition-all duration-1500 ease-linear dark:fill-slate-100 dark:hover:fill-slate-200"
 			autofocus
 			on:click={() => dialog.close()}
 		>
