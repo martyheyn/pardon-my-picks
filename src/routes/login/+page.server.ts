@@ -98,10 +98,10 @@ export const actions: Actions = {
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		sessionCookie.attributes.secure = true;
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '/',
+			path: '.',
 			...sessionCookie.attributes
 		});
 
-		throw redirect(303, '/');
+		throw redirect(302, '/');
 	}
 };

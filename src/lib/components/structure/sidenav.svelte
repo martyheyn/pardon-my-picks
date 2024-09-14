@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import type { User } from 'lucia';
 	import { page } from '$app/stores';
@@ -55,6 +55,12 @@
 			sideNavCollasped.set(true);
 		}
 	};
+
+	const dayOfWeek = new Date().getDay();
+	const pickemOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+	$: if (!pickemOpen) {
+		sideNavItems = sideNavItems.filter((navItem) => navItem.label !== 'PickEm');
+	}
 </script>
 
 <div

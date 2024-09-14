@@ -10,5 +10,5 @@ export const POST: RequestHandler = async ({ locals }) => {
 	await lucia.invalidateSession(session.id);
 	locals.session = null;
 
-	redirect(302, '/');
+	throw redirect(302, '/');
 };
