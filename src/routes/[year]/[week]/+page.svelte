@@ -19,7 +19,6 @@
 	export let form: ActionData;
 
 	$: ({ picks, user, bettingOpen } = data);
-	$: console.log('bettingOpen', bettingOpen);
 
 	$: ({ year, week } = $page.params);
 
@@ -84,34 +83,34 @@
 
 	let animateScore = false;
 	// check security to make sure this function is not called a billion times
-	const updateScore = (pickId: string) => {
-		console.log('Updating the score!');
-		// only call this if the game is currently happening, aka score is not null
-		setInterval(async () => {
-			const res = await fetch('/api/live-scores', {
-				method: 'POST',
-				body: JSON.stringify({ pickId, year: parseInt(year) }),
-				headers: {
-					'content-type': 'application/json'
-				}
-			});
-			const data = await res.json();
+	// const updateScore = (pickId: string) => {
+	// 	console.log('Updating the score!');
+	// 	// only call this if the game is currently happening, aka score is not null
+	// 	setInterval(async () => {
+	// 		const res = await fetch('/api/live-scores', {
+	// 			method: 'POST',
+	// 			body: JSON.stringify({ pickId, year: parseInt(year) }),
+	// 			headers: {
+	// 				'content-type': 'application/json'
+	// 			}
+	// 		});
+	// 		const data = await res.json();
 
-			animateScore = true;
-			liveScores[pickId] = {
-				homeLiveScore: data.homeLiveScore,
-				awayLiveScore: data.awayLiveScore
-			};
-			animateScore = false;
-		}, 60000);
-	};
+	// 		animateScore = true;
+	// 		liveScores[pickId] = {
+	// 			homeLiveScore: data.homeLiveScore,
+	// 			awayLiveScore: data.awayLiveScore
+	// 		};
+	// 		animateScore = false;
+	// 	}, 60000);
+	// };
 
 	// run updateScore function for all live games
-	$: picks.forEach((pick) => {
-		if (pick.isLive) {
-			updateScore(pick.id);
-		}
-	});
+	// $: picks.forEach((pick) => {
+	// 	if (pick.isLive) {
+	// 		updateScore(pick.id);
+	// 	}
+	// });
 
 	const updateAlert = () => {
 		if (form?.pickId) {
