@@ -6,6 +6,9 @@ import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
+const dayOfWeek = new Date().getDay();
+const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
+
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
@@ -19,9 +22,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			fade: true
 		}
 	});
-
-	const dayOfWeek = new Date().getDay();
-	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
 	// only get live scores on Sunday
 	if (dayOfWeek === 7) {
@@ -67,6 +67,14 @@ export const actions: Actions = {
 		if (!locals.user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to fade a pick buddy',
+				success: false,
+				pickId
+			});
+		}
+
+		if (!bettingOpen) {
+			return fail(401, {
+				message: 'Can only fade picks Friday and Saturday',
 				success: false,
 				pickId
 			});
@@ -168,6 +176,14 @@ export const actions: Actions = {
 		if (!locals.user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to tail a pick big dawg',
+				success: false,
+				pickId
+			});
+		}
+
+		if (!bettingOpen) {
+			return fail(401, {
+				message: 'Can only tail picks Friday and Saturday',
 				success: false,
 				pickId
 			});

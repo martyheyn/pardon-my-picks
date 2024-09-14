@@ -19,6 +19,7 @@
 	export let form: ActionData;
 
 	$: ({ picks, user, bettingOpen } = data);
+	$: console.log('bettingOpen', bettingOpen);
 
 	$: ({ year, week } = $page.params);
 
