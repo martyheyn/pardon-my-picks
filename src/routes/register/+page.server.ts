@@ -118,10 +118,6 @@ export const actions: Actions = {
 			...sessionCookie.attributes
 		});
 
-		// redirect to the login page
-		await Promise.all([
-			{ form },
-			redirect(303, '/') // Redirect to the desired page
-		]);
+		throw redirect(303, '/');
 	}
 };

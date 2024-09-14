@@ -89,19 +89,19 @@ export const actions: Actions = {
 			return setError(form, 'Incorrect username or password');
 		}
 
-		// secure flag for security duh
+		// try {
+		const sessions = await lucia.getUserSessions(existingUser.id);
+		if (sessions.length > 0) {
+			await lucia.invalidateSession(sessions[0].id);
+		}
 		const session = await lucia.createSession(existingUser.id, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
 		sessionCookie.attributes.secure = true;
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
+			path: '/',
 			...sessionCookie.attributes
 		});
 
-		// Execute both return and redirect asynchronously
-		await Promise.all([
-			{ form },
-			redirect(303, '/') // Redirect to the desired page
-		]);
+		throw redirect(303, '/');
 	}
 };

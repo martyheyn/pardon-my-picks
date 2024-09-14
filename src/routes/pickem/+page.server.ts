@@ -37,32 +37,6 @@ const PickDataSchema = z.array(PickDataObjectSchema);
 // 	usersPicks: z.array(PickDataObjectSchema)
 // });
 
-const getDescription = (
-	type: string,
-	betNumber: number,
-	homeTeam: string,
-	awayTeam: string,
-	betTeam?: string,
-	overUnder?: string
-) => {
-	let description = '';
-	if (betNumber) {
-	}
-
-	switch (type) {
-		case 'spreads' || 'spread':
-			description = `${betTeam} ${betNumber > 0 ? `+${betNumber}` : betNumber}`;
-			break;
-		case 'totals':
-			description = `${homeTeam} vs ${awayTeam} ${overUnder} ${betNumber}`;
-			break;
-		default:
-			description = 'No description';
-			break;
-	}
-	return description;
-};
-
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
 
@@ -181,14 +155,6 @@ export const actions: Actions = {
 						return fail(400, { message: 'Invalid pick', success: false });
 					}
 
-					const description = getDescription(
-						pickType,
-						betData?.point,
-						gameOdds.home_team,
-						gameOdds.away_team,
-						picks[i].pickTeam
-					);
-
 					await prisma.pick.create({
 						data: {
 							id: picks[i].id,
@@ -198,7 +164,7 @@ export const actions: Actions = {
 							week: parseInt(CURRENT_WEEK),
 							person: user.username,
 							type: pickType,
-							description: picks[i].description || description,
+							description: picks[i].description,
 							league: 'NFL',
 							homeTeam: fullNameToMascot[gameOdds.home_team] as $Enums.NFLTeam,
 							awayTeam: fullNameToMascot[gameOdds.away_team] as $Enums.NFLTeam,
