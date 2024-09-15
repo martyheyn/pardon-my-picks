@@ -199,7 +199,7 @@
 										<h4
 											class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
 												pick.homeTeamScore === null || pick.homeTeamScore === undefined
-													? 'bg-slate-300 bg-opacity-70'
+													? 'bg-slate-300 dark:bg-[#1f1f1f]  bg-opacity-70'
 													: pick.winner
 													? 'bg-lightGreen dark:bg-darkGreen'
 													: pick.push
@@ -361,7 +361,7 @@
 											<p class="text-sm">Fade</p>
 										</div>
 
-										<div class="bg-gray-200 px-3 py-2 bg-opacity-50 rounded-xl">
+										<div class="bg-gray-200 dark:bg-[#1f1f1f] px-3 py-2 bg-opacity-50 rounded-xl">
 											<div class="flex justify-between items-center px-2 gap-x-4">
 												<div class="h-full flex flex-col justify-center items-center gap-y-2">
 													<div class="flex flex-row justify-center items-center gap-x-2">
