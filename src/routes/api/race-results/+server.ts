@@ -64,7 +64,7 @@ export async function GET({ url }) {
 		WHERE
 			year = ${year}
 		ORDER BY
-			person, week;
+			week DESC, wins DESC, losses ASC, pushes DESC;
 		`;
 
 		if (!raceResults) {
@@ -90,7 +90,7 @@ export async function GET({ url }) {
 				img: personaAvatarPath(x.person),
 				link: `/stats/#${personasLabelToCamelCase(x.person)}`,
 				data: weeklyDataByPerson[personasLabelToCamelCase(x.person)]
-					? [...weeklyDataByPerson[personasLabelToCamelCase(x.person)].data, recordByWeek]
+					? [recordByWeek, ...weeklyDataByPerson[personasLabelToCamelCase(x.person)].data]
 					: [recordByWeek]
 			};
 		});

@@ -45,7 +45,8 @@
 			// TODO: Make this more dynamic
 			// had to change it because Max & Memes picked
 			if (openerWeeklyDataByPersonArr.length < 3) return;
-			lastWeekWithData = openerWeeklyDataByPersonArr[1]['max'].data.length;
+			lastWeekWithData =
+				openerWeeklyDataByPersonArr[0][Object.keys(fullGroupData[0])[0]].data.length;
 		}
 
 		if (raceYear === 2024) {
@@ -56,7 +57,7 @@
 
 			// had to change it because Max & Memes picked
 			if (fullGroupData.length < 3) return;
-			lastWeekWithData = fullGroupData[1]['hank'].data.length;
+			lastWeekWithData = fullGroupData[0][Object.keys(fullGroupData[0])[0]].data.length;
 		}
 	};
 
