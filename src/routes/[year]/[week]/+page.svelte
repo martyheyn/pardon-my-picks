@@ -83,34 +83,34 @@
 
 	let animateScore = false;
 	// check security to make sure this function is not called a billion times
-	// const updateScore = (pickId: string) => {
-	// 	console.log('Updating the score!');
-	// 	// only call this if the game is currently happening, aka score is not null
-	// 	setInterval(async () => {
-	// 		const res = await fetch('/api/live-scores', {
-	// 			method: 'POST',
-	// 			body: JSON.stringify({ pickId, year: parseInt(year) }),
-	// 			headers: {
-	// 				'content-type': 'application/json'
-	// 			}
-	// 		});
-	// 		const data = await res.json();
+	const updateScore = (pickId: string) => {
+		console.log('Updating the score!');
+		// only call this if the game is currently happening, aka score is not null
+		setInterval(async () => {
+			const res = await fetch('/api/live-scores', {
+				method: 'POST',
+				body: JSON.stringify({ pickId, year: parseInt(year) }),
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+			const data = await res.json();
 
-	// 		animateScore = true;
-	// 		liveScores[pickId] = {
-	// 			homeLiveScore: data.homeLiveScore,
-	// 			awayLiveScore: data.awayLiveScore
-	// 		};
-	// 		animateScore = false;
-	// 	}, 60000);
-	// };
+			animateScore = true;
+			liveScores[pickId] = {
+				homeLiveScore: data.homeLiveScore,
+				awayLiveScore: data.awayLiveScore
+			};
+			animateScore = false;
+		}, 60000);
+	};
 
 	// run updateScore function for all live games
-	// $: picks.forEach((pick) => {
-	// 	if (pick.isLive) {
-	// 		updateScore(pick.id);
-	// 	}
-	// });
+	$: picks.forEach((pick) => {
+		if (pick.isLive) {
+			updateScore(pick.id);
+		}
+	});
 
 	const updateAlert = () => {
 		if (form?.pickId) {
@@ -133,6 +133,8 @@
 	$: form, updateAlert();
 
 	$: alertBool = $alert.text ? true : false;
+
+	const now = new Date();
 
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
@@ -370,12 +372,16 @@
 															action="?/tailPick&id={pick.id}&week={week}&year={year}"
 															method="POST"
 														>
-															<button disabled={alertBool}>
+															<button
+																disabled={alertBool || (pick.gameDate && now > pick.gameDate)}
+															>
 																<Icon
 																	class={`transition-all duration-300 ease-in-out ${
 																		$currWeek === parseInt(week) &&
 																		parseInt(year) === $currYear &&
-																		!alertBool
+																		!alertBool &&
+																		pick.gameDate &&
+																		now < pick.gameDate
 																			? 'sm:hover:fill-green-300 dark:sm:hover:fill-green-900 cursor-pointer'
 																			: ''
 																	} ${
@@ -406,12 +412,16 @@
 															action="?/fadePick&id={pick.id}&week={week}&year={year}"
 															method="POST"
 														>
-															<button disabled={alertBool}>
+															<button
+																disabled={alertBool || (pick.gameDate && now > pick.gameDate)}
+															>
 																<Icon
 																	class={`transition-all duration-300 ease-in-out ${
 																		$currWeek === parseInt(week) &&
 																		parseInt(year) === $currYear &&
-																		!alertBool
+																		!alertBool &&
+																		pick.gameDate &&
+																		now < pick.gameDate
 																			? 'sm:hover:fill-red-300 dark:sm:hover:fill-red-900 cursor-pointer '
 																			: ''
 																	} ${

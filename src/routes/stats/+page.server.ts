@@ -104,9 +104,13 @@ export const load: PageServerLoad = async () => {
 				Number(person.pushes)
 			).toString(),
 			total_tails: Number(person.total_tails).toString(),
-			tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100).toString(),
+			tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100)
+				.toFixed(1)
+				.toString(),
 			total_fades: Number(person.total_fades).toString(),
-			fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100).toString()
+			fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100)
+				.toFixed(1)
+				.toString()
 		});
 	});
 
@@ -298,9 +302,13 @@ export const actions: Actions = {
 					Number(person.pushes)
 				).toString(),
 				total_tails: Number(person.total_tails).toString(),
-				tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100).toString(),
+				tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100)
+					.toFixed(2)
+					.toString(),
 				total_fades: Number(person.total_fades).toString(),
-				fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100).toString()
+				fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100)
+					.toFixed(2)
+					.toString()
 			});
 		});
 

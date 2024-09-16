@@ -24,11 +24,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	});
 
 	// only get live scores on Sunday
-	if (dayOfWeek === 7) {
+	if (dayOfWeek === 0) {
+		console.log('getting live scores');
 		const scoresLive = await getLiveGames({ year: params.year });
+		console.log('scoresLive', scoresLive);
 
 		scoresLive.map(async (game: Scores) => {
-			const prismaPicks = await prisma.pick.updateMany({
+			await prisma.pick.updateMany({
 				where: {
 					gameId: game.id
 				},
