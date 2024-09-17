@@ -22,6 +22,7 @@
 
 	let odds: Odds[];
 	let bettingOpen: boolean;
+	let showOdds: boolean;
 	let dbPicks: PickData[];
 	let usersPicks: PickData[] = [];
 
@@ -31,6 +32,14 @@
 		let oddsData = await oddsRes.json();
 		odds = oddsData.odds;
 		bettingOpen = oddsData.bettingOpen;
+		showOdds = oddsData.showOdds;
+
+		if (showOdds && bettingOpen !== true) {
+			alert.set({
+				text: 'You can only bet on Thursday through Saturday so your odds are similar to the PMT boys',
+				alertType: 'error'
+			});
+		}
 
 		const dbPicksRes = await fetch(`/api/db-picks`);
 		let dbPicksData = await dbPicksRes.json();
@@ -229,7 +238,7 @@
 		<AlertFlash />
 	</div>
 
-	{#if bettingOpen === false}
+	{#if showOdds === false}
 		<div class="my-4 rounded-md flex flex-col gap-y-4 font-paragraph">
 			<h2 class="text-2xl">Betting is currently on vacation with Hank</h2>
 			<p class="text-xl max-w-2xl">

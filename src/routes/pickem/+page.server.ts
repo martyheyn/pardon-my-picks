@@ -37,6 +37,9 @@ const PickDataSchema = z.array(PickDataObjectSchema);
 // 	usersPicks: z.array(PickDataObjectSchema)
 // });
 
+const dayOfWeek = new Date().getDay();
+const bettingOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
 
@@ -52,6 +55,14 @@ export const actions: Actions = {
 		if (!user) {
 			return fail(401, {
 				message: 'Unauthorized!! Gotta create an account to make a pick buddy',
+				success: false
+			});
+		}
+
+		if (!bettingOpen) {
+			return fail(400, {
+				message:
+					'You can only bet on Thursday through Saturday so your odds are similar to the PMT boys',
 				success: false
 			});
 		}
