@@ -104,6 +104,137 @@ export const fullNameToMascot: { [key: string]: string } = {
 	'Washington Commanders': 'commanders'
 };
 
+export const fullNameToAbrv: { [key: string]: { abbr: string; mascot: string } } = {
+	'Arizona Cardinals': {
+		abbr: 'ARI',
+		mascot: 'Cardinals'
+	},
+	'Atlanta Falcons': {
+		abbr: 'ATL',
+		mascot: 'Falcons'
+	},
+	'Baltimore Ravens': {
+		abbr: 'BAL',
+		mascot: 'Ravens'
+	},
+	'Buffalo Bills': {
+		abbr: 'BUF',
+		mascot: 'Bills'
+	},
+	'Carolina Panthers': {
+		abbr: 'CAR',
+		mascot: 'Panthers'
+	},
+	'Chicago Bears': {
+		abbr: 'CHI',
+		mascot: 'Bears'
+	},
+	'Cincinnati Bengals': {
+		abbr: 'CIN',
+		mascot: 'Bengals'
+	},
+	'Cleveland Browns': {
+		abbr: 'CLE',
+		mascot: 'Browns'
+	},
+	'Dallas Cowboys': {
+		abbr: 'DAL',
+		mascot: 'Cowboys'
+	},
+	'Denver Broncos': {
+		abbr: 'DEN',
+		mascot: 'Broncos'
+	},
+	'Detroit Lions': {
+		abbr: 'DET',
+		mascot: 'Lions'
+	},
+	'Green Bay Packers': {
+		abbr: 'GB',
+		mascot: 'Packers'
+	},
+	'Houston Texans': {
+		abbr: 'HOU',
+		mascot: 'Texans'
+	},
+	'Indianapolis Colts': {
+		abbr: 'IND',
+		mascot: 'Colts'
+	},
+	'Jacksonville Jaguars': {
+		abbr: 'JAX',
+		mascot: 'Jaguars'
+	},
+	'Kansas City Chiefs': {
+		abbr: 'KC',
+		mascot: 'Chiefs'
+	},
+	'Los Angeles Chargers': {
+		abbr: 'LAC',
+		mascot: 'Chargers'
+	},
+	'Los Angeles Rams': {
+		abbr: 'LAR',
+		mascot: 'Rams'
+	},
+	'Miami Dolphins': {
+		abbr: 'MIA',
+		mascot: 'Dolphins'
+	},
+	'Minnesota Vikings': {
+		abbr: 'MIN',
+		mascot: 'Vikings'
+	},
+	'New England Patriots': {
+		abbr: 'NE',
+		mascot: 'Patriots'
+	},
+	'New Orleans Saints': {
+		abbr: 'NO',
+		mascot: 'Saints'
+	},
+	'New York Giants': {
+		abbr: 'NYG',
+		mascot: 'Giants'
+	},
+	'New York Jets': {
+		abbr: 'NYJ',
+		mascot: 'Jets'
+	},
+	'Las Vegas Raiders': {
+		abbr: 'LV',
+		mascot: 'Raiders'
+	},
+	'Philadelphia Eagles': {
+		abbr: 'PHI',
+		mascot: 'Eagles'
+	},
+	'Pittsburgh Steelers': {
+		abbr: 'PIT',
+		mascot: 'Steelers'
+	},
+	'San Francisco 49ers': {
+		abbr: 'SF',
+		mascot: '49ers'
+	},
+	'Seattle Seahawks': {
+		abbr: 'SEA',
+		mascot: 'Seahawks'
+	},
+	'Tampa Bay Buccaneers': {
+		abbr: 'TB',
+		mascot: 'Buccaneers'
+	},
+	'Tennessee Titans': {
+		abbr: 'TEN',
+		mascot: 'Titans'
+	},
+	'Washington Commanders': {
+		abbr: 'WAS',
+		mascot: 'Commanders'
+	}
+};
+
 export const personaImgPath = (person: string) => {
 	switch (person) {
 		case 'Big Cat':

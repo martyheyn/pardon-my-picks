@@ -3,7 +3,7 @@
 	import { fade, fly, slide } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
-	import { fullNameToMascot, logo } from '$lib/utils/matching-format';
+	import { fullNameToAbrv, fullNameToMascot, logo } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
 	import { getContext, onMount } from 'svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
@@ -159,7 +159,10 @@
 		}
 
 		switch (type) {
-			case 'spreads' || 'spread':
+			case 'spread':
+				description = `${team} ${betNumber > 0 ? `+${betNumber}` : betNumber}`;
+				break;
+			case 'spreads':
 				description = `${team} ${betNumber > 0 ? `+${betNumber}` : betNumber}`;
 				break;
 			case 'totals':
@@ -374,22 +377,36 @@
 							<div class="grid grid-cols-8 gap-x-4">
 								<div class="col-span-3 grid grid-rows-3 gap-4 place-content-start w-full">
 									<div />
-									<div class="flex gap-x-4 justify-start items-center">
+									<div class="flex gap-x-6 justify-start items-center">
 										<img
 											src={logo[fullNameToMascot[odd.away_team]]}
 											alt="helmet"
 											class="w-10 h-10"
 										/>
-										<p class="text-sm sm:text-base">{odd.away_team}</p>
+										<div class="flex flex-col">
+											<p class="text-xs sm:text-sm text-muteTextColor dark:text-darkMuteTextColor">
+												{fullNameToAbrv[odd.away_team].abbr}
+											</p>
+											<p class="text-sm sm:text-base">
+												{fullNameToAbrv[odd.away_team].mascot}
+											</p>
+										</div>
 									</div>
-									<div class="flex gap-x-4 justify-start items-center">
+									<div class="flex gap-x-6 justify-start items-center">
 										<img
 											src={logo[fullNameToMascot[odd.home_team]]}
 											alt="helmet"
 											class="w-10 h-10"
 										/>
 
-										<p class="text-sm sm:text-base">{odd.home_team}</p>
+										<div class="flex flex-col">
+											<p class="text-xs sm:text-sm text-muteTextColor dark:text-darkMuteTextColor">
+												{fullNameToAbrv[odd.home_team].abbr}
+											</p>
+											<p class="text-sm sm:text-base">
+												{fullNameToAbrv[odd.home_team].mascot}
+											</p>
+										</div>
 									</div>
 								</div>
 
