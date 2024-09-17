@@ -136,6 +136,19 @@
 
 	const now = new Date();
 
+	const displayDate = (date: Date | null) => {
+		if (!date) return 'TBD';
+		const timezoneOffset = date.getTimezoneOffset() * 60000;
+		let estGameDate = new Date(date.getTime() + timezoneOffset);
+		const timeString = estGameDate.toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true
+		});
+		const dayString = estGameDate.toLocaleDateString('en-US', { weekday: 'long' });
+		return [timeString, dayString];
+	};
+
 	// TODO: find best wy to organize data to display
 	// TODO: clean up logic making data reactive
 	// TODO: look deeper into if there is a more secure way to fade/tail picks,
@@ -152,7 +165,6 @@
 		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black dark:border-white border-opacity-10 max-w-6xl"
 	>
 		<h1 class="font-header text-2xl sm:text-3xl">{year} Week: {week}</h1>
-		<!-- <img class="w-16 h-16" src="$lib/assets/lighthouse.png" alt="hello" /> -->
 		<a href="/pickem" class="btn-primary">Make your picks</a>
 	</div>
 
@@ -216,6 +228,15 @@
 									{#if pick.specialBet}
 										<div class="absolute -top-4 md:top-2 -right-4 z-50 w-fit">
 											<SpecialBet betType={pick.specialBet} />
+										</div>
+									{/if}
+
+									{#if pick.gameDate && now < pick.gameDate}
+										<div class="mt-1 ml-1 text-muteTextColor dark:text-darkMuteTextColor">
+											{displayDate(pick.gameDate)[0]}
+											<span class="text-xs text-muteTextColor dark:text-darkMuteTextColor ml-0.5"
+												>({displayDate(pick.gameDate)[1]})</span
+											>
 										</div>
 									{/if}
 
