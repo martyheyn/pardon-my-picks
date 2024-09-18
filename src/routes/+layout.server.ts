@@ -14,17 +14,17 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 		let week = url.pathname.split('/')[2];
 
 		if (isNaN(parseInt(year)) || isNaN(parseInt(week))) {
-			console.log('REDIRECTING TO 404');
+			console.error('REDIRECTING TO 404');
 			throw redirect(302, '/404');
 		}
 
 		if (parseInt(week) < 1 || parseInt(week) > 18) {
-			console.log('REDIRECTING TO 404');
+			console.error('REDIRECTING TO 404');
 			throw redirect(302, '/404');
 		}
 
 		if (parseInt(year) < 2023 || parseInt(year) > 2025) {
-			console.log('REDIRECTING TO 404');
+			console.error('REDIRECTING TO 404');
 			throw redirect(302, '/404');
 		}
 	}
