@@ -34,13 +34,6 @@
 		bettingOpen = oddsData.bettingOpen;
 		showOdds = oddsData.showOdds;
 
-		if (showOdds && bettingOpen !== true) {
-			alert.set({
-				text: 'You can only bet on Thursday through Saturday so your odds are similar to the PMT boys',
-				alertType: 'error'
-			});
-		}
-
 		const dbPicksRes = await fetch(`/api/db-picks`);
 		let dbPicksData = await dbPicksRes.json();
 		dbPicks = dbPicksData.picks;
@@ -234,7 +227,15 @@
 		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
 	</div>
 
-	<div class="my-4" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
+	{#if !user}
+		<div
+			class={`my-4 px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg max-w-6xl`}
+		>
+			You can only bet on Thursday through Saturday so your odds are similar to the PMT boys
+		</div>
+	{/if}
+
+	<div class="my-4 max-w-6xl" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 		<AlertFlash />
 	</div>
 

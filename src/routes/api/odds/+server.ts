@@ -52,7 +52,7 @@ export async function GET({ locals }) {
 	// I only want to do this on initial load if there is no odds data,
 	// do not need reloading every action, that is what is messing with id's
 	// how can I check if there is odds data already?
-	if (bettingOpen) {
+	if (showOdds) {
 		try {
 			const odds = await fetch(
 				`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}` // &commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}
