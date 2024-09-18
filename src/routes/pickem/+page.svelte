@@ -433,13 +433,17 @@
 													<button
 														class={`w-full py-3 px-0 sm:py-4 sm:px-4 rounded-md transition-all duration-300 ease-in-out text-xs sm:text-base
 													${
-														usersPicks.map((pick) => pick.id === outcome.id).includes(true) || !user
+														usersPicks.map((pick) => pick.id === outcome.id).includes(true) ||
+														!user ||
+														!bettingOpen
 															? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black cursor-not-allowed'
 															: 'bg-gray-200 hover:bg-gray-300 dark:bg-darkPrimary dark:hover:bg-darkHover'
 													}`}
 														disabled={usersPicks
 															.map((pick) => pick.id === outcome.id)
-															.includes(true) || !user}
+															.includes(true) ||
+															!user ||
+															!bettingOpen}
 														on:click={(e) => {
 															let outcomeId = generateId(15);
 															outcome.id = outcomeId;
