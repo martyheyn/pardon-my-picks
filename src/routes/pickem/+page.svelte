@@ -221,19 +221,19 @@
 			You must be logged in to make picks
 		</div>
 	{/if}
-	<div
-		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100 max-w-6xl"
-	>
-		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
-	</div>
-
-	{#if !user}
+	{#if !bettingOpen}
 		<div
 			class={`my-4 px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg max-w-6xl`}
 		>
 			You can only bet on Thursday through Saturday so your odds are similar to the PMT boys
 		</div>
 	{/if}
+
+	<div
+		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100 max-w-6xl"
+	>
+		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
+	</div>
 
 	<div class="my-4 max-w-6xl" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 		<AlertFlash />

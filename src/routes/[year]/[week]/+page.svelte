@@ -18,7 +18,7 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: ({ picks, user, bettingOpen } = data);
+	$: ({ picks, user, bettingOpen, pickemOpen } = data);
 
 	$: ({ year, week } = $page.params);
 
@@ -165,7 +165,9 @@
 		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black dark:border-white border-opacity-10 max-w-6xl"
 	>
 		<h1 class="font-header text-2xl sm:text-3xl">{year} Week: {week}</h1>
-		<a href="/pickem" class="btn-primary">Make your picks</a>
+		{#if pickemOpen}
+			<a href="/pickem" class="btn-primary">Make your picks</a>
+		{/if}
 	</div>
 
 	<!-- {#if form && !form.pickId}
