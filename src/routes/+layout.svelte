@@ -123,7 +123,7 @@
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Pardon My Picks - Weekly Football Picks" />
 	<meta property="og:description" content="Weekly football picks by Pardon My Take." />
-	<meta property="og:image" content="https://pardonmypicks.com/og-image.png" />
+	<meta property="og:image" content="https://pardonmypicks.com/pmp_screenshot.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
 	<meta property="og:image:alt" content="Pardon My Picks" />
@@ -133,7 +133,7 @@
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Pardon My Picks - Weekly Football Picks" />
 	<meta name="twitter:description" content="Weekly football picks by Pardon My Take." />
-	<meta name="twitter:image" content="https://pardonmypicks.com/og-image.png" />
+	<meta name="twitter:image" content="https://pardonmypicks.com/pmp_screenshot.png" />
 </svelte:head>
 
 <svelte:window bind:innerWidth={$screenWidth} bind:scrollY bind:innerHeight={$fullPageHeight} />
