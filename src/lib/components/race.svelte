@@ -26,6 +26,7 @@
 	const getRaceData = async () => {
 		mainActVar = [];
 		openerVar = [];
+		groupVar = [];
 		const response = await fetch(`/api/race-results?week=${week}&year=${raceYear}`);
 		let data: weeklyPersonDataType = await response.json();
 
