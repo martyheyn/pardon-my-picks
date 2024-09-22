@@ -24,21 +24,28 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}
 	});
 
+	// move pick.gameDate up 4 hours
+	picks.map((pick) => {
+		if (!pick.gameDate) return;
+		pick.gameDate.setHours(pick.gameDate.getHours() + 4);
+	});
+
 	// only get live scores on Sunday
 	if (dayOfWeek === 0) {
 		console.log('getting live scores');
-		const scoresLive = await getLiveGames({ year: params.year });
-		// console.log('scoresLive', scoresLive);
+		const scoresLive = await getLiveGames();
 
 		scoresLive.map(async (game: Scores) => {
+			const { homeTeamScore, awayTeamScore } = await getTeamScores(game);
+
 			await prisma.pick.updateMany({
 				where: {
 					gameId: game.id
 				},
 				data: {
-					isLive: false,
-					homeTeamScore: await getTeamScores(game, game.home_team),
-					awayTeamScore: await getTeamScores(game, game.away_team)
+					isLive: game.completed ? false : true,
+					homeTeamScore: homeTeamScore,
+					awayTeamScore: awayTeamScore
 				}
 			});
 		});

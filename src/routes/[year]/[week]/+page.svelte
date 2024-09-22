@@ -29,6 +29,8 @@
 
 	let cardWidth: number;
 
+	// $: console.log('picks', picks);
+
 	$: picksByPerson = picks.reduce((acc: PickByPerson, pick: any) => {
 		const { person } = pick;
 		acc[person] = acc[person] || [];
@@ -80,6 +82,8 @@
 			},
 			{}
 		);
+
+	$: console.log('liveScores', liveScores);
 
 	let animateScore = false;
 	// check security to make sure this function is not called a billion times
@@ -138,8 +142,7 @@
 
 	const displayDate = (date: Date | null) => {
 		if (!date) return 'TBD';
-		const timezoneOffset = date.getTimezoneOffset() * 60000;
-		let estGameDate = new Date(date.getTime() + timezoneOffset);
+		let estGameDate = new Date(date.getTime());
 		const timeString = estGameDate.toLocaleTimeString('en-US', {
 			hour: 'numeric',
 			minute: '2-digit',
@@ -214,7 +217,7 @@
 									<div class="">
 										<h4
 											class={`min-h-[56px] text-lg shadow-lg dark:text-white ${
-												pick.homeTeamScore === null || pick.homeTeamScore === undefined
+												pick.winner === null || pick.winner === undefined
 													? 'bg-slate-300 dark:bg-[#1f1f1f]  bg-opacity-70'
 													: pick.winner
 													? 'bg-lightGreen dark:bg-darkGreen'
@@ -245,7 +248,7 @@
 									<div
 										class="flex justify-between items-center pb-4 border-b border-black border-opacity-25 dark:border-white dark:border-opacity-100"
 									>
-										<div class="flex flex-col items-center gap-2">
+										<div class="flex flex-col items-center gap-4">
 											<a href={`${teamLink[pick.awayTeam]}`} target="_blank" rel="noopener">
 												<img src={logo[pick.awayTeam]} alt="helmet" class="w-10 h-10" />
 											</a>
@@ -271,18 +274,10 @@
 										</div>
 
 										<div>
-											{#if pick.isLive}
-												{#key animateScore}
-													<div transition:fade={{ duration: 1000, delay: 250, easing: cubicInOut }}>
-														<p class="text-xl">Time Left in the game</p>
-													</div>
-												{/key}
-											{:else}
-												<p class="font-semibold">@</p>
-											{/if}
+											<p class="font-semibold">@</p>
 										</div>
 
-										<div class="flex flex-col items-center gap-2">
+										<div class="flex flex-col items-center gap-4">
 											<a href={`${teamLink[pick.homeTeam]}`} target="_blank" rel="noopener">
 												<img src={logo[pick.homeTeam]} alt="helmet" class="w-10 h-10" />
 											</a>

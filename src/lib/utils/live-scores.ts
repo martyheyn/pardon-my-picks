@@ -2,17 +2,27 @@ import type { Scores } from './types';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { ODDS_API_KEY } from '$env/static/private';
 
-export const getTeamScores = async (scores: Scores, teamName: string) => {
-	if (!scores) return null;
-	const score = scores.scores?.find((score) => {
-		const scoreTeamName = score.name.split(' ')[score.name.split(' ').length - 1].toLowerCase();
-		return scoreTeamName === teamName;
-	})?.score;
+export const getTeamScores = async (scores: Scores) => {
+	if (!scores) {
+		return {
+			homeTeamScore: null,
+			awayTeamScore: null
+		};
+	}
 
-	return score ? parseInt(score) : null;
+	const ht_score = scores.scores?.find((sc) => sc.name === scores.home_team)?.score;
+	const at_score = scores.scores?.find((sc) => sc.name === scores.away_team)?.score;
+
+	const homeTeamScore = ht_score ? parseInt(ht_score) : null;
+	const awayTeamScore = at_score ? parseInt(at_score) : null;
+
+	return {
+		homeTeamScore,
+		awayTeamScore
+	};
 };
 
-export const getLiveGames = async ({ year }: { year: string }) => {
+export const getLiveGames = async () => {
 	// get live scores if the games have already started (americanfootball_nfl)
 	const scores = await fetch(
 		`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
