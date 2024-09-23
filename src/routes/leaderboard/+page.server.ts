@@ -1,4 +1,4 @@
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
 
 type LeaderboardStats = {
@@ -35,18 +35,17 @@ export const load: PageServerLoad = async () => {
 	SELECT u.username as username,
 		COUNT(p.id) as total_picks,
     	SUM(p.winner) as wins,
-    	SUM(p.push) as pushes
+    	SUM(p.push) as pushes,
+		(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0)) as win_pct
 	   FROM "User" u
 	   LEFT JOIN "Pick" p ON u.id = p.user_id
-	--    WHERE p.year = 2023
+	   WHERE p.year = 2024
+	   AND p.pmt_persona = false
 	   GROUP BY u.username
 	   HAVING COUNT(p.id) > 0
-	-- u.id as user_id,
-	-- 	u.username as username,
-	-- 	p.id as pick_id,
-	-- 	p.description as pick
+	   ORDER BY wins DESC, win_pct DESC
+	   LIMIT 10
 	`;
-	console.log('winsByUser', winsByUser);
 
 	const winStats: LeaderboardStats[] = winsByUser.map((user) => {
 		const wins = Number(user.wins);
@@ -68,9 +67,14 @@ export const load: PageServerLoad = async () => {
 	SELECT u.username,
 	   COALESCE(t.tail_count, 0) as total_tails,
 	   COALESCE(t.tail_winner, 0) as tail_wins,
-	   COALESCE(t.tail_push, 0) as tail_push
+	   COALESCE(t.tail_push, 0) as tail_push,
+	   CASE 
+	   		WHEN COALESCE(t.tail_count, 0) - COALESCE(t.tail_push, 0) = 0 THEN .1
+		ELSE
+			(COALESCE(t.tail_winner, 0) * 100.0) / ((COALESCE(t.tail_count, 0) * 100.0) - (COALESCE(t.tail_push, 0) * 100.0))
+		END as tail_pct
 	   FROM "User" u
-	   LEFT JOIN (
+	   INNER JOIN (
 	    SELECT t.user_id,
 	       COUNT(t.id) as tail_count,
 	       SUM(t.winner) as tail_winner,
@@ -79,7 +83,7 @@ export const load: PageServerLoad = async () => {
 	    GROUP BY t.user_id
 	    HAVING COUNT(t.id) > 0
 	   ) t ON u.id = t.user_id
-	   ORDER BY tail_wins DESC
+	   ORDER BY tail_wins DESC, tail_pct DESC
 	   LIMIT 10;
 	`;
 
@@ -87,9 +91,15 @@ export const load: PageServerLoad = async () => {
 		SELECT u.username,
 	   	COALESCE(f.fade_count, 0) as total_fades,
 	   	COALESCE(f.fade_winner, 0) as fade_wins,
-	   	COALESCE(f.fade_push, 0) as fade_push
+	   	COALESCE(f.fade_push, 0) as fade_push,
+		CASE 
+	   		WHEN COALESCE(f.fade_count, 0) - COALESCE(f.fade_push, 0) = 0 THEN .1
+		ELSE
+			(COALESCE(f.fade_winner, 0) * 100.0) / ((COALESCE(f.fade_count, 0) * 100.0) - (COALESCE(f.fade_push, 0) * 100.0))
+		END as fade_pct
+
 	   	FROM "User" u
-	   	LEFT JOIN (
+	   	INNER JOIN (
 	   	 SELECT f.user_id,
 	   	    COUNT(f.id) as fade_count,
 	   	    SUM(f.winner) as fade_winner,
@@ -98,7 +108,7 @@ export const load: PageServerLoad = async () => {
 	   	 GROUP BY f.user_id
 	     HAVING COUNT(f.id) > 0
 		) f ON u.id = f.user_id
-		ORDER BY fade_wins DESC
+		ORDER BY fade_wins DESC, fade_pct DESC
 		LIMIT 10;
 	`;
 
@@ -134,11 +144,13 @@ export const load: PageServerLoad = async () => {
 		};
 	});
 
-	// console.log('tailFadeStats', tailFadeStats);
-
 	return {
 		wins: winStats,
 		tails: tailStats,
 		fades: fadeStats
 	};
+};
+
+export const actions: Actions = {
+	pageWinners: async () => {}
 };

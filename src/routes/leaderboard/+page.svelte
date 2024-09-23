@@ -24,12 +24,6 @@
 	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
 	out:fade={{ duration: 150, easing: linear }}
 >
-	<div
-		class="hidden md:flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
-	>
-		<h1 class="font-header">Leaderboard</h1>
-	</div>
-
 	<div class="card px-0 xs:my-2 md:my-4">
 		<div class="border-b dark:border-white dark:border-opacity-100 text-center pt-3">
 			<h2 class="text-2xl font-header mb-4">Leaderboard</h2>
@@ -71,10 +65,8 @@
 			</div>
 		</div>
 
-		<div
-			class="my-2 mx-4 p-2 flex flex-col justify-center items-center gap-y-2 border border-white rounded-md"
-		>
-			<h4 class="text-xl font-header mb-4">
+		<div class="my-2 mx-4 p-2 flex flex-col justify-center items-center gap-y-2">
+			<h4 class="text-2xl font-header mb-4">
 				{selectedStats.charAt(0).toUpperCase() + selectedStats.slice(1)} Leaderboard
 			</h4>
 			{#each stats[selectedStats] as stat, i}
