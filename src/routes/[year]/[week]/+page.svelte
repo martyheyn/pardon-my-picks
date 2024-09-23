@@ -63,59 +63,6 @@
 
 	let btnsDivWidth: number = 0;
 
-	// call live-scores api server every minute to get the latest scores, only call if is live
-	// pick is only called when the game is live
-	// this can come from the winner function I will have to create, this will be called at the end of a game,
-	//  maybe based off the response from the odds api
-	$: liveScores = picks
-		.filter((pick) => pick.isLive)
-		.reduce(
-			(
-				acc: { [key: string]: { homeLiveScore: number | null; awayLiveScore: number | null } },
-				pick
-			) => {
-				acc[pick.id] = {
-					homeLiveScore: pick.homeTeamScore,
-					awayLiveScore: pick.awayTeamScore
-				};
-				return acc;
-			},
-			{}
-		);
-
-	$: console.log('liveScores', liveScores);
-
-	let animateScore = false;
-	// check security to make sure this function is not called a billion times
-	const updateScore = (pickId: string) => {
-		console.log('Updating the score!');
-		// only call this if the game is currently happening, aka score is not null
-		setInterval(async () => {
-			const res = await fetch('/api/live-scores', {
-				method: 'POST',
-				body: JSON.stringify({ pickId, year: parseInt(year) }),
-				headers: {
-					'content-type': 'application/json'
-				}
-			});
-			const data = await res.json();
-
-			animateScore = true;
-			liveScores[pickId] = {
-				homeLiveScore: data.homeLiveScore,
-				awayLiveScore: data.awayLiveScore
-			};
-			animateScore = false;
-		}, 60000);
-	};
-
-	// run updateScore function for all live games
-	$: picks.forEach((pick) => {
-		if (pick.isLive) {
-			updateScore(pick.id);
-		}
-	});
-
 	const updateAlert = () => {
 		if (form?.pickId) {
 			alert.set({
@@ -258,17 +205,7 @@
 														pick.homeTeamScore - pick.awayTeamScore > 0 ? '' : 'font-bold'
 													} ${pick.isLive ? ' font-normal' : ''} text-lg`}
 												>
-													{#if pick.isLive}
-														{#key animateScore}
-															<div
-																transition:fade={{ duration: 1000, delay: 250, easing: cubicInOut }}
-															>
-																{liveScores[pick.id].awayLiveScore}
-															</div>
-														{/key}
-													{:else}
-														{pick.awayTeamScore}
-													{/if}
+													{pick.awayTeamScore}
 												</p>
 											{/if}
 										</div>
@@ -290,11 +227,7 @@
 															: ''
 													} text-lg`}
 												>
-													{#if pick.isLive}
-														{liveScores[pick.id].homeLiveScore}
-													{:else}
-														{pick.homeTeamScore}
-													{/if}
+													{pick.homeTeamScore}
 												</p>
 											{/if}
 										</div>
