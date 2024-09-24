@@ -48,7 +48,7 @@ export const load: PageServerLoad = async () => {
 	   GROUP BY u.username
 	   HAVING COUNT(p.id) > 0
 	   ORDER BY wins DESC, win_pct DESC
-	   LIMIT 10
+	   LIMIT 10 OFFSET 0;
 	`;
 
 	const winStats: LeaderboardStats[] = winsByUser.map((user) => {
@@ -88,7 +88,7 @@ export const load: PageServerLoad = async () => {
 	    HAVING COUNT(t.id) > 0
 	   ) t ON u.id = t.user_id
 	   ORDER BY tail_wins DESC, tail_pct DESC
-	   LIMIT 10;
+	   LIMIT 10 OFFSET 0;
 	`;
 
 	const fadesByUser: FadeRawQuery[] = await prisma.$queryRaw`
@@ -113,7 +113,7 @@ export const load: PageServerLoad = async () => {
 	     HAVING COUNT(f.id) > 0
 		) f ON u.id = f.user_id
 		ORDER BY fade_wins DESC, fade_pct DESC
-		LIMIT 10;
+		LIMIT 10 OFFSET 0;
 	`;
 
 	const tailStats: LeaderboardStats[] = tailsByUser.map((user) => {
@@ -177,7 +177,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	winsTotal: async ({ url }) => {
+	winsTotal: async ({ url }: { url: URL }) => {
 		const page = Number(url.searchParams.get('page'));
 
 		const winsByUser: WinsByUser[] = await prisma.$queryRaw`
@@ -217,7 +217,7 @@ export const actions: Actions = {
 		};
 	},
 
-	tailsTotal: async ({ url }) => {
+	tailsTotal: async ({ url }: { url: URL }) => {
 		const page = Number(url.searchParams.get('page'));
 
 		const tailsByUser: TailRawQuery[] = await prisma.$queryRaw`
@@ -265,7 +265,7 @@ export const actions: Actions = {
 		};
 	},
 
-	fadesTotal: async ({ url }) => {
+	fadesTotal: async ({ url }: { url: URL }) => {
 		const page = Number(url.searchParams.get('page'));
 
 		const fadesByUser: FadeRawQuery[] = await prisma.$queryRaw`

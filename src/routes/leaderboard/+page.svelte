@@ -7,13 +7,18 @@
 	export let data: PageData;
 	export let form: ActionData;
 
+	type statsType = 'wins' | 'tails' | 'fades';
+
 	// $: console.log(data);
 	const { wins, tails, fades, totalCounts } = data;
 	$: winsData = form?.wins || wins;
 	$: tailsData = form?.tails || tails;
 	$: fadesData = form?.fades || fades;
 
-	let selectedStats: 'wins' | 'tails' | 'fades' = 'wins';
+	$: console.log('tailsData', tailsData);
+
+	let selectedStats: statsType = 'wins';
+	let selectedStatsArr: statsType[] = ['wins', 'tails', 'fades'];
 
 	$: stats = {
 		wins: winsData,
@@ -36,48 +41,27 @@
 			<h2 class="text-2xl font-header mb-4">Leaderboard</h2>
 
 			<div class="grid grid-cols-3 mt-2">
-				<button
-					class={`w-full h-full hover:bg-darkHover transition-all duration-300 ease-in-out
-                     cursor-pointer py-4 rounded-md ${
-												selectedStats === 'wins'
-													? 'text-blue-200 underline underline-offset-4 bg-darkHover'
-													: 'text-white'
-											}`}
-					on:click={() => {
-						selectedStats = 'wins';
-						cuurentPage = 1;
-					}}
-				>
-					Wins
-				</button>
-				<button
-					class={`w-full h-full hover:bg-darkHover transition-all duration-300 ease-in-out
-                     cursor-pointer py-4 rounded-md ${
-												selectedStats === 'tails'
-													? 'text-blue-200 underline underline-offset-4 bg-darkHover'
-													: 'text-white'
-											}`}
-					on:click={() => {
-						selectedStats = 'tails';
-						cuurentPage = 1;
-					}}
-				>
-					Tails
-				</button>
-				<button
-					class={`w-full h-full hover:bg-darkHover transition-all duration-300 ease-in-out
-                     cursor-pointer py-4 rounded-md ${
-												selectedStats === 'fades'
-													? 'text-blue-200 underline underline-offset-4 bg-darkHover'
-													: 'text-white'
-											}`}
-					on:click={() => {
-						selectedStats = 'fades';
-						cuurentPage = 1;
-					}}
-				>
-					Fades
-				</button>
+				{#each selectedStatsArr as statType}
+					<form
+						action="?/{statType}Total&page=0"
+						method="POST"
+						use:enhance={() => {
+							selectedStats = statType;
+							cuurentPage = 1;
+						}}
+					>
+						<button
+							class={`w-full h-full text-slate-900 dark:text-white transition-all duration-300 
+									ease-in-out cursor-pointer py-4 rounded-md ${
+										selectedStats === statType
+											? 'underline underline-offset-4 bg-slate-300 dark:bg-[#1f1f1f]'
+											: 'hover:bg-darkHover'
+									}`}
+						>
+							{statType.charAt(0).toUpperCase() + statType.slice(1)}
+						</button>
+					</form>
+				{/each}
 			</div>
 		</div>
 
