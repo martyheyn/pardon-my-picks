@@ -28,6 +28,7 @@ const RegisterFormSchema = z.object({
 	username: z
 		.string()
 		.min(6)
+		.max(24)
 		.refine((s) => !s.includes(' '), 'No Spaces!'),
 	password: z
 		.string()

@@ -37,7 +37,7 @@
 		arrow: {
 			box: 24,
 			svg: `<path
-					class="stroke-black dark:stroke-white"
+					class="stroke-white"
 					d="M10 7L15 12L10 17"
 					stroke-width="1.5"
 					stroke-linecap="round"
@@ -118,8 +118,7 @@
 		},
 		leaderBoard: {
 			box: 24,
-			svg: `<path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7" class="stroke-black dark:stroke-white fill-none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path d="M15 7h6v6" class="stroke-black dark:stroke-white fill-none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`
-			// fill="none" stroke="#000000" >
+			svg: `<path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7" class="stroke-white fill-none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path d="M15 7h6v6" class="stroke-white fill-none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`
 		}
 	};
 	let displayIcon = icons[iconName];

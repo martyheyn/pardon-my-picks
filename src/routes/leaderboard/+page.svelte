@@ -15,8 +15,6 @@
 	$: tailsData = form?.tails || tails;
 	$: fadesData = form?.fades || fades;
 
-	$: console.log('tailsData', tailsData);
-
 	let selectedStats: statsType = 'wins';
 	let selectedStatsArr: statsType[] = ['wins', 'tails', 'fades'];
 
@@ -27,7 +25,7 @@
 	};
 
 	// pagination
-	let cuurentPage = 1;
+	let currentPage = 1;
 	let totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
 </script>
 
@@ -47,15 +45,15 @@
 						method="POST"
 						use:enhance={() => {
 							selectedStats = statType;
-							cuurentPage = 1;
+							currentPage = 1;
 						}}
 					>
 						<button
 							class={`w-full h-full text-slate-900 dark:text-white transition-all duration-300 
 									ease-in-out cursor-pointer py-4 rounded-md ${
 										selectedStats === statType
-											? 'underline underline-offset-4 bg-slate-300 dark:bg-[#1f1f1f]'
-											: 'hover:bg-darkHover'
+											? 'underline underline-offset-4 bg-primary text-white dark:bg-[#1f1f1f]'
+											: 'hover:bg-primaryHover hover:text-white dark:hover:bg-darkHover'
 									}`}
 						>
 							{statType.charAt(0).toUpperCase() + statType.slice(1)}
@@ -73,10 +71,12 @@
 				<div class="flex justify-between items-center w-full max-w-md">
 					<div class="flex items-center gap-x-2">
 						<p>{i + 1}.</p>
-						<h4 class="font-semibold font-header">{stat.username}</h4>
+						<h4 class="font-semibold font-header max-w-44 sm:max-w-none break-words">
+							{stat.username}
+						</h4>
 					</div>
 
-					<div class=" w-24 flex items-center justify-between">
+					<div class="w-24 flex items-center justify-between">
 						<p class="text-lg font-paragraph">
 							{stat.wins} - {stat.losses}
 							{stat.pushes ? `${stat.pushes}` : ''}
@@ -98,23 +98,114 @@
 
 			<div class="mt-8">
 				<div class="flex flex-row gap-x-4">
-					{#each Array.from({ length: totalPages }) as _, i}
+					{#if totalPages <= 3}
+						{#each Array.from({ length: totalPages }) as _, i}
+							<form
+								action="?/{selectedStats}Total&page={i}"
+								method="POST"
+								use:enhance={() => {
+									currentPage = i + 1;
+								}}
+							>
+								<button
+									disabled={currentPage === i + 1}
+									class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
+										currentPage === i + 1 ? 'bg-primaryHover dark:bg-darkHover text-white' : ''
+									}`}
+									>{i + 1}
+								</button>
+							</form>
+						{/each}
+					{:else if currentPage === 1}
+						<button
+							disabled={true}
+							class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white text-white rounded-full py-2 px-4`}
+							>1
+						</button>
+
 						<form
-							action="?/{selectedStats}Total&page={i}"
+							action="?/{selectedStats}Total&page=1"
 							method="POST"
 							use:enhance={() => {
-								cuurentPage = i + 1;
+								currentPage = 2;
 							}}
 						>
 							<button
-								disabled={cuurentPage === i + 1}
-								class={`hover:bg-darkHover rounded-full py-2 px-4 ${
-									cuurentPage === i + 1 ? 'bg-darkHover' : ''
-								}`}
-								>{i + 1}
+								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 bg-darkHover`}
+								>2
 							</button>
 						</form>
-					{/each}
+
+						<div>...</div>
+
+						<form
+							action="?/{selectedStats}Total&page={totalPages - 1}"
+							method="POST"
+							use:enhance={() => {
+								currentPage = 1;
+							}}
+						>
+							<button
+								disabled={currentPage === totalPages}
+								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
+									currentPage === totalPages ? 'bg-primaryHover dark:bg-darkHover text-white' : ''
+								}`}
+								>{totalPages}
+							</button>
+						</form>
+					{:else}
+						<form
+							action="?/{selectedStats}Total&page={currentPage - 2}"
+							method="POST"
+							use:enhance={() => {
+								currentPage = currentPage - 1;
+							}}
+						>
+							<button
+								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 bg-darkHover`}
+								>{currentPage - 1}</button
+							>
+						</form>
+
+						<button
+							disabled={true}
+							class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white text-white 
+									rounded-full py-2 px-4 bg-darkHover`}>{currentPage}</button
+						>
+
+						{#if currentPage !== totalPages}
+							<form
+								action="?/{selectedStats}Total&page={currentPage}"
+								method="POST"
+								use:enhance={() => {
+									currentPage = currentPage + 1;
+								}}
+							>
+								<button
+									class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4`}
+									>{currentPage + 1}</button
+								>
+							</form>
+						{/if}
+
+						<div>...</div>
+
+						<form
+							action="?/{selectedStats}Total&page={totalPages - 1}"
+							method="POST"
+							use:enhance={() => {
+								currentPage = 1;
+							}}
+						>
+							<button
+								disabled={currentPage === totalPages}
+								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
+									currentPage === totalPages ? 'bg-darkHover' : ''
+								}`}
+								>{totalPages}
+							</button>
+						</form>
+					{/if}
 				</div>
 			</div>
 		</div>
