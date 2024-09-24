@@ -377,7 +377,8 @@ export type SpecialBetKey =
 	| 'gameOfTheYear'
 	| 'huh'
 	| 'thanksgiving'
-	| 'holiday';
+	| 'holiday'
+	| 'malikWillis';
 
 type SpecialBetsLabelMap = {
 	[key in SpecialBetKey]: string;
@@ -389,5 +390,6 @@ export const specialBetsLabelMap: SpecialBetsLabelMap = {
 	gameOfTheYear: 'Game of the Year',
 	huh: 'Huh?',
 	thanksgiving: 'Thanksgiving',
-	holiday: 'Holiday'
+	holiday: 'Holiday',
+	malikWillis: 'Malik Willis'
 };
