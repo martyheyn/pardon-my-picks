@@ -1,22 +1,29 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import { enhance } from '$app/forms';
+	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
 
 	export let data: PageData;
+	export let form: ActionData;
 
 	// $: console.log(data);
-	const { wins, tails, fades } = data;
+	const { wins, tails, fades, totalCounts } = data;
+	$: winsData = form?.wins || wins;
+	$: tailsData = form?.tails || tails;
+	$: fadesData = form?.fades || fades;
 
 	let selectedStats: 'wins' | 'tails' | 'fades' = 'wins';
 
-	const stats = {
-		wins: wins,
-		tails: tails,
-		fades: fades
+	$: stats = {
+		wins: winsData,
+		tails: tailsData,
+		fades: fadesData
 	};
 
-	$: console.log(stats[selectedStats]);
+	// pagination
+	let cuurentPage = 1;
+	let totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
 </script>
 
 <div
@@ -24,7 +31,7 @@
 	in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}
 	out:fade={{ duration: 150, easing: linear }}
 >
-	<div class="card px-0 xs:my-2 md:my-4">
+	<div class="card px-0">
 		<div class="border-b dark:border-white dark:border-opacity-100 text-center pt-3">
 			<h2 class="text-2xl font-header mb-4">Leaderboard</h2>
 
@@ -36,7 +43,10 @@
 													? 'text-blue-200 underline underline-offset-4 bg-darkHover'
 													: 'text-white'
 											}`}
-					on:click={() => (selectedStats = 'wins')}
+					on:click={() => {
+						selectedStats = 'wins';
+						cuurentPage = 1;
+					}}
 				>
 					Wins
 				</button>
@@ -47,7 +57,10 @@
 													? 'text-blue-200 underline underline-offset-4 bg-darkHover'
 													: 'text-white'
 											}`}
-					on:click={() => (selectedStats = 'tails')}
+					on:click={() => {
+						selectedStats = 'tails';
+						cuurentPage = 1;
+					}}
 				>
 					Tails
 				</button>
@@ -58,7 +71,10 @@
 													? 'text-blue-200 underline underline-offset-4 bg-darkHover'
 													: 'text-white'
 											}`}
-					on:click={() => (selectedStats = 'fades')}
+					on:click={() => {
+						selectedStats = 'fades';
+						cuurentPage = 1;
+					}}
 				>
 					Fades
 				</button>
@@ -95,6 +111,28 @@
 					</div>
 				</div>
 			{/each}
+
+			<div class="mt-8">
+				<div class="flex flex-row gap-x-4">
+					{#each Array.from({ length: totalPages }) as _, i}
+						<form
+							action="?/{selectedStats}Total&page={i}"
+							method="POST"
+							use:enhance={() => {
+								cuurentPage = i + 1;
+							}}
+						>
+							<button
+								disabled={cuurentPage === i + 1}
+								class={`hover:bg-darkHover rounded-full py-2 px-4 ${
+									cuurentPage === i + 1 ? 'bg-darkHover' : ''
+								}`}
+								>{i + 1}
+							</button>
+						</form>
+					{/each}
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
