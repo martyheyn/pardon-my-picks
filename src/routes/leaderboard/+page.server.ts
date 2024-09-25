@@ -45,6 +45,7 @@ export const load: PageServerLoad = async () => {
 	   LEFT JOIN "Pick" p ON u.id = p.user_id
 	   WHERE p.year = 2024
 	   AND p.pmt_persona = false
+	   AND p.winner IS NOT NULL
 	   GROUP BY u.username
 	   HAVING COUNT(p.id) > 0
 	   ORDER BY wins DESC, win_pct DESC
@@ -84,6 +85,7 @@ export const load: PageServerLoad = async () => {
 	       SUM(t.winner) as tail_winner,
 	       SUM(t.push) as tail_push
 	    FROM "Tail" t
+		WHERE t.winner IS NOT NULL
 	    GROUP BY t.user_id
 	    HAVING COUNT(t.id) > 0
 	   ) t ON u.id = t.user_id
@@ -109,6 +111,7 @@ export const load: PageServerLoad = async () => {
 	   	    SUM(f.winner) as fade_winner,
 	   	    SUM(f.push) as fade_push
 	   	 FROM "Fade" f
+		 WHERE f.winner IS NOT NULL
 	   	 GROUP BY f.user_id
 	     HAVING COUNT(f.id) > 0
 		) f ON u.id = f.user_id
@@ -190,6 +193,7 @@ export const actions: Actions = {
 			LEFT JOIN "Pick" p ON u.id = p.user_id
 			WHERE p.year = 2024
 			AND p.pmt_persona = false
+			AND p.winner IS NOT NULL
 			GROUP BY u.username
 			HAVING COUNT(p.id) > 0
 			ORDER BY wins DESC, win_pct DESC
@@ -237,6 +241,7 @@ export const actions: Actions = {
 				SUM(t.winner) as tail_winner,
 				SUM(t.push) as tail_push
 				FROM "Tail" t
+				WHERE t.winner IS NOT NULL
 				GROUP BY t.user_id
 				HAVING COUNT(t.id) > 0
 			) t ON u.id = t.user_id
@@ -286,6 +291,7 @@ export const actions: Actions = {
 				SUM(f.winner) as fade_winner,
 				SUM(f.push) as fade_push
 			FROM "Fade" f
+			WHERE f.winner IS NOT NULL
 			GROUP BY f.user_id
 			HAVING COUNT(f.id) > 0
 			) f ON u.id = f.user_id

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
@@ -9,7 +9,6 @@
 
 	type statsType = 'wins' | 'tails' | 'fades';
 
-	// $: console.log(data);
 	const { wins, tails, fades, totalCounts } = data;
 	$: winsData = form?.wins || wins;
 	$: tailsData = form?.tails || tails;
@@ -70,7 +69,7 @@
 			{#each stats[selectedStats] as stat, i}
 				<div class="flex justify-between items-center w-full max-w-md">
 					<div class="flex items-center gap-x-2">
-						<p>{i + 1}.</p>
+						<p>{i + 1 + (currentPage - 1) * 10}.</p>
 						<h4 class="font-semibold font-header max-w-44 sm:max-w-none break-words">
 							{stat.username}
 						</h4>
@@ -104,7 +103,14 @@
 								action="?/{selectedStats}Total&page={i}"
 								method="POST"
 								use:enhance={() => {
-									currentPage = i + 1;
+									return async ({ result }) => {
+										if (result.type === 'success') {
+											await applyAction(result);
+											currentPage = i + 1;
+										} else if (result.type === 'failure') {
+											await applyAction(result);
+										}
+									};
 								}}
 							>
 								<button
@@ -127,7 +133,14 @@
 							action="?/{selectedStats}Total&page=1"
 							method="POST"
 							use:enhance={() => {
-								currentPage = 2;
+								return async ({ result }) => {
+									if (result.type === 'success') {
+										await applyAction(result);
+										currentPage = 2;
+									} else if (result.type === 'failure') {
+										await applyAction(result);
+									}
+								};
 							}}
 						>
 							<button
@@ -142,7 +155,14 @@
 							action="?/{selectedStats}Total&page={totalPages - 1}"
 							method="POST"
 							use:enhance={() => {
-								currentPage = 1;
+								return async ({ result }) => {
+									if (result.type === 'success') {
+										await applyAction(result);
+										currentPage = 1;
+									} else if (result.type === 'failure') {
+										await applyAction(result);
+									}
+								};
 							}}
 						>
 							<button
@@ -158,7 +178,14 @@
 							action="?/{selectedStats}Total&page={currentPage - 2}"
 							method="POST"
 							use:enhance={() => {
-								currentPage = currentPage - 1;
+								return async ({ result }) => {
+									if (result.type === 'success') {
+										await applyAction(result);
+										currentPage = currentPage - 1;
+									} else if (result.type === 'failure') {
+										await applyAction(result);
+									}
+								};
 							}}
 						>
 							<button
@@ -178,7 +205,14 @@
 								action="?/{selectedStats}Total&page={currentPage}"
 								method="POST"
 								use:enhance={() => {
-									currentPage = currentPage + 1;
+									return async ({ result }) => {
+										if (result.type === 'success') {
+											await applyAction(result);
+											currentPage = currentPage + 1;
+										} else if (result.type === 'failure') {
+											await applyAction(result);
+										}
+									};
 								}}
 							>
 								<button
@@ -194,7 +228,14 @@
 							action="?/{selectedStats}Total&page={totalPages - 1}"
 							method="POST"
 							use:enhance={() => {
-								currentPage = 1;
+								return async ({ result }) => {
+									if (result.type === 'success') {
+										await applyAction(result);
+										currentPage = 1;
+									} else if (result.type === 'failure') {
+										await applyAction(result);
+									}
+								};
 							}}
 						>
 							<button

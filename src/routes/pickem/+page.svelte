@@ -223,7 +223,7 @@
 	{/if}
 	{#if !bettingOpen}
 		<div
-			class={`my-4 px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg max-w-6xl`}
+			class={`mb-4 px-4 py-3 bg-lightRed dark:bg-darkRed dark:text-white rounded-md mb-4 shadow-lg max-w-6xl`}
 		>
 			You can only bet on Thursday through Saturday so your odds are similar to the PMT boys
 		</div>
