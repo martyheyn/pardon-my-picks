@@ -39,7 +39,7 @@ export async function GET({ locals }) {
 
 	// this will be the end of Friday or early Sunday
 	const dayOfWeek = new Date().getDay();
-	const bettingOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 	const showOdds = dayOfWeek !== 1 && dayOfWeek !== 2;
 
 	// times for testing

@@ -38,7 +38,7 @@ const PickDataSchema = z.array(PickDataObjectSchema);
 // });
 
 const dayOfWeek = new Date().getDay();
-const bettingOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
@@ -61,8 +61,7 @@ export const actions: Actions = {
 
 		if (!bettingOpen) {
 			return fail(400, {
-				message:
-					'You can only bet on Thursday through Saturday so your odds are similar to the PMT boys',
+				message: 'You can only bet on Friday & Saturday so your odds are similar to the PMT boys',
 				success: false
 			});
 		}

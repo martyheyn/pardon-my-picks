@@ -7,7 +7,7 @@ import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 const dayOfWeek = new Date().getDay();
-const bettingOpen = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 const pickemOpen = dayOfWeek !== 1 && dayOfWeek !== 2;
 
 export const load: PageServerLoad = async ({ params, locals }) => {
