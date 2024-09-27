@@ -110,7 +110,7 @@
 	<title>Pardon My Picks - Week {week}</title>
 </svelte:head>
 
-<div class="" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
+<div class="max-w-6xl" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
 	<div
 		class="flex justify-between items-center gap-x-8 text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100"
 	>
