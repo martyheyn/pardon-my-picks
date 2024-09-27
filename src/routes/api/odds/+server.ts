@@ -68,9 +68,12 @@ export async function GET({ locals }) {
 				game.bookmakers[0].markets.forEach((market) => {
 					market.outcomes = market.outcomes
 						.map((outcome) => {
+							console.log('outcome', outcome);
+
 							let id = '';
 							if (dbUserPicks.length > 0) {
 								dbUserPicks.map((pick) => {
+									console.log('pick', pick);
 									if (
 										pick.homeTeam === fullNameToMascot[game.home_team] &&
 										pick.awayTeam === fullNameToMascot[game.away_team] &&
@@ -79,11 +82,8 @@ export async function GET({ locals }) {
 										((pick.type === 'totals' &&
 											outcome.name ===
 												(pick.description.indexOf('Over') > -1 ? 'Over' : 'Under')) ||
-											(pick.type === 'spread' &&
-												outcome.point ===
-													parseFloat(
-														pick.description.split(' ')[pick.description.split(' ').length - 1]
-													)))
+											pick.type === 'spread' ||
+											(pick.type == 'spreads' && pick.description.indexOf(outcome.name) > -1))
 									) {
 										id = pick.id;
 									}
