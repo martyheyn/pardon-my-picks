@@ -62,6 +62,8 @@
 		}
 	};
 
+	$: console.log('lastWeekWithData', lastWeekWithData);
+
 	let dataExpanded = false;
 
 	// when screen width gets below, reset dataExpanded reset to false
@@ -72,6 +74,8 @@
 	}
 
 	$: year, week, getRaceData();
+
+	$: console.log('week', week);
 </script>
 
 {#if Number(week) > 1}
@@ -236,17 +240,17 @@
 				>
 				<tr class="">
 					<th class="text-left font-paragraph" />
-					<!-- {#if $screenWidth < 600}
+					{#if $screenWidth < 600}
 						<th class="text-center pb-1" />
-					{/if} -->
+					{/if}
 
-					{#each !dataExpanded && week ? [week] : !dataExpanded && !week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
+					{#each !dataExpanded && week ? [lastWeekWithData] : Array.from({ length: week && parseInt(week) < lastWeekWithData ? parseInt(week) : lastWeekWithData }, (_, i) => i + 1) as i}
 						<th class="text-center pb-1 min-w-[50px]">{i}</th>
 					{/each}
 				</tr>
 				<th class="text-center pb-2" />
 
-				{#each fullGroupData as personRecord, i}
+				{#each fullGroupData as personRecord}
 					<tr class="">
 						<td
 							class="flex gap-x-4 py-2 items-center border-b border-b-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 shadow-sm w-[120px]"
@@ -288,7 +292,7 @@
 								</td>
 							{/each}
 						{:else}
-							{#each Object.values(personRecord)[0].data.slice(week ? parseInt(week) - 1 : lastWeekWithData - 1, week ? parseInt(week) : lastWeekWithData) as weekData}
+							{#each [Object.values(personRecord)[0].data[lastWeekWithData - 1]] as weekData}
 								<td
 									class="text-xs shadow-sm bg-opacity-60 border border-gray-300 border-opacity-60 dark:border-white dark:border-opacity-100 rounded-md text-center min-w-[50px] max-w-[52px]"
 								>
