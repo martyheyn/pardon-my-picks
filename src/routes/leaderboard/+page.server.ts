@@ -155,15 +155,18 @@ export const load: PageServerLoad = async () => {
 			SELECT COUNT(DISTINCT user_id) as total
 			FROM "Pick"
 			WHERE year = 2024
-			AND pmt_persona = false;`;
+			AND pmt_persona = false
+			AND winner IS NOT NULL;`;
 
 	const totalTails: total[] = await prisma.$queryRaw`
 			SELECT COUNT(DISTINCT user_id) as total
-			FROM "Tail";`;
+			FROM "Tail"
+			WHERE winner IS NOT NULL;`;
 
 	const totalFades: total[] = await prisma.$queryRaw`
 			SELECT COUNT(DISTINCT user_id) as total
-			FROM "Fade";`;
+			FROM "Fade"
+			WHERE winner IS NOT NULL;`;
 
 	const totalCounts = {
 		wins: totalWins[0].total,
