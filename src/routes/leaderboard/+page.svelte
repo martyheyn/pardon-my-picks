@@ -26,6 +26,8 @@
 	// pagination
 	let currentPage = 1;
 	$: totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
+
+	$: console.log('stats[selectedStats]', stats[selectedStats]);
 </script>
 
 <div
@@ -70,18 +72,18 @@
 				<div class="flex justify-between items-center w-full max-w-md">
 					<div class="flex items-center gap-x-2">
 						<p>{i + 1 + (currentPage - 1) * 10}.</p>
-						<h4 class="font-semibold font-header max-w-44 sm:max-w-none break-words">
+						<h4 class="font-semibold font-header max-w-36 sm:max-w-none break-words">
 							{stat.username}
 						</h4>
 					</div>
 
-					<div class="w-24 flex items-center justify-between">
+					<div class="flex items-center justify-between gap-x-6">
 						<p class="text-lg font-paragraph">
 							{stat.wins} - {stat.losses}
-							{stat.pushes ? `${stat.pushes}` : ''}
+							{stat.pushes ? ` - ${stat.pushes}` : ''}
 						</p>
 						<p
-							class={`${
+							class={`w-12 text-right ${
 								stat.pct > 50
 									? 'text-green-500 dark:text-green-300'
 									: stat.pct < 50
@@ -125,7 +127,7 @@
 					{:else if currentPage === 1}
 						<button
 							disabled={true}
-							class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white text-white rounded-full py-2 px-4`}
+							class={`bg-darkHover hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white text-white rounded-full py-2 px-4`}
 							>1
 						</button>
 
@@ -144,7 +146,7 @@
 							}}
 						>
 							<button
-								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 bg-darkHover`}
+								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4`}
 								>2
 							</button>
 						</form>
@@ -189,7 +191,7 @@
 							}}
 						>
 							<button
-								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 bg-darkHover`}
+								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4`}
 								>{currentPage - 1}</button
 							>
 						</form>
@@ -222,30 +224,32 @@
 							</form>
 						{/if}
 
-						<div>...</div>
+						{#if currentPage < totalPages - 1}
+							<div>...</div>
 
-						<form
-							action="?/{selectedStats}Total&page={totalPages - 1}"
-							method="POST"
-							use:enhance={() => {
-								return async ({ result }) => {
-									if (result.type === 'success') {
-										await applyAction(result);
-										currentPage = 1;
-									} else if (result.type === 'failure') {
-										await applyAction(result);
-									}
-								};
-							}}
-						>
-							<button
-								disabled={currentPage === totalPages}
-								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
-									currentPage === totalPages ? 'bg-darkHover' : ''
-								}`}
-								>{totalPages}
-							</button>
-						</form>
+							<form
+								action="?/{selectedStats}Total&page={totalPages - 1}"
+								method="POST"
+								use:enhance={() => {
+									return async ({ result }) => {
+										if (result.type === 'success') {
+											await applyAction(result);
+											currentPage = 1;
+										} else if (result.type === 'failure') {
+											await applyAction(result);
+										}
+									};
+								}}
+							>
+								<button
+									disabled={currentPage === totalPages}
+									class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
+										currentPage === totalPages ? 'bg-darkHover' : ''
+									}`}
+									>{totalPages}
+								</button>
+							</form>
+						{/if}
 					{/if}
 				</div>
 			</div>

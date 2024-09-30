@@ -8,7 +8,7 @@ import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 const dayOfWeek = new Date().getDay();
 const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
-const pickemOpen = dayOfWeek !== 1 && dayOfWeek !== 2;
+const pickemOpen = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
