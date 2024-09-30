@@ -6,7 +6,8 @@ import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
-const dayOfWeek = new Date().getDay();
+const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+const dayOfWeek = new Date(date).getDay();
 const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 const pickemOpen = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
 

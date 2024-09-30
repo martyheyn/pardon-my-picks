@@ -37,7 +37,8 @@ const PickDataSchema = z.array(PickDataObjectSchema);
 // 	usersPicks: z.array(PickDataObjectSchema)
 // });
 
-const dayOfWeek = new Date().getDay();
+const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+const dayOfWeek = new Date(date).getDay();
 const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
 
 export const load: PageServerLoad = async ({ locals }) => {

@@ -2,7 +2,7 @@
 	import type { ActionData, PageData } from './$types';
 	import { page } from '$app/stores';
 	import { fade, fly, slide } from 'svelte/transition';
-	import { cubicInOut, quadInOut } from 'svelte/easing';
+	import { quadInOut } from 'svelte/easing';
 	import { getContext } from 'svelte';
 	import { logo, personaImgPath, sortOrder, teamLink } from '$lib/utils/matching-format';
 	import type { PickByPerson } from '$lib/utils/types';
