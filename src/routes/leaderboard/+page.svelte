@@ -160,7 +160,7 @@
 								return async ({ result }) => {
 									if (result.type === 'success') {
 										await applyAction(result);
-										currentPage = 1;
+										currentPage = totalPages;
 									} else if (result.type === 'failure') {
 										await applyAction(result);
 									}
@@ -168,7 +168,6 @@
 							}}
 						>
 							<button
-								disabled={currentPage === totalPages}
 								class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
 									currentPage === totalPages ? 'bg-primaryHover dark:bg-darkHover text-white' : ''
 								}`}
@@ -234,7 +233,7 @@
 									return async ({ result }) => {
 										if (result.type === 'success') {
 											await applyAction(result);
-											currentPage = 1;
+											currentPage = totalPages;
 										} else if (result.type === 'failure') {
 											await applyAction(result);
 										}
