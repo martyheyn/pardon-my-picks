@@ -27,7 +27,7 @@
 	let selectedWeekPicks: number = $currWeek;
 	// get all unique weeks from picks
 	$: weekPicks = Array.from(new Set(picks.map((p) => p.week)));
-	let photoKey: string | undefined;
+	let photoKey: string | null;
 	$: photoKey = user.avatar;
 
 	let avatar: File | undefined;

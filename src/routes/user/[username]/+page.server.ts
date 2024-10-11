@@ -96,6 +96,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	// initialize forms
 	const form = await superValidate(zod(ProfileFormSchema));
 
+	const user = usersProfile ? locals.user : existingUser;
+
 	// get the statsssss
 	const tails = existingUser.tail;
 	const markedTails = tails.filter((tail) => tail.winner !== null);
@@ -103,7 +105,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	const markedFades = fades.filter((fade) => fade.winner !== null);
 
 	return {
-		user: locals.user,
+		user: user,
 		stats: {
 			tails: {
 				total: tails.length,

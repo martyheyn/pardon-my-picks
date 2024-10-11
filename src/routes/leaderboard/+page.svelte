@@ -70,8 +70,12 @@
 				<div class="flex justify-between items-center w-full max-w-md">
 					<div class="flex items-center gap-x-2">
 						<p>{i + 1 + (currentPage - 1) * 10}.</p>
-						<h4 class="font-semibold font-header max-w-36 sm:max-w-none break-words">
-							{stat.username}
+						<h4
+							class="font-semibold font-header max-w-36 sm:max-w-none break-words hover:scale-[1.02] transition-all ease-in-out duration-300"
+						>
+							<a href={`/user/${stat.username}`}>
+								{stat.username}
+							</a>
 						</h4>
 					</div>
 
