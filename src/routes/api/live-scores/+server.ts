@@ -59,9 +59,9 @@ export async function POST({ request }: { request: Request }) {
 					},
 					data: {
 						homeTeamScore: homeTeamLiveScore ? parseInt(homeTeamLiveScore) : pick.homeTeamScore,
-						awayTeamScore: awayTeamLiveScore ? parseInt(awayTeamLiveScore) : pick.awayTeamScore,
+						awayTeamScore: awayTeamLiveScore ? parseInt(awayTeamLiveScore) : pick.awayTeamScore
 						// check if game is still live to stop function
-						isLive: game.completed ? false : true
+						// isLive: game.completed ? false : true
 					}
 				});
 			} catch (error) {

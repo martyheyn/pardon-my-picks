@@ -29,8 +29,6 @@
 
 	let cardWidth: number;
 
-	// $: console.log('picks', picks);
-
 	$: picksByPerson = picks.reduce((acc: PickByPerson, pick: any) => {
 		const { person } = pick;
 		acc[person] = acc[person] || [];

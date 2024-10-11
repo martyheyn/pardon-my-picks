@@ -45,8 +45,8 @@ export async function GET({ locals }) {
 
 	// times for testing
 	// create 2 javascript dates for 9-8-2024 and 9-9-2024 in the format of 2024-09-08T00:00:00Z
-	const commenceTimeFrom = '2024-10-06T00:00:00Z';
-	const commenceTimeTo = '2024-10-08T00:00:00Z';
+	const commenceTimeFrom = '2024-10-13T00:00:00Z';
+	const commenceTimeTo = '2024-10-15T00:00:00Z';
 
 	let oddsDataClean: Odds[] = [];
 

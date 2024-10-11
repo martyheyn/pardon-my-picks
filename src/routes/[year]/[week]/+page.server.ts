@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 					gameId: game.id
 				},
 				data: {
-					isLive: game.completed ? false : true,
+					// isLive: game.completed ? false : true,
 					homeTeamScore: homeTeamScore,
 					awayTeamScore: awayTeamScore
 				}
