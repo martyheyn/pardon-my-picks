@@ -61,14 +61,10 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 };
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	if (!locals.user) {
-		redirect(303, '/');
-	}
-
 	let usersProfile: boolean = false;
 	const { username } = params;
 
-	if (locals.user.username === username) {
+	if (locals.user && locals.user.username === username) {
 		usersProfile = true;
 	}
 
