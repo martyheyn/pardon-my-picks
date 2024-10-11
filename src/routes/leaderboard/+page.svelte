@@ -26,8 +26,6 @@
 	// pagination
 	let currentPage = 1;
 	$: totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
-
-	$: console.log('stats[selectedStats]', stats[selectedStats]);
 </script>
 
 <div

@@ -62,8 +62,6 @@
 		}
 	};
 
-	$: console.log('lastWeekWithData', lastWeekWithData);
-
 	let dataExpanded = false;
 
 	// when screen width gets below, reset dataExpanded reset to false
@@ -74,8 +72,6 @@
 	}
 
 	$: year, week, getRaceData();
-
-	$: console.log('week', week);
 </script>
 
 {#if Number(week) > 1}

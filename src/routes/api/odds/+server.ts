@@ -69,12 +69,9 @@ export async function GET({ locals }) {
 				game.bookmakers[0].markets.forEach((market) => {
 					market.outcomes = market.outcomes
 						.map((outcome) => {
-							console.log('outcome', outcome);
-
 							let id = '';
 							if (dbUserPicks.length > 0) {
 								dbUserPicks.map((pick) => {
-									console.log('pick', pick);
 									if (
 										pick.homeTeam === fullNameToMascot[game.home_team] &&
 										pick.awayTeam === fullNameToMascot[game.away_team] &&
