@@ -378,7 +378,8 @@ export type SpecialBetKey =
 	| 'huh'
 	| 'thanksgiving'
 	| 'holiday'
-	| 'malikWillis';
+	| 'malikWillis'
+	| 'gunder';
 
 type SpecialBetsLabelMap = {
 	[key in SpecialBetKey]: string;
@@ -391,5 +392,6 @@ export const specialBetsLabelMap: SpecialBetsLabelMap = {
 	huh: 'Huh?',
 	thanksgiving: 'Thanksgiving',
 	holiday: 'Holiday',
-	malikWillis: 'Malik Willis'
+	malikWillis: 'Malik Willis',
+	gunder: "G'under"
 };

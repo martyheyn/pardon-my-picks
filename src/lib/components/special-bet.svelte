@@ -8,6 +8,9 @@
 		case 'lunder':
 			betText = "L'Under";
 			break;
+		case 'gunder':
+			betText = "G'Under";
+			break;
 		case 'timezone':
 			betText = 'Timezone';
 			break;
