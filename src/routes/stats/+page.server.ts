@@ -156,7 +156,7 @@ export const load: PageServerLoad = async () => {
 		},
 		where: {
 			specialBet: {
-				not: undefined || ''
+				not: ''
 			},
 			pmtPersona: true,
 			barstoolEmployee: true,
@@ -315,7 +315,7 @@ export const actions: Actions = {
 		// TODO: rawSQL query to find fades and tails and % by bet type
 		// get type bet  data
 		const typeBetData: BetData[] = [];
-		const yearWh = yearHeader === 'all-time' ? 2023 || 2024 : Number(yearHeader);
+		const yearWh = yearHeader === 'all-time' ? 2023 & 2024 : Number(yearHeader);
 		// TODO:: 2023 || 2024 not sustainable
 		const typeBet = await prisma.pick.groupBy({
 			by: ['person', 'type'],
@@ -358,7 +358,7 @@ export const actions: Actions = {
 			},
 			where: {
 				specialBet: {
-					not: undefined || ''
+					not: ''
 				},
 				pmtPersona: true,
 				barstoolEmployee: true,

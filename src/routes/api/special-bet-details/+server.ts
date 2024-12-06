@@ -6,6 +6,9 @@ import { fail } from '@sveltejs/kit';
 export async function GET({ url }: { url: URL }) {
 	const person = url.searchParams.get('person');
 	const specialBet = url.searchParams.get('specialBet');
+	const year = url.searchParams.get('year');
+	const yearWh = year === 'all-time' ? 2023 & 2024 : Number(year);
+
 	if (!person || !specialBet) {
 		return fail(400, { message: 'Invalid request' });
 	}
@@ -21,7 +24,8 @@ export async function GET({ url }: { url: URL }) {
 			},
 			where: {
 				specialBet: specialBet,
-				person: person
+				person: person,
+				year: yearWh
 			}
 		});
 		return new Response(JSON.stringify(bets));

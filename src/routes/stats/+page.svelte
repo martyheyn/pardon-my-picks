@@ -100,7 +100,9 @@
 
 	const getSpecialBetDetails = async (person: string, specialBet: string) => {
 		try {
-			const res = await fetch(`/api/special-bet-details?person=${person}&specialBet=${specialBet}`);
+			const res = await fetch(
+				`/api/special-bet-details?person=${person}&specialBet=${specialBet}&year=${statsHeaderYearNum[selectedStat]}`
+			);
 			const data: {
 				description: string;
 				person: string;
