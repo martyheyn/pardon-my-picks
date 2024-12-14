@@ -17,7 +17,7 @@
 	import type { Page } from '@sveltejs/kit';
 
 	const sideNavCollasped = writable(true);
-	const currWeek = writable(14);
+	const currWeek = writable(15);
 	const currYear = writable(2024);
 	const screenWidth = writable(0);
 	const active = writable('');
