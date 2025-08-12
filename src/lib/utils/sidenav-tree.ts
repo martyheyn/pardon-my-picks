@@ -68,6 +68,13 @@ export const sideNavItems: sideNavItems = [
 		route: '/archive',
 		subItems: [
 			{
+				label: '2024',
+				icon: 'calendar',
+				route: ``,
+				subItems: yearRoute(2024),
+				subItemsOpen: false
+			},
+			{
 				label: '2023',
 				icon: 'calendar',
 				route: ``,

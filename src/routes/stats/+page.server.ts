@@ -172,6 +172,7 @@ export const load: PageServerLoad = async () => {
 };
 
 const yearHeaderMap = {
+	'2025 NFL Season Stats': 2025,
 	'2024 NFL Season Stats': 2024,
 	'2023 NFL Season Stats': 2023,
 	'All Time Stats': 'all-time'
@@ -181,6 +182,7 @@ export const actions: Actions = {
 	selectStats: async (event) => {
 		const form = await event.request.formData();
 		const year = form.get('year') as
+			| '2025 NFL Season Stats'
 			| '2024 NFL Season Stats'
 			| '2023 NFL Season Stats'
 			| 'All Time Stats';

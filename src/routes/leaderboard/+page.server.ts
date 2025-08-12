@@ -85,7 +85,9 @@ export const load: PageServerLoad = async () => {
 	       SUM(t.winner) as tail_winner,
 	       SUM(t.push) as tail_push
 	    FROM "Tail" t
+		LEFT JOIN "Pick" p ON p.id = t.pick_id
 		WHERE t.winner IS NOT NULL
+		AND year = 2024
 	    GROUP BY t.user_id
 	    HAVING COUNT(t.id) > 0
 	   ) t ON u.id = t.user_id
@@ -111,7 +113,9 @@ export const load: PageServerLoad = async () => {
 	   	    SUM(f.winner) as fade_winner,
 	   	    SUM(f.push) as fade_push
 	   	 FROM "Fade" f
+		 LEFT JOIN "Pick" p ON p.id = f.pick_id
 		 WHERE f.winner IS NOT NULL
+		 AND year = 2024
 	   	 GROUP BY f.user_id
 	     HAVING COUNT(f.id) > 0
 		) f ON u.id = f.user_id
@@ -159,14 +163,18 @@ export const load: PageServerLoad = async () => {
 			AND winner IS NOT NULL;`;
 
 	const totalTails: total[] = await prisma.$queryRaw`
-			SELECT COUNT(DISTINCT user_id) as total
-			FROM "Tail"
-			WHERE winner IS NOT NULL;`;
+			SELECT COUNT(DISTINCT t.user_id) as total
+			FROM "Tail" t
+			LEFT JOIN "Pick" p ON p.id = t.pick_id
+			WHERE t.winner IS NOT NULL
+			AND year = 2024;`;
 
 	const totalFades: total[] = await prisma.$queryRaw`
-			SELECT COUNT(DISTINCT user_id) as total
-			FROM "Fade"
-			WHERE winner IS NOT NULL;`;
+			SELECT COUNT(DISTINCT f.user_id) as total
+			FROM "Fade" f
+			LEFT JOIN "Pick" p ON p.id = f.pick_id
+			WHERE f.winner IS NOT NULL
+			AND year = 2024;`;
 
 	const totalCounts = {
 		wins: totalWins[0].total,
@@ -244,7 +252,9 @@ export const actions: Actions = {
 				SUM(t.winner) as tail_winner,
 				SUM(t.push) as tail_push
 				FROM "Tail" t
+				LEFT JOIN "Pick" p ON p.id = t.pick_id
 				WHERE t.winner IS NOT NULL
+				AND year = 2024
 				GROUP BY t.user_id
 				HAVING COUNT(t.id) > 0
 			) t ON u.id = t.user_id
@@ -294,7 +304,9 @@ export const actions: Actions = {
 				SUM(f.winner) as fade_winner,
 				SUM(f.push) as fade_push
 			FROM "Fade" f
+			LEFT JOIN "Pick" p ON p.id = f.pick_id
 			WHERE f.winner IS NOT NULL
+			AND year = 2024
 			GROUP BY f.user_id
 			HAVING COUNT(f.id) > 0
 			) f ON u.id = f.user_id

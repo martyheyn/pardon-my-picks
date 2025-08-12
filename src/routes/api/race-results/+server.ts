@@ -1,9 +1,5 @@
 import { prisma } from '$lib/server/prisma';
-import {
-	personaAvatarPath,
-	personasLabelToCamelCase,
-	sortOrder
-} from '$lib/utils/matching-format.js';
+import { personaAvatarPath, personasLabelToCamelCase } from '$lib/utils/matching-format.js';
 
 export type weeklyPersonDataType = {
 	[key: string]: {

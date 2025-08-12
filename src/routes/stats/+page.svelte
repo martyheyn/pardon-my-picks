@@ -123,12 +123,14 @@
 
 	// dropdown selector for stat aggregation
 	enum StatHeaders {
+		// CURR_YEAR = '2025 NFL Season Stats',
 		CURR_YEAR = '2024 NFL Season Stats',
 		STATS_2023 = '2023 NFL Season Stats',
 		ALLTIME = 'All Time Stats'
 	}
 
 	const statsHeaderYearNum = {
+		// '2025 NFL Season Stats': 2025,
 		'2024 NFL Season Stats': 2024,
 		'2023 NFL Season Stats': 2023,
 		'All Time Stats': 2024
@@ -137,6 +139,7 @@
 	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
 	const selectStatHeaders: StatHeaders[] = [
 		StatHeaders.CURR_YEAR,
+		// StatHeaders.STATS_2024,
 		StatHeaders.STATS_2023,
 		StatHeaders.ALLTIME
 	];
@@ -169,7 +172,7 @@
 			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
 			<h2 class="text-base">
-				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023 & 2024)' : selectedStat}
+				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023, 2024 & 2025)' : selectedStat}
 			</h2>
 			<button
 				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2 

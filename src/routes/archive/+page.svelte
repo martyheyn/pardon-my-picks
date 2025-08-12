@@ -10,8 +10,7 @@
 	$: ({ yearsMaxWeek } = data);
 
 	// TODO:: get years from the db and lop through them
-	let selectedYear = 2023;
-	let dropdownOpen = true;
+	let selectedYear = 2024;
 </script>
 
 <div class="max-w-2xl" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
