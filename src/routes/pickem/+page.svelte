@@ -7,7 +7,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext, onMount } from 'svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
-	import { type PickData, type AddPickForm, type Alert, type Odds } from '$lib/utils/types';
+	import { type PickData, type Alert, type Odds } from '$lib/utils/types';
 	import { type $Enums } from '@prisma/client';
 	import { generateId } from 'lucia';
 	import { beforeNavigate } from '$app/navigation';

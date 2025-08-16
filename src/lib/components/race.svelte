@@ -81,7 +81,7 @@
 	>
 		<div class="flex flex-col justify-center items-center w-full">
 			<h1 class="text-xl font-semibold font-header">
-				{raceYear === 2023 ? 'Race to the Bottom' : '4 Weddings and a Funeral'}:
+				{raceYear === 2024 ? '4 Weddings and a Funeral' : 'Race to the Bottom'}
 				<span class="ml-1.5">{raceYear}</span>
 			</h1>
 		</div>

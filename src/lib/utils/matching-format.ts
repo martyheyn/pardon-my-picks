@@ -104,6 +104,41 @@ export const fullNameToMascot: { [key: string]: string } = {
 	'Washington Commanders': 'commanders'
 };
 
+export const mascotToFullName: { [key: string]: string } = {
+	cardinals: 'Arizona Cardinals',
+	falcons: 'Atlanta Falcons',
+	ravens: 'Baltimore Ravens',
+	bills: 'Buffalo Bills',
+	panthers: 'Carolina Panthers',
+	bears: 'Chicago Bears',
+	bengals: 'Cincinnati Bengals',
+	browns: 'Cleveland Browns',
+	cowboys: 'Dallas Cowboys',
+	broncos: 'Denver Broncos',
+	lions: 'Detroit Lions',
+	packers: 'Green Bay Packers',
+	texans: 'Houston Texans',
+	colts: 'Indianapolis Colts',
+	jaguars: 'Jacksonville Jaguars',
+	chiefs: 'Kansas City Chiefs',
+	chargers: 'Los Angeles Chargers',
+	rams: 'Los Angeles Rams',
+	dolphins: 'Miami Dolphins',
+	vikings: 'Minnesota Vikings',
+	patriots: 'New England Patriots',
+	saints: 'New Orleans Saints',
+	giants: 'New York Giants',
+	jets: 'New York Jets',
+	raiders: 'Las Vegas Raiders',
+	eagles: 'Philadelphia Eagles',
+	steelers: 'Pittsburgh Steelers',
+	fortyNiners: 'San Francisco 49ers',
+	seahawks: 'Seattle Seahawks',
+	buccaneers: 'Tampa Bay Buccaneers',
+	titans: 'Tennessee Titans',
+	commanders: 'Washington Commanders'
+};
+
 export const fullNameToAbrv: { [key: string]: { abbr: string; mascot: string } } = {
 	'Arizona Cardinals': {
 		abbr: 'ARI',
@@ -395,3 +430,38 @@ export const specialBetsLabelMap: SpecialBetsLabelMap = {
 	malikWillis: 'Malik Willis',
 	gunder: "G'under"
 };
+
+export const nflTeams = [
+	'Arizona Cardinals',
+	'Atlanta Falcons',
+	'Baltimore Ravens',
+	'Buffalo Bills',
+	'Carolina Panthers',
+	'Chicago Bears',
+	'Cincinnati Bengals',
+	'Cleveland Browns',
+	'Dallas Cowboys',
+	'Denver Broncos',
+	'Detroit Lions',
+	'Green Bay Packers',
+	'Houston Texans',
+	'Indianapolis Colts',
+	'Jacksonville Jaguars',
+	'Kansas City Chiefs',
+	'Los Angeles Chargers',
+	'Los Angeles Rams',
+	'Miami Dolphins',
+	'Minnesota Vikings',
+	'New England Patriots',
+	'New Orleans Saints',
+	'New York Giants',
+	'New York Jets',
+	'Las Vegas Raiders',
+	'Philadelphia Eagles',
+	'Pittsburgh Steelers',
+	'San Francisco 49ers',
+	'Seattle Seahawks',
+	'Tampa Bay Buccaneers',
+	'Tennessee Titans',
+	'Washington Commanders'
+];
