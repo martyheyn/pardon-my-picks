@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from '../../archive/$types';
-import { fail, redirect, type ActionFailure } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { generateId } from 'lucia';
 import { type $Enums } from '@prisma/client';
@@ -105,12 +105,13 @@ export const actions: Actions = {
 
 			try {
 				for (let i = 0; i < picks.length; i++) {
-					console.log('picks[i]', picks[i]);
+					console.log('picks[i].pickTeam', picks[i].pickTeam);
 					let gameOdds = weeklyOddsGames.filter(
 						(game) =>
 							fullNameToMascot[game.home_team] === picks[i].pickTeam ||
 							fullNameToMascot[game.away_team] === picks[i].pickTeam
 					)[0];
+					console.log('gameOdds', gameOdds);
 
 					if (!gameOdds) {
 						return fail(400, { message: 'ODDS API NOT WORKING', success: false });

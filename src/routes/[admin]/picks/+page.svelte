@@ -29,10 +29,6 @@
     const personas = [
         'Big Cat', 'PFT', 'Memes', 'Hank', 'Max', 'Zach'
     ]
-
-    // submit for with the following data format
-    // [{ bigcat spread pick }, { bigcat total pick }, { pft spread pick }, ...]
-
 </script>
 
 <div

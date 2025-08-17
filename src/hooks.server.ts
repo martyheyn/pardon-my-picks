@@ -28,5 +28,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 	event.locals.user = user;
 	event.locals.session = session;
+
+	if (event.url.pathname.startsWith('/.well-known/appspecific/com.chrome.devtools.json')) {
+		// return empty JSON so Chrome stops complaining
+		return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+	}
+
 	return resolve(event);
 };
