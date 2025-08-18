@@ -1,0 +1,28 @@
+name: Run Mark Games Script
+
+on:
+  schedule:
+    - cron: '*/4 * * * *' # '15 16 * * 7', '05 19 * * 7', '35 19 * * 7', '59 23 * * 7', '59 23 * * 1'
+  workflow_dispatch:
+
+jobs:
+  mark-games:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm install
+      - run: node scripts/script.js
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          CURRENT_WEEK: ${{ secrets.CURRENT_WEEK }}
+          CURRENT_YEAR: ${{ secrets.CURRENT_YEAR }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
