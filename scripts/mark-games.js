@@ -1,22 +1,13 @@
 import pg from 'pg';
-import {
-	ODDS_API_KEY,
-	CURRENT_WEEK,
-	CURRENT_YEAR,
-	DB_USER,
-	DB_PASS,
-	DB_HOST,
-	DB_DATABASE
-} from '$env/static/private';
 
 const { Pool } = pg;
 
 const pool = new Pool({
-	user: DB_USER,
-	password: DB_PASS,
-	host: DB_HOST,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASS,
+	host: process.env.DB_HOST,
 	port: 5432,
-	database: DB_DATABASE,
+	database: process.env.DB_DATABASE,
 	ssl: true
 });
 
@@ -34,13 +25,13 @@ const markGames = async () => {
         SELECT * FROM "Pick" 
         WHERE winner IS NULL 
         AND marked = FALSE
-        AND week = ${CURRENT_WEEK}
-        AND year = ${CURRENT_YEAR}`);
+        AND week = ${process.env.CURRENT_WEEK}
+        AND year = ${process.env.CURRENT_YEAR}`);
 
 		if (unMarkedGames.rows.length > 0) {
 			// if not already in the db we gotta query the odds api
 			const response = await fetch(
-				`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=3&apiKey=${ODDS_API_KEY}`
+				`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=3&apiKey=${process.env.ODDS_API_KEY}`
 			);
 			const scoresDataRaw = await response.json();
 
