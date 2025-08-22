@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: node scripts/mark-games.js
+      - run: node mark-games.js
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           CURRENT_WEEK: ${{ secrets.CURRENT_WEEK }}
