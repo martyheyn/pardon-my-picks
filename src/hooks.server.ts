@@ -3,7 +3,6 @@ import { validateSessionToken } from '$lib/server/auth';
 
 export const handle = async ({ event, resolve }) => {
 	const sessionCookie = event.cookies.get('session');
-	console.log('sessionCookie');
 
 	const { user, session } = await validateSessionToken(sessionCookie);
 	event.locals.user = user;

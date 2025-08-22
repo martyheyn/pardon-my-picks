@@ -42,7 +42,6 @@ export async function createSession(userId: string) {
 export async function validateSessionToken(
 	token: string | undefined
 ): Promise<{ session: Session; user: User } | { session: null; user: null }> {
-	console.log('token', token);
 	if (!token) {
 		return { session: null, user: null };
 	}

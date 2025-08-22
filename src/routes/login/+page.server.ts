@@ -68,6 +68,9 @@ export const actions: Actions = {
 		const existingUser = await prisma.user.findUnique({
 			where: {
 				username
+			},
+			include: {
+				session: true
 			}
 		});
 		if (!existingUser) {
@@ -89,11 +92,14 @@ export const actions: Actions = {
 			return setError(form, 'Incorrect username or password');
 		}
 
-		// try {
-		const currSession = await getUserSession(existingUser.id);
-		if (currSession) {
-			await invalidateSession(currSession.id);
+		// if currently has a sesh, invalidate that fool
+		if (existingUser.session?.id) {
+			const currSession = await getUserSession(existingUser.session?.id);
+			if (currSession) {
+				await invalidateSession(currSession.id);
+			}
 		}
+
 		const session = await createSession(existingUser.id);
 
 		event.cookies.set('session', session.token, {
