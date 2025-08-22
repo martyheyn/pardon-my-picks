@@ -42,9 +42,11 @@ export async function createSession(userId: string) {
 export async function validateSessionToken(
 	token: string | null
 ): Promise<{ session: Session; user: User } | { session: null; user: null }> {
+	console.log('token before', token);
 	if (!token) {
 		return { session: null, user: null };
 	}
+	console.log('token after', token);
 
 	const tokenSession = token.split(' session=');
 	const tokenParts = tokenSession[1].split('.');
