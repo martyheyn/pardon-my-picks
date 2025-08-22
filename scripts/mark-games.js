@@ -11,8 +11,6 @@ const pool = new Pool({
 	ssl: true
 });
 
-console.log('✅ Hello from GitHub Actions at ' + new Date().toISOString());
-
 const markGames = async () => {
 	console.log('Here markGames\n');
 
@@ -55,10 +53,10 @@ const markGames = async () => {
 					// first check if the game has been marked somewhere else in the db by another user
 					const gameAlreadyMarked = await client.query(
 						`SELECT * FROM "Pick"
-            WHERE game_id = $1
-            AND winner IS NOT NULL
-            AND marked = TRUE
-            AND week = $2`,
+							WHERE game_id = $1
+							AND winner IS NOT NULL
+							AND marked = TRUE
+							AND week = $2`,
 						[game.game_id, game.week]
 					);
 
@@ -153,49 +151,49 @@ const markWinner = async (games) => {
 					if (total > games[i].pick_score) {
 						await client.query(
 							`UPDATE "Pick"
-               SET 
-                    "winner" = 1,
-                    "push" = 0,
-                    "marked" = true,
-                    "is_live" = false,
-                    "completed" = true,
-                    "home_team_score" = $1,
-                    "away_team_score" = $2 
-                WHERE 
-                    "id" = $3
-                    AND "game_id" = $4;`,
+							SET 
+									"winner" = 1,
+									"push" = 0,
+									"marked" = true,
+									"is_live" = false,
+									"completed" = true,
+									"home_team_score" = $1,
+									"away_team_score" = $2
+								WHERE 
+									"id" = $3
+									AND "game_id" = $4;`,
 							[games[i].home_team_score, games[i].away_team_score, games[i].id, games[i].game_id]
 						);
 					} else if (total === games[i].pick_score) {
 						await client.query(
 							`UPDATE "Pick"
-               SET 
-                    "winner" = 0,
-                    "push" = 1,
-                    "marked" = true,
-                    "is_live" = false,
-                    "completed" = true,
-                    "home_team_score" = $1,
-                    "away_team_score" = $2 
-                WHERE 
-                    "id" = $3
-                    AND "game_id" = $4;`,
+								SET 
+										"winner" = 0,
+										"push" = 1,
+										"marked" = true,
+										"is_live" = false,
+										"completed" = true,
+										"home_team_score" = $1,
+										"away_team_score" = $2
+									WHERE 
+										"id" = $3
+										AND "game_id" = $4;`,
 							[games[i].home_team_score, games[i].away_team_score, games[i].id, games[i].game_id]
 						);
 					} else {
 						await client.query(
 							`UPDATE "Pick"
-               SET 
-                    "winner" = 0,
-                    "push" = 0,
-                    "marked" = true,
-                    "is_live" = false,
-                    "completed" = true,
-                    "home_team_score" = $1,
-                    "away_team_score" = $2 
-                WHERE 
-                    "id" = $3
-                    AND "game_id" = $4;`,
+								SET 
+								"winner" = 0,
+								"push" = 0,
+								"marked" = true,
+								"is_live" = false,
+								"completed" = true,
+								"home_team_score" = $1,
+								"away_team_score" = $2
+							WHERE 
+								"id" = $3
+								AND "game_id" = $4;`,
 							[games[i].home_team_score, games[i].away_team_score, games[i].id, games[i].game_id]
 						);
 					}
@@ -205,49 +203,49 @@ const markWinner = async (games) => {
 					if (total < games[i].pick_score) {
 						await client.query(
 							`UPDATE "Pick"
-               SET 
-                    "winner" = 1,
-                    "push" = 0,
-                    "marked" = true,
-                    "is_live" = false,
-                    "completed" = true,
-                    "home_team_score" = $1,
-                    "away_team_score" = $2 
-                WHERE 
-                    "id" = $3
-                    AND "game_id" = $4;`,
+							SET 
+								"winner" = 1,
+								"push" = 0,
+								"marked" = true,
+								"is_live" = false,
+								"completed" = true,
+								"home_team_score" = $1,
+								"away_team_score" = $2
+							WHERE 
+								"id" = $3
+								AND "game_id" = $4;`,
 							[games[i].home_team_score, games[i].away_team_score, games[i].id, games[i].game_id]
 						);
 					} else if (total === games[i].pick_score) {
 						await client.query(
 							`UPDATE "Pick"
-               SET 
-                    "winner" = 0,
-                    "push" = 1,
-                    "marked" = true,
-                    "is_live" = false,
-                    "completed" = true,
-                    "home_team_score" = $1,
-                    "away_team_score" = $2 
-                WHERE 
-                    "id" = $3
-                    AND "game_id" = $4;`,
+							SET 
+								"winner" = 0,
+								"push" = 1,
+								"marked" = true,
+								"is_live" = false,
+								"completed" = true,
+								"home_team_score" = $1,
+								"away_team_score" = $2
+							WHERE 
+								"id" = $3
+								AND "game_id" = $4;`,
 							[games[i].home_team_score, games[i].away_team_score, games[i].id, games[i].game_id]
 						);
 					} else {
 						await client.query(
 							`UPDATE "Pick"
-               SET 
-                    "winner" = 0,
-                    "push" = 0,
-                    "marked" = true,
-                    "is_live" = false,
-                    "completed" = true,
-                    "home_team_score" = $1,
-                    "away_team_score" = $2 
-                WHERE 
-                    "id" = $3
-                    AND "game_id" = $4;`,
+							SET 
+								"winner" = 0,
+								"push" = 0,
+								"marked" = true,
+								"is_live" = false,
+								"completed" = true,
+								"home_team_score" = $1,
+								"away_team_score" = $2
+							WHERE 
+								"id" = $3
+								AND "game_id" = $4;`,
 							[games[i].home_team_score, games[i].away_team_score, games[i].id, games[i].game_id]
 						);
 					}
@@ -274,52 +272,52 @@ const markSpreadLogic = async (game, home_team) => {
 			if (diff > flipNumber(game.pick_score)) {
 				await client.query(
 					`UPDATE "Pick"
-         SET 
-            "winner" = 1,
-            "push" = 0,
-            "marked" = true,
-            "is_live" = false,
-            "completed" = true,
-            "home_team_score" = $1,
-            "away_team_score" = $2
-         WHERE 
-            "id" = $3
-            AND "game_id" = $4;
-        `,
+					SET 
+						"winner" = 1,
+						"push" = 0,
+						"marked" = true,
+						"is_live" = false,
+						"completed" = true,
+						"home_team_score" = $1,
+						"away_team_score" = $2
+					WHERE 
+						"id" = $3
+						AND "game_id" = $4;
+					`,
 					[game.home_team_score, game.away_team_score, game.id, game.game_id]
 				);
 			} else if (diff < flipNumber(game.pick_score)) {
 				await client.query(
 					`UPDATE "Pick"
-         SET 
-            "winner" = 0,
-            "push" = 0,
-            "marked" = true,
-            "is_live" = false,
-            "completed" = true,
-            "home_team_score" = $1,
-            "away_team_score" = $2
-         WHERE 
-            "id" = $3
-            AND "game_id" = $4;
-        `,
+					SET 
+						"winner" = 0,
+						"push" = 0,
+						"marked" = true,
+						"is_live" = false,
+						"completed" = true,
+						"home_team_score" = $1,
+						"away_team_score" = $2
+					WHERE 
+						"id" = $3
+						AND "game_id" = $4;
+					`,
 					[game.home_team_score, game.away_team_score, game.id, game.game_id]
 				);
 			} else if (diff === flipNumber(game.pick_score)) {
 				await client.query(
 					`UPDATE "Pick"
-         SET 
-            "winner" = 0,
-            "push" = 1,
-            "marked" = true,
-            "is_live" = false,
-            "completed" = true,
-            "home_team_score" = $1,
-            "away_team_score" = $2
-         WHERE 
-            "id" = $3
-            AND "game_id" = $4;
-        `,
+						SET 
+							"winner" = 0,
+							"push" = 1,
+							"marked" = true,
+							"is_live" = false,
+							"completed" = true,
+							"home_team_score" = $1,
+							"away_team_score" = $2
+						WHERE 
+							"id" = $3
+							AND "game_id" = $4;
+						`,
 					[game.home_team_score, game.away_team_score, game.id, game.game_id]
 				);
 			} else {
@@ -332,52 +330,52 @@ const markSpreadLogic = async (game, home_team) => {
 			if (diff > flipNumber(game.pick_score)) {
 				await client.query(
 					`UPDATE "Pick"
-         SET 
-            "winner" = 1,
-            "push" = 0,
-            "marked" = true,
-            "is_live" = false,
-            "completed" = true,
-            "home_team_score" = $1,
-            "away_team_score" = $2
-         WHERE 
-            "id" = $3
-            AND "game_id" = $4;
-        `,
+					SET 
+						"winner" = 1,
+						"push" = 0,
+						"marked" = true,
+						"is_live" = false,
+						"completed" = true,
+						"home_team_score" = $1,
+						"away_team_score" = $2
+					WHERE 
+						"id" = $3
+						AND "game_id" = $4;
+					`,
 					[game.home_team_score, game.away_team_score, game.id, game.game_id]
 				);
 			} else if (diff < flipNumber(game.pick_score)) {
 				await client.query(
 					`UPDATE "Pick"
-         SET 
-            "winner" = 0,
-            "push" = 0,
-            "marked" = true,
-            "is_live" = false,
-            "completed" = true,
-            "home_team_score" = $1,
-            "away_team_score" = $2
-         WHERE 
-            "id" = $3
-            AND "game_id" = $4;
-        `,
+					SET 
+						"winner" = 0,
+						"push" = 0,
+						"marked" = true,
+						"is_live" = false,
+						"completed" = true,
+						"home_team_score" = $1,
+						"away_team_score" = $2
+					WHERE 
+						"id" = $3
+						AND "game_id" = $4;
+					`,
 					[game.home_team_score, game.away_team_score, game.id, game.game_id]
 				);
 			} else if (diff === flipNumber(game.pick_score)) {
 				await client.query(
 					`UPDATE "Pick"
-         SET 
-            "winner" = 0,
-            "push" = 1,
-            "marked" = true,
-            "is_live" = false,
-            "completed" = true,
-            "home_team_score" = $1,
-            "away_team_score" = $2
-         WHERE 
-            "id" = $3
-            AND "game_id" = $4;
-        `,
+					SET 
+						"winner" = 0,
+						"push" = 1,
+						"marked" = true,
+						"is_live" = false,
+						"completed" = true,
+						"home_team_score" = $1,
+						"away_team_score" = $2
+					WHERE 
+						"id" = $3
+						AND "game_id" = $4;
+					`,
 					[game.home_team_score, game.away_team_score, game.id, game.game_id]
 				);
 			} else {
@@ -396,17 +394,17 @@ const markTailFade = async () => {
 
 	try {
 		let tails = await client.query(`
-    SELECT t.id as t_id, p.id as p_id, 
-    p.winner as p_winner, p.push as p_push,
-    t.winner as t_winner, t.push as t_push
-    FROM "Tail" t
-    LEFT JOIN "Pick" p ON "t".pick_id = "p".id
-    WHERE t.winner IS NULL
-    AND t.push IS NULL
-    AND p.winner IS NOT NULL
-    AND p.marked = TRUE
-    AND p.is_live = FALSE
-    `);
+			SELECT t.id as t_id, p.id as p_id, 
+			p.winner as p_winner, p.push as p_push,
+			t.winner as t_winner, t.push as t_push
+			FROM "Tail" t
+			LEFT JOIN "Pick" p ON "t".pick_id = "p".id
+			WHERE t.winner IS NULL
+			AND t.push IS NULL
+			AND p.winner IS NOT NULL
+			AND p.marked = TRUE
+			AND p.is_live = FALSE
+		`);
 		tails = tails.rows;
 
 		// markem
@@ -414,31 +412,31 @@ const markTailFade = async () => {
 			if (tails[i].p_winner === 1) {
 				await client.query(
 					`UPDATE "Tail"
-           SET
-              "winner" = 1,
-              "push" = 0
-           WHERE
-              "id" = $1;`,
+						SET
+							"winner" = 1,
+							"push" = 0
+						WHERE
+							"id" = $1;`,
 					[tails[i].t_id]
 				);
 			} else if (tails[i].p_winner === 0) {
 				await client.query(
 					`UPDATE "Tail"
-           SET
-              "winner" = 0,
-              "push" = 0
-           WHERE
-              "id" = $1;`,
+						SET
+							"winner" = 0,
+							"push" = 0
+						WHERE
+							"id" = $1;`,
 					[tails[i].t_id]
 				);
 			} else if (tails[i].p_push === 1) {
 				await client.query(
 					`UPDATE "Tail"
-           SET
-              "winner" = 0,
-              "push" = 1
-           WHERE
-              "id" = $1;`,
+						SET
+							"winner" = 0,
+							"push" = 1
+						WHERE
+							"id" = $1;`,
 					[tails[i].t_id]
 				);
 			}
@@ -446,17 +444,17 @@ const markTailFade = async () => {
 
 		// mark fades
 		let fades = await client.query(`
-    SELECT f.id as f_id, p.id as p_id, 
-    p.winner as p_winner, p.push as p_push,
-    f.winner as f_winner, f.push as f_push
-    FROM "Fade" f
-    LEFT JOIN "Pick" p ON "f".pick_id = "p".id
-    WHERE f.winner IS NULL
-    AND f.push IS NULL
-    AND p.winner IS NOT NULL
-    AND p.marked = TRUE
-    AND p.is_live = FALSE
-    `);
+			SELECT f.id as f_id, p.id as p_id, 
+			p.winner as p_winner, p.push as p_push,
+			f.winner as f_winner, f.push as f_push
+			FROM "Fade" f
+			LEFT JOIN "Pick" p ON "f".pick_id = "p".id
+			WHERE f.winner IS NULL
+			AND f.push IS NULL
+			AND p.winner IS NOT NULL
+			AND p.marked = TRUE
+			AND p.is_live = FALSE
+		`);
 		fades = fades.rows;
 
 		// markem
@@ -464,31 +462,31 @@ const markTailFade = async () => {
 			if (fades[i].p_winner === 1) {
 				await client.query(
 					`UPDATE "Fade"
-           SET
-              "winner" = 0,
-              "push" = 0
-           WHERE
-              "id" = $1;`,
+						SET
+							"winner" = 0,
+							"push" = 0
+						WHERE
+							"id" = $1;`,
 					[fades[i].f_id]
 				);
 			} else if (fades[i].p_winner === 0) {
 				await client.query(
 					`UPDATE "Fade"
-           SET
-              "winner" = 1,
-              "push" = 0
-           WHERE
-              "id" = $1;`,
+						SET
+							"winner" = 1,
+							"push" = 0
+						WHERE
+							"id" = $1;`,
 					[fades[i].f_id]
 				);
 			} else if (fades[i].p_push === 1) {
 				await client.query(
 					`UPDATE "Fade"
-           SET
-              "winner" = 0,
-              "push" = 1
-           WHERE
-              "id" = $1;`,
+						SET
+							"winner" = 0,
+							"push" = 1
+						WHERE
+							"id" = $1;`,
 					[fades[i].f_id]
 				);
 			}
@@ -525,11 +523,11 @@ const markResults = async (games) => {
 
 			await client.query(
 				`UPDATE "Pick"
-              SET
-                  result = $1
-              WHERE
-                  "id" = $2
-                  AND "game_id" = $3;`,
+					SET
+						result = $1
+					WHERE
+						"id" = $2
+						AND "game_id" = $3;`,
 				[result, games[i].id, games[i].game_id]
 			);
 
@@ -540,8 +538,8 @@ const markResults = async (games) => {
 	}
 };
 
-// markGames();
-// markTailFade();
+markGames();
+markTailFade();
 
 const fullNameToMascot = {
 	'Arizona Cardinals': 'cardinals',

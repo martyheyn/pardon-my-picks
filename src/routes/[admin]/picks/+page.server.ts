@@ -119,7 +119,9 @@ export const actions: Actions = {
 
 					let description;
 					if (picks[i].type === 'spread') {
-						description = `${mascotToFullName[picks[i].pickTeam]} ${picks[i].pickScore}`;
+						description = `${mascotToFullName[picks[i].pickTeam]} ${
+							picks[i].pickScore > 0 ? `+${picks[i].pickScore}` : picks[i].pickScore
+						}`;
 					} else {
 						description = `${gameOdds.home_team} vs ${gameOdds.away_team} ${picks[i].pickTotalType
 							.charAt(0)
