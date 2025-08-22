@@ -31,6 +31,7 @@ const markGames = async () => {
 			const response = await fetch(
 				`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=3&apiKey=${process.env.ODDS_API_KEY}`
 			);
+			console.log('response', response);
 			const scoresDataRaw = await response.json();
 
 			if (scoresDataRaw.length === 0 || !scoresDataRaw) return [];
@@ -47,6 +48,7 @@ const markGames = async () => {
 			let completedUnmarkedGames = unMarkedGames.rows.filter((game) => {
 				return completedGamesMap[game.game_id];
 			});
+			console.log('completedUnmarkedGames', completedUnmarkedGames);
 
 			const gamesToMark = await Promise.all(
 				completedUnmarkedGames.map(async (game) => {
