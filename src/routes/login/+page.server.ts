@@ -1,4 +1,4 @@
-import { lucia } from '$lib/server/lucia';
+import { getUserSession, invalidateSession, createSession } from '$lib/server/auth';
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from 'oslo/password';
@@ -90,16 +90,18 @@ export const actions: Actions = {
 		}
 
 		// try {
-		const sessions = await lucia.getUserSessions(existingUser.id);
-		if (sessions.length > 0) {
-			await lucia.invalidateSession(sessions[0].id);
+		const currSession = await getUserSession(existingUser.id);
+		if (currSession) {
+			await invalidateSession(currSession.id);
 		}
-		const session = await lucia.createSession(existingUser.id, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		sessionCookie.attributes.secure = true;
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
+		const session = await createSession(existingUser.id);
+
+		event.cookies.set('session', session.token, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: true,
+			maxAge: 60 * 60 * 24 * 120
 		});
 
 		throw redirect(302, '/');

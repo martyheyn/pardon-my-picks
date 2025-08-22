@@ -1,8 +1,7 @@
-import { lucia } from '$lib/server/lucia';
+import { generateSecureRandomString } from '$lib/utils/helpers';
 import { fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from 'oslo/password';
 import { TimeSpan, createDate } from 'oslo';
-import { generateId } from 'lucia';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { prisma } from '$lib/server/prisma';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -65,7 +64,7 @@ export const actions: Actions = {
 
 		try {
 			// optionally invalidate all existing tokens
-			const tokenId = generateId(40);
+			const tokenId = generateSecureRandomString(20);
 			const tokenHash = await new Argon2id().hash(tokenId);
 			await prisma.user.update({
 				where: { email },

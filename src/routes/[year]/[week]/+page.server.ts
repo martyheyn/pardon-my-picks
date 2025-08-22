@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { generateId } from 'lucia';
+import { generateSecureRandomString } from '$lib/utils/helpers';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
@@ -152,7 +152,7 @@ export const actions: Actions = {
 
 			await prisma.fade.create({
 				data: {
-					id: generateId(36),
+					id: generateSecureRandomString(18),
 					userId: locals.user.id,
 					pickId: pickId,
 					winner: pick?.winner ? (pick?.winner ? 0 : 1) : null,
@@ -262,7 +262,7 @@ export const actions: Actions = {
 			// TODO:: make a function to go back and update the tail winner if the pick wins
 			await prisma.tail.create({
 				data: {
-					id: generateId(36),
+					id: generateSecureRandomString(18),
 					userId: locals.user.id,
 					pickId: pickId,
 					winner: pick?.winner ? (pick?.winner === 1 ? 1 : 0) : null,

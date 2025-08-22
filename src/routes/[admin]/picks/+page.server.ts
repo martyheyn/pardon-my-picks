@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from '../../archive/$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
-import { generateId } from 'lucia';
+import { generateSecureRandomString } from '$lib/utils/helpers';
 import { type $Enums } from '@prisma/client';
 import type { Odds } from '$lib/utils/types';
 
@@ -136,7 +136,7 @@ export const actions: Actions = {
 
 					await prisma.pick.create({
 						data: {
-							id: generateId(36),
+							id: generateSecureRandomString(18),
 							gameId: gameOdds.id,
 							year: new Date().getFullYear(),
 							show: 'PMT',
