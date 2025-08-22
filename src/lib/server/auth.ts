@@ -40,16 +40,14 @@ export async function createSession(userId: string) {
 }
 
 export async function validateSessionToken(
-	token: string | null
+	token: string | undefined
 ): Promise<{ session: Session; user: User } | { session: null; user: null }> {
-	console.log('token before', token);
+	console.log('token', token);
 	if (!token) {
 		return { session: null, user: null };
 	}
-	console.log('token after', token);
 
-	const tokenSession = token.split(' session=');
-	const tokenParts = tokenSession[1].split('.');
+	const tokenParts = token.split('.');
 	if (tokenParts.length !== 2) {
 		return { session: null, user: null };
 	}
@@ -71,8 +69,10 @@ export async function validateSessionToken(
 	const user = await prisma.user.findUnique({
 		where: { id: session.userId }
 	});
+
 	if (!user) {
 		// stale session if user deleted
+		invalidateSession(sessionId);
 		return { session: null, user: null };
 	}
 

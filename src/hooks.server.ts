@@ -2,7 +2,10 @@
 import { validateSessionToken } from '$lib/server/auth';
 
 export const handle = async ({ event, resolve }) => {
-	const { user, session } = await validateSessionToken(event.request.headers.get('cookie'));
+	const sessionCookie = event.cookies.get('session');
+	console.log('sessionCookie');
+
+	const { user, session } = await validateSessionToken(sessionCookie);
 	event.locals.user = user;
 	event.locals.session = session;
 
