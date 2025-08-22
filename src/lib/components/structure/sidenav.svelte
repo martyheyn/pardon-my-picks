@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import type { User } from 'lucia';
+	import type { User } from '@prisma/client';
 	import { page } from '$app/stores';
 	import { fade, slide } from 'svelte/transition';
 	import { quintInOut } from 'svelte/easing';

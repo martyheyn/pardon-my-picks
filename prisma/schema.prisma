@@ -65,10 +65,12 @@ model User {
 }
 
 model Session {
-  id        String   @id @db.VarChar(191)
-  userId    String   @unique @map("user_id") @db.VarChar(191)
-  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
-  user      User     @relation(fields: [userId], references: [id])
+  id         String   @id @db.VarChar(191)
+  userId     String   @unique @map("user_id") @db.VarChar(191)
+  secretHash Bytes    @unique @map("secret_hash") @db.ByteA
+  createdAt  DateTime @map("created_at") @db.Timestamptz(6)
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(6)
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Fade {

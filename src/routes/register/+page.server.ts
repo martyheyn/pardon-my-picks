@@ -1,7 +1,7 @@
-import { lucia } from '$lib/server/lucia';
+import { createSession } from '$lib/server/auth';
+import { generateSecureRandomString } from '$lib/utils/helpers';
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
-import { generateId } from 'lucia';
 import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -85,7 +85,7 @@ export const actions: Actions = {
 			return setError(form, 'Password does not match');
 		}
 
-		const userId = generateId(36);
+		const userId = generateSecureRandomString(18);
 		const pass = password + PEPPER;
 		const passwordHash = await new Argon2id().hash(pass);
 
@@ -112,11 +112,13 @@ export const actions: Actions = {
 			data: userData
 		});
 
-		const session = await lucia.createSession(userId, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
+		const session = await createSession(userId);
+		event.cookies.set('session', session.token, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: true,
+			maxAge: 60 * 60 * 24 * 120
 		});
 
 		throw redirect(303, '/');

@@ -2,7 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { quadInOut } from 'svelte/easing';
 	import Icon from '../icon.svelte';
-	import type { User } from 'lucia';
+	import type { User } from '@prisma/client';
 
 	export let user: User | null;
 	let showSocials = false;

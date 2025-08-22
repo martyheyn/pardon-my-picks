@@ -1,4 +1,4 @@
-import { lucia } from '$lib/server/lucia';
+import { invalidateSession } from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -7,7 +7,7 @@ export const POST: RequestHandler = async ({ locals }) => {
 	if (!session) {
 		redirect(302, '/');
 	}
-	await lucia.invalidateSession(session.id);
+	await invalidateSession(session.id);
 	locals.session = null;
 
 	throw redirect(302, '/');

@@ -1,38 +1,15 @@
-import { lucia } from '$lib/server/lucia';
-import type { Handle } from '@sveltejs/kit';
+// src/hooks.server.ts
+import { validateSessionToken } from '$lib/server/auth';
 
-export const handle: Handle = async ({ event, resolve }) => {
-	const sessionId = event.cookies.get(lucia.sessionCookieName);
-	if (!sessionId) {
-		event.locals.user = null;
-		event.locals.session = null;
-		return resolve(event);
-	}
-
-	const { session, user } = await lucia.validateSession(sessionId);
-	if (session && session.fresh) {
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		// sveltekit types deviates from the de-facto standard
-		// you can use 'as any' too
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
-		});
-	}
-	if (!session) {
-		const sessionCookie = lucia.createBlankSessionCookie();
-		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
-			...sessionCookie.attributes
-		});
-	}
+export const handle = async ({ event, resolve }) => {
+	const { user, session } = await validateSessionToken(event.request.headers.get('cookie'));
 	event.locals.user = user;
 	event.locals.session = session;
 
+	// Not found: /.well-known/appspecific/com.chrome.devtools.json warning
 	if (event.url.pathname.startsWith('/.well-known/appspecific/com.chrome.devtools.json')) {
 		// return empty JSON so Chrome stops complaining
 		return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
 	}
-
 	return resolve(event);
 };

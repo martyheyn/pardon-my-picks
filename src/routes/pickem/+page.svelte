@@ -2,6 +2,7 @@
 	import { applyAction, enhance } from '$app/forms';
 	import { fade, fly, slide } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
+	import { generateSecureRandomString } from '$lib/utils/helpers';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToAbrv, fullNameToMascot, logo } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
@@ -9,7 +10,6 @@
 	import AlertFlash from '$lib/components/alert.svelte';
 	import { type PickData, type Alert, type Odds } from '$lib/utils/types';
 	import { type $Enums } from '@prisma/client';
-	import { generateId } from 'lucia';
 	import { beforeNavigate } from '$app/navigation';
 	import Modal from '$lib/components/modal.svelte';
 
@@ -445,7 +445,7 @@
 															!user ||
 															!bettingOpen}
 														on:click={(e) => {
-															let outcomeId = generateId(15);
+															let outcomeId = generateSecureRandomString(8);
 															outcome.id = outcomeId;
 															e.preventDefault();
 															addPick(

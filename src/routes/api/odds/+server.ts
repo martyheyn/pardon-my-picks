@@ -1,6 +1,6 @@
 import type { Odds, PickData } from '$lib/utils/types';
+import { generateSecureRandomString } from '$lib/utils/helpers';
 import { ODDS_API_KEY } from '$env/static/private';
-import { generateId } from 'lucia';
 import { CURRENT_WEEK } from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { prisma } from '$lib/server/prisma';
@@ -99,7 +99,7 @@ export async function GET({ locals }) {
 
 				return {
 					...game,
-					id: generateId(36),
+					id: generateSecureRandomString(18),
 					gameId: game.id,
 					commence_time: new Date(game.commence_time).toLocaleString('en-US', {
 						timeZone: 'America/New_York'

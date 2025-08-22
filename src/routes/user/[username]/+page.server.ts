@@ -1,7 +1,7 @@
 import { prisma } from '$lib/server/prisma';
+import { generateSecureRandomString } from '$lib/utils/helpers';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
-import { generateId } from 'lucia';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 
@@ -42,7 +42,7 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 		ContentType: string;
 	} = {
 		Bucket: AWS_S3_BUCKET_NAME,
-		Key: `${username}-${generateId(20)}`, // Key must be unique for each photo
+		Key: `${username}-${generateSecureRandomString(10)}`, // Key must be unique for each photo
 		Body: buffer,
 		ContentType: photoFile.type // Set the content type
 	};
