@@ -2,7 +2,7 @@ name: Run Mark Games Script
 
 on:
   schedule:
-    - cron: '4 1 * * *' # '15 16 * * 7', '05 19 * * 7', '35 19 * * 7', '59 23 * * 7', '59 23 * * 1'
+    - cron: '*/5 * * * *' # '15 16 * * 7', '05 19 * * 7', '35 19 * * 7', '59 23 * * 7', '59 23 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: node scripts/script.js
+      - run: node scripts/mark-games.js
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           CURRENT_WEEK: ${{ secrets.CURRENT_WEEK }}
