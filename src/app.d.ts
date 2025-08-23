@@ -25,6 +25,8 @@ declare module '$env/static/private' {
 	export const ODDS_API_KEY: string;
 	export const CURRENT_WEEK: number;
 	export const MAINTENANCE_MODE: string;
+	export const GAMES_START_DATE: string;
+	export const GAMES_END_DATE: string;
 }
 
 declare module '$env/static/public' {
