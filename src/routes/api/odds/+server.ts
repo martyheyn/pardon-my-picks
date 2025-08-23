@@ -1,7 +1,6 @@
 import type { Odds, PickData } from '$lib/utils/types';
 import { generateSecureRandomString } from '$lib/utils/helpers';
-import { ODDS_API_KEY } from '$env/static/private';
-import { CURRENT_WEEK } from '$env/static/private';
+import { ODDS_API_KEY, CURRENT_WEEK, GAMES_START_DATE, GAMES_END_DATE } from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { prisma } from '$lib/server/prisma';
 
@@ -40,13 +39,13 @@ export async function GET({ locals }) {
 	// this will be the end of Friday or early Sunday
 	const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 	const dayOfWeek = new Date(date).getDay();
-	const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
+	const bettingOpen = dayOfWeek !== 1 && dayOfWeek !== 7;
 	const showOdds = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
 
 	// times for testing
 	// create 2 javascript dates for 9-8-2024 and 9-9-2024 in the format of 2024-09-08T00:00:00Z
-	const commenceTimeFrom = '2024-01-02T00:00:00Z';
-	const commenceTimeTo = '2025-01-08T00:00:00Z';
+	const commenceTimeFrom = `${GAMES_START_DATE}T00:00:00Z`;
+	const commenceTimeTo = `${GAMES_END_DATE}T00:00:00Z`;
 
 	let oddsDataClean: Odds[] = [];
 
