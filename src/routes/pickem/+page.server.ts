@@ -39,7 +39,7 @@ const PickDataSchema = z.array(PickDataObjectSchema);
 
 const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 const dayOfWeek = new Date(date).getDay();
-const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
+const bettingOpen = dayOfWeek !== 0 && dayOfWeek !== 1;
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
@@ -62,7 +62,7 @@ export const actions: Actions = {
 
 		if (!bettingOpen) {
 			return fail(400, {
-				message: 'You can only bet on Friday & Saturday so your odds are similar to the PMT boys',
+				message: 'Betting is open Tuesday - Saturday',
 				success: false
 			});
 		}

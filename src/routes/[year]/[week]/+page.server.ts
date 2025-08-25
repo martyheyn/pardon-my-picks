@@ -8,8 +8,7 @@ import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 const dayOfWeek = new Date(date).getDay();
-const bettingOpen = dayOfWeek === 5 || dayOfWeek === 6;
-const pickemOpen = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
+const bettingOpen = dayOfWeek !== 0 && dayOfWeek !== 1;
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
@@ -33,7 +32,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// only get live scores on Sunday
 	if (dayOfWeek === 0) {
-		console.log('getting live scores');
 		const scoresLive = await getLiveGames();
 
 		scoresLive.map(async (game: Scores) => {
@@ -55,8 +53,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		picks,
 		user: locals.user,
-		bettingOpen,
-		pickemOpen
+		bettingOpen
 	};
 };
 
