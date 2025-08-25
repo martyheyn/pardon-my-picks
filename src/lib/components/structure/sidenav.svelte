@@ -56,11 +56,11 @@
 		}
 	};
 
-	const dayOfWeek = new Date().getDay();
-	const pickemOpen = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
-	$: if (!pickemOpen) {
-		sideNavItems = sideNavItems.filter((navItem) => navItem.label !== 'PickEm');
-	}
+	// const dayOfWeek = new Date().getDay();
+	// const pickemOpen = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
+	// $: if (!pickemOpen) {
+	// 	sideNavItems = sideNavItems.filter((navItem) => navItem.label !== 'PickEm');
+	// }
 </script>
 
 <div
