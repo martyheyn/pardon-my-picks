@@ -435,7 +435,7 @@
 														!user ||
 														!bettingOpen}
 													on:click={(e) => {
-														let outcomeId = generateSecureRandomString(8);
+														let outcomeId = generateSecureRandomString(16);
 														outcome.id = outcomeId;
 														e.preventDefault();
 														addPick(
@@ -446,9 +446,9 @@
 															getDescription(
 																bets.key,
 																outcome.point,
-																bets.key === 'spreads' ? outcome.name : odd.home_team,
+																bets.key === 'spreads' ? fullNameToAbrv[outcome.name].mascot : fullNameToAbrv[odd.home_team].mascot,
 																bets.key === 'totals' ? outcome.name : undefined,
-																bets.key === 'totals' ? odd.away_team : undefined
+																bets.key === 'totals' ? fullNameToAbrv[odd.away_team].mascot: undefined
 															), // getDescription(type, betNumber, team, overUnder, otherTeam)
 															odd.home_team,
 															odd.away_team,
