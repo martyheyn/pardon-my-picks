@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
+import { CURRENT_YEAR } from '$env/static/private';
 
 type LeaderboardStats = {
 	username: string;
@@ -35,6 +36,8 @@ type total = {
 };
 
 export const load: PageServerLoad = async () => {
+	let currYear = Number(CURRENT_YEAR);
+
 	const winsByUser: WinsByUser[] = await prisma.$queryRaw`
 	SELECT u.username as username,
 		COUNT(p.id) as total_picks,
@@ -43,7 +46,7 @@ export const load: PageServerLoad = async () => {
 		(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0)) as win_pct
 	   FROM "User" u
 	   LEFT JOIN "Pick" p ON u.id = p.user_id
-	   WHERE p.year = 2024
+	   WHERE p.year = ${currYear}
 	   AND p.pmt_persona = false
 	   AND p.winner IS NOT NULL
 	   GROUP BY u.username
@@ -87,7 +90,7 @@ export const load: PageServerLoad = async () => {
 	    FROM "Tail" t
 		LEFT JOIN "Pick" p ON p.id = t.pick_id
 		WHERE t.winner IS NOT NULL
-		AND year = 2024
+		AND year = ${currYear}
 	    GROUP BY t.user_id
 	    HAVING COUNT(t.id) > 0
 	   ) t ON u.id = t.user_id
@@ -115,7 +118,7 @@ export const load: PageServerLoad = async () => {
 	   	 FROM "Fade" f
 		 LEFT JOIN "Pick" p ON p.id = f.pick_id
 		 WHERE f.winner IS NOT NULL
-		 AND year = 2024
+		 AND year = ${currYear}
 	   	 GROUP BY f.user_id
 	     HAVING COUNT(f.id) > 0
 		) f ON u.id = f.user_id
@@ -158,7 +161,7 @@ export const load: PageServerLoad = async () => {
 	const totalWins: total[] = await prisma.$queryRaw`
 			SELECT COUNT(DISTINCT user_id) as total
 			FROM "Pick"
-			WHERE year = 2024
+			WHERE year = ${currYear}
 			AND pmt_persona = false
 			AND winner IS NOT NULL;`;
 
@@ -167,14 +170,14 @@ export const load: PageServerLoad = async () => {
 			FROM "Tail" t
 			LEFT JOIN "Pick" p ON p.id = t.pick_id
 			WHERE t.winner IS NOT NULL
-			AND year = 2024;`;
+			AND year = ${currYear};`;
 
 	const totalFades: total[] = await prisma.$queryRaw`
 			SELECT COUNT(DISTINCT f.user_id) as total
 			FROM "Fade" f
 			LEFT JOIN "Pick" p ON p.id = f.pick_id
 			WHERE f.winner IS NOT NULL
-			AND year = 2024;`;
+			AND year = ${currYear};`;
 
 	const totalCounts = {
 		wins: totalWins[0].total,
@@ -192,6 +195,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 	winsTotal: async ({ url }: { url: URL }) => {
+		let currYear = Number(CURRENT_YEAR);
 		const page = Number(url.searchParams.get('page'));
 
 		const winsByUser: WinsByUser[] = await prisma.$queryRaw`
@@ -202,7 +206,7 @@ export const actions: Actions = {
 			(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0)) as win_pct
 			FROM "User" u
 			LEFT JOIN "Pick" p ON u.id = p.user_id
-			WHERE p.year = 2024
+			WHERE p.year = ${currYear}
 			AND p.pmt_persona = false
 			AND p.winner IS NOT NULL
 			GROUP BY u.username
@@ -233,6 +237,8 @@ export const actions: Actions = {
 	},
 
 	tailsTotal: async ({ url }: { url: URL }) => {
+		let currYear = Number(CURRENT_YEAR);
+
 		const page = Number(url.searchParams.get('page'));
 
 		const tailsByUser: TailRawQuery[] = await prisma.$queryRaw`
@@ -254,7 +260,7 @@ export const actions: Actions = {
 				FROM "Tail" t
 				LEFT JOIN "Pick" p ON p.id = t.pick_id
 				WHERE t.winner IS NOT NULL
-				AND year = 2024
+				AND year = ${currYear}
 				GROUP BY t.user_id
 				HAVING COUNT(t.id) > 0
 			) t ON u.id = t.user_id
@@ -284,6 +290,8 @@ export const actions: Actions = {
 	},
 
 	fadesTotal: async ({ url }: { url: URL }) => {
+		let currYear = Number(CURRENT_YEAR);
+
 		const page = Number(url.searchParams.get('page'));
 
 		const fadesByUser: FadeRawQuery[] = await prisma.$queryRaw`
@@ -306,7 +314,7 @@ export const actions: Actions = {
 			FROM "Fade" f
 			LEFT JOIN "Pick" p ON p.id = f.pick_id
 			WHERE f.winner IS NOT NULL
-			AND year = 2024
+			AND year = ${currYear}
 			GROUP BY f.user_id
 			HAVING COUNT(f.id) > 0
 			) f ON u.id = f.user_id

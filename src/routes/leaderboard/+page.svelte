@@ -23,6 +23,8 @@
 		fades: fadesData
 	};
 
+	$: console.log("stats", stats)
+
 	// pagination
 	let currentPage = 1;
 	$: totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
@@ -66,6 +68,9 @@
 			<h4 class="text-2xl font-header mb-4">
 				{selectedStats.charAt(0).toUpperCase() + selectedStats.slice(1)} Leaderboard
 			</h4>
+			{#if stats[selectedStats].length === 0}
+				<p class="text-xl">No stats for the leaderboard yet</p>
+			{/if}
 			{#each stats[selectedStats] as stat, i}
 				<div class="flex justify-between items-center w-full max-w-md">
 					<div class="flex items-center gap-x-2">
