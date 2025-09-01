@@ -58,7 +58,8 @@ export const load: PageServerLoad = async () => {
 				FROM "Pick" as p
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
-				AND p.year = ${currYear}
+				-- AND p.year = ${currYear}
+				AND p.year IN (2023,2024,2025)
 				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) p LEFT JOIN (
@@ -70,7 +71,8 @@ export const load: PageServerLoad = async () => {
 				ON p.id = t.pick_id
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
-				AND p.year = ${currYear}
+				-- AND p.year = ${currYear}
+				AND p.year IN (2023,2024,2025)
 				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) t ON p.person = t.person
@@ -83,7 +85,8 @@ export const load: PageServerLoad = async () => {
 				ON p.id = f.pick_id
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
-				AND p.year = ${currYear}
+				-- AND p.year = ${currYear}
+				AND p.year IN (2023,2024,2025)
 				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) f ON p.person = f.person
@@ -129,7 +132,10 @@ export const load: PageServerLoad = async () => {
 		where: {
 			pmtPersona: true,
 			barstoolEmployee: true,
-			year: currYear
+			// year: currYear
+			year: {
+				in: [2023, 2024, 2025]
+			}
 		}
 	});
 
@@ -160,7 +166,10 @@ export const load: PageServerLoad = async () => {
 			},
 			pmtPersona: true,
 			barstoolEmployee: true,
-			year: Number(CURRENT_YEAR)
+			// year: Number(CURRENT_YEAR)
+			year: {
+				in: [2023, 2024, 2025]
+			}
 		}
 	});
 
