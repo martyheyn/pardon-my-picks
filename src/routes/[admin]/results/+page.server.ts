@@ -1,3 +1,4 @@
+import { prisma } from '$lib/server/prisma';
 import type { Actions, PageServerLoad } from '../../archive/$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
