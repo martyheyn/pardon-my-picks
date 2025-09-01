@@ -181,10 +181,10 @@ export const load: PageServerLoad = async () => {
 };
 
 const yearHeaderMap = {
-	'2025 NFL Season Stats': 2025,
-	'2024 NFL Season Stats': 2024,
-	'2023 NFL Season Stats': 2023,
-	'All Time Stats': 'all-time'
+	'2025 NFL Season Stats': [2025],
+	'2024 NFL Season Stats': [2024],
+	'2023 NFL Season Stats': [2023],
+	'All Time Stats': [2023, 2024, 2025]
 };
 
 export const actions: Actions = {
@@ -199,8 +199,8 @@ export const actions: Actions = {
 
 		// get data based on year of alltime
 		let rawPersonData: RawPersonData[] = [];
-		switch (yearHeader) {
-			case 'all-time':
+		switch (year) {
+			case 'All Time Stats':
 				rawPersonData = await prisma.$queryRaw`
 				SELECT p.person,
 					p.total_picks,
@@ -262,7 +262,7 @@ export const actions: Actions = {
 		   			SUM(p.winner) as wins,
 		   			SUM(p.push) as pushes
 					FROM "Pick" as p
-					WHERE p.year = (${yearHeader})
+					WHERE p.year = (${yearHeader[0]})
 					AND p.pmt_persona = true
 					AND p.barstool_employee = true
 					AND p.winner IS NOT NULL
@@ -275,7 +275,7 @@ export const actions: Actions = {
 					FROM "Pick" as p
 					LEFT JOIN "Tail" as t
 					ON p.id = t.pick_id
-					WHERE p.year = (${yearHeader})
+					WHERE p.year = (${yearHeader[0]})
 					AND p.pmt_persona = true
 					AND p.barstool_employee = true
 					AND p.winner IS NOT NULL
@@ -288,7 +288,7 @@ export const actions: Actions = {
 					FROM "Pick" as p
 					LEFT JOIN "Fade" as f
 					ON p.id = f.pick_id
-		   			WHERE p.year = (${yearHeader})
+		   			WHERE p.year = (${yearHeader[0]})
 					AND p.pmt_persona = true
 					AND p.barstool_employee = true
 					AND p.winner IS NOT NULL
@@ -326,7 +326,7 @@ export const actions: Actions = {
 		// TODO: rawSQL query to find fades and tails and % by bet type
 		// get type bet  data
 		const typeBetData: BetData[] = [];
-		const yearWh = yearHeader === 'all-time' ? 2023 & 2024 : Number(yearHeader);
+
 		// TODO:: 2023 || 2024 not sustainable
 		const typeBet = await prisma.pick.groupBy({
 			by: ['person', 'type'],
@@ -340,7 +340,9 @@ export const actions: Actions = {
 			where: {
 				pmtPersona: true,
 				barstoolEmployee: true,
-				year: yearWh
+				year: {
+					in: yearHeader
+				}
 			}
 		});
 
@@ -373,7 +375,9 @@ export const actions: Actions = {
 				},
 				pmtPersona: true,
 				barstoolEmployee: true,
-				year: typeof yearHeader === 'number' ? yearHeader : { not: undefined }
+				year: {
+					in: yearHeader
+				}
 			}
 		});
 
