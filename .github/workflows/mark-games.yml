@@ -2,7 +2,12 @@ name: Run Mark Games Script
 
 on:
   schedule:
-    - cron: '1 1 1 * *' # '15 16 * * 7', '05 19 * * 7', '35 19 * * 7', '59 23 * * 7', '59 23 * * 1'
+    - cron: '59 23 * * 4' # Runs at 11:59, only on Thursday
+    - cron: '30 16 * * 0' # Runs at 4:30, only on Sunday
+    - cron: '20 19 * * 0' # Runs at 7:20, only on Sunday
+    - cron: '50 19 * * 0' # Runs at 7:50, only on Sunday
+    - cron: '59 23 * * 0' # Runs at 11:59, only on Sunday
+    - cron: '59 23 * * 1' # Runs at 11:59, only on Monday
   workflow_dispatch:
 
 jobs:
