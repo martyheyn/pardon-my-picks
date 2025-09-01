@@ -7,7 +7,7 @@ export async function GET({ url }: { url: URL }) {
 	const person = url.searchParams.get('person');
 	const specialBet = url.searchParams.get('specialBet');
 	const year = url.searchParams.get('year');
-	const yearWh = year === 'all-time' ? 2023 & 2024 : Number(year);
+	const yearWh = !!year ? [2023, 2024, 2025] : [Number(year)];
 
 	if (!person || !specialBet) {
 		return fail(400, { message: 'Invalid request' });
@@ -25,7 +25,9 @@ export async function GET({ url }: { url: URL }) {
 			where: {
 				specialBet: specialBet,
 				person: person,
-				year: yearWh
+				year: {
+					in: yearWh
+				}
 			}
 		});
 		return new Response(JSON.stringify(bets));

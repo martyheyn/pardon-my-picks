@@ -26,6 +26,29 @@
 		);
 	});
 
+	// dropdown selector for stat aggregation
+	enum StatHeaders {
+		CURR_YEAR = '2025 NFL Season Stats',
+		STATS_2024 = '2024 NFL Season Stats',
+		STATS_2023 = '2023 NFL Season Stats',
+		ALLTIME = 'All Time Stats'
+	}
+
+	const statsHeaderYearNum = {
+		'2025 NFL Season Stats': 2025,
+		'2024 NFL Season Stats': 2024,
+		'2023 NFL Season Stats': 2023,
+		'All Time Stats': 0
+	};
+
+	let selectedStat: StatHeaders = StatHeaders.ALLTIME;
+	const selectStatHeaders: StatHeaders[] = [
+		StatHeaders.CURR_YEAR,
+		StatHeaders.STATS_2024,
+		StatHeaders.STATS_2023,
+		StatHeaders.ALLTIME
+	];
+
 	// TODO:: indexing would be more efficeint format
 	// { "Big Cat": { spread: '11 - 5 -3', total: '11 - 6' } } on the server side
 	const getBetTypeStats = (persona: string, type: string) => {
@@ -98,7 +121,9 @@
 		}`;
 	};
 
+	console.log("here IN LEADERBOARD")
 	const getSpecialBetDetails = async (person: string, specialBet: string) => {
+		console.log("here getting the stats")
 		try {
 			const res = await fetch(
 				`/api/special-bet-details?person=${person}&specialBet=${specialBet}&year=${statsHeaderYearNum[selectedStat]}`
@@ -121,28 +146,6 @@
 	let showModal = false;
 	let profilePic = '';
 
-	// dropdown selector for stat aggregation
-	enum StatHeaders {
-		// CURR_YEAR = '2025 NFL Season Stats',
-		CURR_YEAR = '2024 NFL Season Stats',
-		STATS_2023 = '2023 NFL Season Stats',
-		ALLTIME = 'All Time Stats'
-	}
-
-	const statsHeaderYearNum = {
-		// '2025 NFL Season Stats': 2025,
-		'2024 NFL Season Stats': 2024,
-		'2023 NFL Season Stats': 2023,
-		'All Time Stats': 2024
-	};
-
-	let selectedStat: StatHeaders = StatHeaders.CURR_YEAR;
-	const selectStatHeaders: StatHeaders[] = [
-		StatHeaders.CURR_YEAR,
-		// StatHeaders.STATS_2024,
-		StatHeaders.STATS_2023,
-		StatHeaders.ALLTIME
-	];
 	let dropdownOpen = false;
 </script>
 
