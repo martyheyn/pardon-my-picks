@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms';
-	import { fade, fly, slide } from 'svelte/transition';
+	import { enhance } from '$app/forms';
+	import { fade, fly } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
 	import type { ActionData, PageData } from '../results/$types';
 	import AlertFlash from '$lib/components/alert.svelte';
-    import { mascotToFullName, nflTeams } from '$lib/utils/matching-format'
+    import { mascotToFullName } from '$lib/utils/matching-format'
 	import type { Writable } from 'svelte/store';
 	import type { Alert } from '$lib/utils/types';
 	import { getContext } from 'svelte';
@@ -30,10 +30,6 @@
 	// alerts
 	$: form, updateAlert();
 
-    const personas = [
-        'Big Cat', 'PFT', 'Memes', 'Hank', 'Max', 'Zach'
-    ]
-
     // ---> server data of team arr & id ---> list teams for inputs ---> lookup by gameId and insert data
 </script>
 
@@ -58,7 +54,7 @@
         use:enhance
         class="flex flex-col gap-y-6 justify-center"
     >
-        {#if pmtWeeklyPicks}
+        {#if pmtWeeklyPicks && pmtWeeklyPicks?.length > 0}
             {#each pmtWeeklyPicks as team}
                 <div class="flex flex-col gap-y-2 justify-center-center">
                     <h1 class="text-2xl font-semibold">{mascotToFullName[team.homeTeam]} vs {mascotToFullName[team.awayTeam]}</h1>
@@ -93,10 +89,11 @@
 
                 <div class="w-full h-[1px] bg-white/20" />
             {/each}
+
+            <button class="w-fit px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out" type="submit">
+                Submit
+            </button>
         {/if}
 
-        <button class="w-fit px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover dark:bg-darkRed dark:hover:bg-darkRedHover text-white transition-all duration-300 ease-in-out" type="submit">
-            Submit
-        </button>
     </form>
 </div>
