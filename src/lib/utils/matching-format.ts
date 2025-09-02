@@ -304,9 +304,9 @@ export const personaAvatarPath = (person: string) => {
 		case 'Max':
 			return '/avatars/max-avatar.jpg';
 		case 'Memes':
-			return '/avatars/zach-wilson-mirror.jpg';
-		case 'Huey':
-			return '/avatars/huey_avatar.jpg';
+			return '/avatars/dianna-russini.jpg';
+		case 'Zach':
+			return '/avatars/zach.jpg';
 		default:
 			return '/avatars/sad-max-pmt.png';
 	}
@@ -326,8 +326,8 @@ export const personasLabelToCamelCase = (person: string) => {
 			return 'max';
 		case 'Memes':
 			return 'memes';
-		case 'Huey':
-			return 'huey';
+		case 'Zach':
+			return 'zach';
 		default:
 			return 'big-cat';
 	}
@@ -347,8 +347,8 @@ export const camelCaseToLabel = (person: string) => {
 			return 'Max';
 		case 'memes':
 			return 'Memes';
-		case 'huey':
-			return 'Huey';
+		case 'zacb':
+			return 'Zach';
 		default:
 			return 'Big Cat';
 	}
@@ -368,8 +368,8 @@ export const personasLabelToslug = (person: string) => {
 			return 'bat-girl';
 		case 'Memes':
 			return 'memes';
-		case 'Huey':
-			return 'huey';
+		case 'Zach':
+			return 'zach';
 		default:
 			return 'big-cat';
 	}
@@ -389,8 +389,8 @@ export const sluglToPersona = (person: string) => {
 			return 'Max';
 		case 'memes':
 			return 'Memes';
-		case 'huey':
-			return 'Huey';
+		case 'zach':
+			return 'Zach';
 		default:
 			return 'Big Cat';
 	}
@@ -400,10 +400,10 @@ export const sortOrder = {
 	'Big Cat': 1,
 	PFT: 2,
 	Hank: 3,
-	Jake: 4,
-	Max: 5,
-	Memes: 6,
-	Huey: 7
+	Max: 4,
+	Memes: 5,
+	Zach: 6,
+	Jake: 7
 };
 
 export type SpecialBetKey =

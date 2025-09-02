@@ -121,9 +121,7 @@
 		}`;
 	};
 
-	console.log("here IN LEADERBOARD")
 	const getSpecialBetDetails = async (person: string, specialBet: string) => {
-		console.log("here getting the stats")
 		try {
 			const res = await fetch(
 				`/api/special-bet-details?person=${person}&specialBet=${specialBet}&year=${statsHeaderYearNum[selectedStat]}`
@@ -225,12 +223,9 @@
 		{#each personData as persona}
 			<div class="card px-4 sm:px-6" id={personasLabelToslug(persona.person)}>
 				<div class="flex justify-between items-start">
-					<a
-						href="/stats/{personasLabelToslug(persona.person)}"
-						class="text-2xl hover:text-gray-600 transition duration-200 ease-in-out cursor-pointer"
-					>
+					<p class="text-2xl transition duration-200 ease-in-out">
 						{persona.person}
-					</a>
+					</p>
 					<button
 						on:click={() => {
 							showModal = true;
