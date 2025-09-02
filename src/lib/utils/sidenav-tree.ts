@@ -21,11 +21,18 @@ export type sideNavItems = {
 }[];
 
 const currWeekSubNavArr: { label: string; icon: string; route: string }[] = [];
-for (let i = 1; i <= Number(PUBLIC_CURRENT_WEEK); i++) {
+// for (let i = 1; i <= Number(PUBLIC_CURRENT_WEEK); i++) {
+// 	currWeekSubNavArr.push({
+// 		label: `Week ${i}`,
+// 		icon: 'calendar',
+// 		route: `/${PUBLIC_CURRENT_YEAR}/${i}`
+// 	});
+// }
+for (let i = 1; i <= 18; i++) {
 	currWeekSubNavArr.push({
 		label: `Week ${i}`,
 		icon: 'calendar',
-		route: `/${PUBLIC_CURRENT_YEAR}/${i}`
+		route: `/2024/${i}`
 	});
 }
 
@@ -48,7 +55,8 @@ export const sideNavItems: sideNavItems = [
 	{
 		label: 'Week',
 		icon: 'calendar',
-		route: `/${PUBLIC_CURRENT_YEAR}/${PUBLIC_CURRENT_WEEK}`,
+		// route: `/${PUBLIC_CURRENT_YEAR}/${PUBLIC_CURRENT_WEEK}`,
+		route: `/2024/18`,
 		subItems: currWeekSubNavArr,
 		subItemsOpen: false
 	},
