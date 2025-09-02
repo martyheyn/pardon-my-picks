@@ -21,6 +21,7 @@ const getDbUserPicks = async (userId: string) => {
 			description: true,
 			homeTeam: true,
 			awayTeam: true,
+			pickTeam: true,
 			gameDate: true,
 			marked: true
 		}
@@ -76,8 +77,7 @@ export async function GET({ locals }) {
 									// TODO: need to change this so it is not dependent on the exact number as that might change
 									((pick.type === 'totals' &&
 										outcome.name === (pick.description.indexOf('Over') > -1 ? 'Over' : 'Under')) ||
-										pick.type === 'spread' ||
-										(pick.type == 'spreads' && pick.description.indexOf(outcome.name) > -1))
+										(pick.type == 'spreads' && pick.pickTeam === fullNameToMascot[outcome.name]))
 								) {
 									id = pick.id;
 								}

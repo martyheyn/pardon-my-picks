@@ -23,7 +23,7 @@ const PickDataObjectSchema = z.object({
 	homeTeam: z.custom<$Enums.NFLTeam>(),
 	awayTeam: z.custom<$Enums.NFLTeam>(),
 	marked: z.boolean(),
-	pickTeam: z.custom<$Enums.NFLTeam>().optional(),
+	pickTeam: z.custom<$Enums.NFLTeam>() || null,
 	pickScore: z.number().optional(),
 	pickTotalType: z.enum(['over', 'under']).optional(),
 	gameDate: z.string().optional()
@@ -288,6 +288,7 @@ export const actions: Actions = {
 					description: true,
 					homeTeam: true,
 					awayTeam: true,
+					pickTeam: true,
 					marked: true
 				}
 			});
