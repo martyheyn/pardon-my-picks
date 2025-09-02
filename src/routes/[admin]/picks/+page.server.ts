@@ -13,7 +13,7 @@ import { CURRENT_WEEK } from '$env/static/private';
 
 const PickDataObjectSchema = z.object({
 	person: z.string(),
-	type: z.enum(['spread', 'totals']),
+	type: z.enum(['spreads', 'totals']),
 	pickTeam: z.custom<$Enums.NFLTeam>().optional(),
 	pickScore: z.number().optional(),
 	pickTotalType: z.enum(['over', 'under']).optional()
@@ -119,7 +119,7 @@ export const actions: Actions = {
 					}
 
 					let description;
-					if (picks[i].type === 'spread') {
+					if (picks[i].type === 'spreads') {
 						description = `${mascotToFullName[picks[i].pickTeam]} ${
 							picks[i].pickScore > 0 ? `+${picks[i].pickScore}` : picks[i].pickScore
 						}`;

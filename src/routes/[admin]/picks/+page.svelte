@@ -69,7 +69,7 @@
                     <input type="hidden" name="person" value={person}>
                     <div class="flex flex-row gap-x-4 items-center">
                         <p>Spread:</p>
-                        <input type="hidden" name="betType" value="spread">
+                        <input type="hidden" name="betType" value="spreads">
                         <label for="team-name" class="block text-sm font-semibold text-gray-800 flex-1">
                             <select required name="teamName" id="team-name-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
                                 <option value="">--Choose Team--</option>

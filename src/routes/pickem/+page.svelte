@@ -38,6 +38,8 @@
 		usersPicks = dbPicksData.picks;
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
+	$: console.log("dpPicks", dbPicks)
+	$: console.log("odds", odds)
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
@@ -72,7 +74,7 @@
 			description: description,
 			homeTeam: fullNameToMascot[homeTeam] as $Enums.NFLTeam,
 			awayTeam: fullNameToMascot[awayTeam] as $Enums.NFLTeam,
-			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : undefined,
+			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : null,
 			pickTotalType: pickTotalType?.toLocaleLowerCase() as 'over' | 'under' | undefined,
 			pickScore: pickScore,
 			gameDate: estGameDate,

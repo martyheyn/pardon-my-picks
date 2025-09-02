@@ -101,7 +101,7 @@ export type PickData = {
 	description: string;
 	homeTeam: $Enums.NFLTeam;
 	awayTeam: $Enums.NFLTeam;
-	pickTeam?: $Enums.NFLTeam;
+	pickTeam: $Enums.NFLTeam | null;
 	pickTotalType?: 'over' | 'under' | null;
 	pickScore?: number;
 	gameDate?: Date | string | null;
