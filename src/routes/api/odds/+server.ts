@@ -56,7 +56,16 @@ export async function GET({ locals }) {
 		const odds = await fetch(
 			`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}` // &commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}
 		);
-		const oddsData: Odds[] = await odds.json();
+		const oddsData: Odds[] | { message: string; error_code: string; details_url: string } =
+			await odds.json();
+		if (!Array.isArray(oddsData)) {
+			return new Response(
+				JSON.stringify({
+					success: false,
+					message: 'Error fetching odds data. Probably reached the limit'
+				})
+			);
+		}
 
 		const oddsDataFiltered = oddsData.filter(
 			(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1
