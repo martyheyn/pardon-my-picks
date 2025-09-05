@@ -66,10 +66,6 @@ export async function GET({ locals }) {
 				})
 			);
 		}
-		console.log(
-			'oddsData[0].commence_time',
-			new Date(oddsData[0].commence_time).toLocaleString('en-US', { timeZone: 'America/New_York' })
-		);
 
 		const oddsDataFiltered = oddsData.filter(
 			(game) =>
