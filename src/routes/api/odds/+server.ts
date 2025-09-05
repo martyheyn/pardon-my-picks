@@ -62,13 +62,22 @@ export async function GET({ locals }) {
 			return new Response(
 				JSON.stringify({
 					success: false,
-					message: 'Error fetching odds data. Probably reached the limit'
+					message: 'Error fetching odds data.'
 				})
 			);
 		}
+		console.log(
+			'oddsData[0].commence_time',
+			new Date(oddsData[0].commence_time).toLocaleString('en-US', { timeZone: 'America/New_York' })
+		);
 
 		const oddsDataFiltered = oddsData.filter(
-			(game) => game.bookmakers.length > 0 && game.bookmakers[0].markets.length > 1
+			(game) =>
+				game.bookmakers.length > 0 &&
+				game.bookmakers[0].markets.length > 1 &&
+				new Date(game.commence_time).toLocaleString('en-US', {
+					timeZone: 'America/New_York'
+				}) > date
 		);
 
 		oddsDataClean = oddsDataFiltered.map((game) => {
