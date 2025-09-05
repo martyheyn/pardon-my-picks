@@ -38,8 +38,6 @@
 		usersPicks = dbPicksData.picks;
 	});
 	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
-	$: console.log("dpPicks", dbPicks)
-	$: console.log("odds", odds)
 
 	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
 	let errorId: string;
