@@ -4,7 +4,7 @@
 	export let data: PageData;
 
 	// create store
-	import { onMount, setContext } from 'svelte';
+	import { getContext, onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
@@ -18,8 +18,8 @@
 	import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
 
 	const sideNavCollasped = writable(true);
-	const currWeek = writable(PUBLIC_CURRENT_WEEK);
 	const currYear = writable(PUBLIC_CURRENT_YEAR);
+	const currWeek = writable(PUBLIC_CURRENT_WEEK);
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);
@@ -67,7 +67,8 @@
 	inject({ mode: dev ? 'development' : 'production' });
 
 	let sidenavElement: HTMLElement;
-	onMount(() => {
+
+	onMount(() => {				
 		// close sidenav subitems onmount if open
 		sideNavItems.forEach((navItem, i) => {
 			if (navItem.subItemsOpen) {

@@ -17,6 +17,7 @@
 	const screenWidth: Writable<number> = getContext('screenWidth');
 	const fullPageHeight: Writable<number> = getContext('fullPageHeight');
 	const active: Writable<string> = getContext('active');
+	const currWeek: Writable<number> = getContext('currWeek');
 	$: mobile = $screenWidth && $screenWidth < 640;
 
 	export let scrollY: number;
@@ -55,6 +56,8 @@
 			sideNavCollasped.set(true);
 		}
 	};
+
+	$: console.log("sideNavItems", sideNavItems)
 </script>
 
 <div
@@ -139,6 +142,7 @@
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
 					href={navItem.label === 'Profile' && user
 						? `${navItem.route}/${user.username}`
+						: navItem.label === 'Week' ? `${navItem.route}/${$currWeek}`
 						: navItem.route}
 				>
 					<div

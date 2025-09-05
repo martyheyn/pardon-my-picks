@@ -67,7 +67,7 @@
 				{selectedStats.charAt(0).toUpperCase() + selectedStats.slice(1)} Leaderboard
 			</h4>
 			{#if stats[selectedStats].length === 0}
-				<p class="text-xl">No stats for the leaderboard yet</p>
+				<p class="text-xl">No stats for this leaderboard yet</p>
 			{/if}
 			{#each stats[selectedStats] as stat, i}
 				<div class="flex justify-between items-center w-full max-w-md">

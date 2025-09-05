@@ -48,7 +48,7 @@ export const sideNavItems: sideNavItems = [
 	{
 		label: 'Week',
 		icon: 'calendar',
-		route: `/${PUBLIC_CURRENT_YEAR}/${PUBLIC_CURRENT_WEEK}`,
+		route: `/${PUBLIC_CURRENT_YEAR}`,
 		subItems: currWeekSubNavArr,
 		subItemsOpen: false
 	},
