@@ -18,11 +18,16 @@ const markGames = async () => {
 		const client = await pool.connect();
 
 		const unMarkedGames = await client.query(`
-        SELECT * FROM "Pick" 
-        WHERE winner IS NULL 
-        AND marked = FALSE
-        AND week = ${process.env.CURRENT_WEEK}
-        AND year = ${process.env.CURRENT_YEAR}`);
+			SELECT * FROM "Pick" 
+			WHERE winner IS NULL 
+			AND marked = FALSE
+			AND week = ${process.env.CURRENT_WEEK}
+			AND year = ${process.env.CURRENT_YEAR}
+			AND game_date < NOW();
+		`);
+
+		console.log(`CURRENT_WEEK ${CURRENT_WEEK}`);
+		console.log(`CURRENT_YEAR ${CURRENT_YEAR}`);
 
 		if (unMarkedGames.rows.length > 0) {
 			// if not already in the db we gotta query the odds api
