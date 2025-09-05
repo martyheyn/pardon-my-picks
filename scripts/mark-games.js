@@ -26,8 +26,8 @@ const markGames = async () => {
 			AND game_date < NOW();
 		`);
 
-		console.log(`CURRENT_WEEK ${CURRENT_WEEK}`);
-		console.log(`CURRENT_YEAR ${CURRENT_YEAR}`);
+		console.log(`CURRENT_WEEK ${process.env.CURRENT_WEEK}`);
+		console.log(`CURRENT_YEAR ${process.env.CURRENT_YEAR}`);
 
 		if (unMarkedGames.rows.length > 0) {
 			// if not already in the db we gotta query the odds api
