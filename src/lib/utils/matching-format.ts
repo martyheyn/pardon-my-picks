@@ -284,8 +284,8 @@ export const personaImgPath = (person: string) => {
 			return '/personas/sad-max-pmt.png';
 		case 'Memes':
 			return '/personas/zach-wilson-bench-no-bg.png';
-		case 'Huey':
-			return '/personas/huey.png';
+		case 'Zach':
+			return '/personas/zach_eagle.png';
 		default:
 			return '/personas/sad-max-pmt.png';
 	}
