@@ -17,8 +17,6 @@ const markGames = async () => {
 	try {
 		const client = await pool.connect();
 
-		await client.query(`UPDATE "Pick" SET is_live = false WHERE is_live = true`);
-
 		const unMarkedGames = await client.query(`
         SELECT * FROM "Pick" 
         WHERE winner IS NULL 
