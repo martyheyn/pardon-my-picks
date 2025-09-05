@@ -26,15 +26,11 @@ const markGames = async () => {
 			AND game_date < NOW();
 		`);
 
-		console.log(`CURRENT_WEEK ${process.env.CURRENT_WEEK}`);
-		console.log(`CURRENT_YEAR ${process.env.CURRENT_YEAR}`);
-
 		if (unMarkedGames.rows.length > 0) {
 			// if not already in the db we gotta query the odds api
 			const response = await fetch(
 				`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=3&apiKey=${process.env.ODDS_API_KEY}`
 			);
-			console.log('response', response);
 			const scoresDataRaw = await response.json();
 
 			if (scoresDataRaw.length === 0 || !scoresDataRaw) return [];
