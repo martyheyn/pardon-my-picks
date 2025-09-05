@@ -23,8 +23,6 @@
 		fades: fadesData
 	};
 
-	$: console.log("stats", stats)
-
 	// pagination
 	let currentPage = 1;
 	$: totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
