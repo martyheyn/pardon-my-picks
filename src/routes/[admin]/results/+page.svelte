@@ -13,7 +13,6 @@
 	export let form: ActionData;
 
 	$: ({ pmtWeeklyPicks } = data);
-    $: console.log("pmtWeeklyPicks", pmtWeeklyPicks)
 
 	const alert: Writable<Alert> = getContext('alert');
 

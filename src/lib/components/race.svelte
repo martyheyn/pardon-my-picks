@@ -48,9 +48,7 @@
 			if (openerWeeklyDataByPersonArr.length < 3) return;
 			lastWeekWithData =
 				openerWeeklyDataByPersonArr[0][Object.keys(fullGroupData[0])[0]].data.length;
-		}
-
-		if (raceYear === 2024) {
+		} else {
 			for (const x in data) {
 				groupVar.push({ [x]: data[x] });
 			}
@@ -227,7 +225,7 @@
 			</table>
 		{/if}
 
-		{#if raceYear === 2024}
+		{#if raceYear !== 2023}
 			<table class="w-full mb-2">
 				<caption
 					class={`text-lg font-semibold font-header mt-2 mb-4 ${

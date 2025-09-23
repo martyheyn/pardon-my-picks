@@ -56,8 +56,6 @@
 			sideNavCollasped.set(true);
 		}
 	};
-
-	$: console.log("sideNavItems", sideNavItems)
 </script>
 
 <div

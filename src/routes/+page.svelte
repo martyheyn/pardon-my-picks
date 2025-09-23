@@ -6,7 +6,6 @@
 
 	const currWeek: Writable<number> = getContext('currWeek');
 	const currYear: Writable<number> = getContext('currYear');
-	console.log("$currWeek", $currWeek)
 
 	onMount(async () => {
 		try {
@@ -18,7 +17,6 @@
 			console.error("Failed to fetch weekly picks:", err);
 		}
 
-		console.log(`/${$currYear}/${$currWeek}`);
 		goto(`/${$currYear}/${$currWeek}`);
 	})
 </script>
