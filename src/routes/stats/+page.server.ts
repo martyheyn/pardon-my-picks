@@ -144,7 +144,7 @@ export const load: PageServerLoad = async () => {
 		let pushCount = bet._sum.push ? bet._sum.push : 0;
 		typeBetData.push({
 			person: bet.person,
-			type: bet.type,
+			type: bet.type === 'spreads' ? 'spread' : bet.type,
 			wins: winCount ? winCount.toString() : '0',
 			pushes: pushCount ? pushCount.toString() : '0',
 			record: `${bet._sum.winner} - ${bet._count.winner - winCount - pushCount} - ${bet._sum.push}`
@@ -327,7 +327,6 @@ export const actions: Actions = {
 		// get type bet  data
 		const typeBetData: BetData[] = [];
 
-		// TODO:: 2023 || 2024 not sustainable
 		const typeBet = await prisma.pick.groupBy({
 			by: ['person', 'type'],
 			_sum: {
@@ -351,7 +350,7 @@ export const actions: Actions = {
 			let pushCount = bet._sum.push ? bet._sum.push : 0;
 			typeBetData.push({
 				person: bet.person,
-				type: bet.type,
+				type: bet.type === 'spreads' ? 'spread' : bet.type,
 				wins: winCount ? winCount.toString() : '0',
 				pushes: pushCount ? pushCount.toString() : '0',
 				record: `${bet._sum.winner} - ${bet._count.winner - winCount - pushCount} - ${
