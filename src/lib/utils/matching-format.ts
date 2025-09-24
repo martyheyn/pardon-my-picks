@@ -347,7 +347,7 @@ export const camelCaseToLabel = (person: string) => {
 			return 'Max';
 		case 'memes':
 			return 'Memes';
-		case 'zacb':
+		case 'zach':
 			return 'Zach';
 		default:
 			return 'Big Cat';
