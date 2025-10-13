@@ -71,7 +71,7 @@
                         <p>Spread:</p>
                         <input type="hidden" name="betType" value="spreads">
                         <label for="team-name" class="block text-sm font-semibold text-gray-800 flex-1">
-                            <select required name="teamName" id="team-name-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
+                            <select  name="teamName" id="team-name-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
                                 <option value="">--Choose Team--</option>
                                 {#each nflTeams as team}
                                     <option value={team}>{team}</option>
@@ -81,7 +81,7 @@
                         <input type="hidden" name="overUnder" value={null}>
                         <label for="points" class="block text-sm font-semibold text-gray-800 flex-1">
                             <input
-                                required
+                                
                                 id="points"
                                 name="points"
                                 type="text"
@@ -96,7 +96,7 @@
                         <p>Total:</p>
                         <input type="hidden" name="betType" value="totals">
                         <label for="team-name" class="block text-sm font-semibold text-gray-800 flex-1">
-                            <select required name="teamName" id="team-name-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
+                            <select  name="teamName" id="team-name-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
                                 <option value="">--Choose Team--</option>
                                 {#each nflTeams as team}
                                     <option value={team}>{team}</option>
@@ -104,7 +104,7 @@
                             </select>
                         </label>
                         <label for="over-under" class="block text-sm font-semibold text-gray-800 flex-1">
-                            <select required name="overUnder" id="over-under-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
+                            <select  name="overUnder" id="over-under-select" class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out">
                                 <option value="">--Over / Under--</option>
                                     <option value="under">Under</option>
                                     <option value="over">Over</option>
@@ -112,7 +112,7 @@
                         </label>
                         <label for="points" class="block text-sm font-semibold text-gray-800 flex-1">
                             <input
-                                required
+                                
                                 id="points"
                                 name="points"
                                 type="text"

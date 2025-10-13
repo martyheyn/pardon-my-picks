@@ -84,7 +84,8 @@ export const actions: Actions = {
 			});
 		}
 
-		const parsedPicks = JSON.parse(picksJson);
+		const parsedPicks_ = JSON.parse(picksJson);
+		const parsedPicks = parsedPicks_.filter((p: any) => p.pickTeam);
 		console.log('parsedPicks', parsedPicks);
 
 		// Validate the data using Zod
@@ -130,39 +131,43 @@ export const actions: Actions = {
 					}
 
 					const tzoffset = new Date().getTimezoneOffset() * 60000;
+					console.log('tzoffset', tzoffset);
 					const dt = new Date(gameOdds.commence_time);
+					console.log('gameOdds.commence_time', gameOdds.commence_time);
+					console.log('dt', dt);
 					let estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
+					console.log('estGameDate', estGameDate);
 
 					if (new Date(estGameDate) < new Date()) {
 						return fail(400, { message: 'Game has already started', success: false });
 					}
 
-					await prisma.pick.create({
-						data: {
-							id: generateSecureRandomString(18),
-							gameId: gameOdds.id,
-							year: new Date().getFullYear(),
-							show: 'PMT',
-							week: parseInt(CURRENT_WEEK),
-							person: picks[i].person,
-							type: picks[i].type,
-							description: description,
-							league: 'NFL',
-							homeTeam: fullNameToMascot[gameOdds.home_team] as $Enums.NFLTeam,
-							awayTeam: fullNameToMascot[gameOdds.away_team] as $Enums.NFLTeam,
-							isLive: false,
-							completed: false,
-							marked: false,
-							pickTeam: picks[i].pickTotalType ? null : picks[i]?.pickTeam,
-							pickTotalType: picks[i].pickTotalType ? picks[i]?.pickTotalType : null,
-							pickScore: picks[i].pickScore,
-							gameDate: estGameDate,
-							private: false,
-							userId: null,
-							barstoolEmployee: true,
-							pmtPersona: true
-						}
-					});
+					// await prisma.pick.create({
+					// 	data: {
+					// 		id: generateSecureRandomString(18),
+					// 		gameId: gameOdds.id,
+					// 		year: new Date().getFullYear(),
+					// 		show: 'PMT',
+					// 		week: parseInt(CURRENT_WEEK),
+					// 		person: picks[i].person,
+					// 		type: picks[i].type,
+					// 		description: description,
+					// 		league: 'NFL',
+					// 		homeTeam: fullNameToMascot[gameOdds.home_team] as $Enums.NFLTeam,
+					// 		awayTeam: fullNameToMascot[gameOdds.away_team] as $Enums.NFLTeam,
+					// 		isLive: false,
+					// 		completed: false,
+					// 		marked: false,
+					// 		pickTeam: picks[i].pickTotalType ? null : picks[i]?.pickTeam,
+					// 		pickTotalType: picks[i].pickTotalType ? picks[i]?.pickTotalType : null,
+					// 		pickScore: picks[i].pickScore,
+					// 		gameDate: estGameDate,
+					// 		private: false,
+					// 		userId: null,
+					// 		barstoolEmployee: true,
+					// 		pmtPersona: true
+					// 	}
+					// });
 				}
 
 				return {
