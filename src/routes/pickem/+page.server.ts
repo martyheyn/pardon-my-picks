@@ -142,8 +142,8 @@ export const actions: Actions = {
 					const gameOdds = gameOddsJson[0];
 
 					const tzoffset = new Date().getTimezoneOffset() * 60000;
-					const dt = new Date(gameOdds.commence_time);
-					let estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
+					const dt = new Date(new Date(gameOdds.commence_time).getTime());
+					const estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 
 					if (new Date(estGameDate) < new Date()) {
 						return fail(400, { message: 'Game has already started', success: false });
