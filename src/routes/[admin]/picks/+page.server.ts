@@ -130,7 +130,7 @@ export const actions: Actions = {
 							.toUpperCase()}${picks[i].pickTotalType.slice(1)} ${picks[i].pickScore}`;
 					}
 
-					const tzoffset = new Date().getTimezoneOffset() * 60000;
+					const tzoffset = new Date().getTimezoneOffset() * 120000;
 					const dt = new Date(new Date(gameOdds.commence_time).getTime());
 					const estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 
