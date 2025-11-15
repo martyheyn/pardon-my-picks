@@ -24,6 +24,8 @@
 		case 'malikWillis':
 			betText = 'Malik Willis';
 			break;
+		case 'spunder':
+			betText = "Sp'Under"
 	}
 </script>
 
