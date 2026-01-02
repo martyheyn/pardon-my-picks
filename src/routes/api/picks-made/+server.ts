@@ -1,10 +1,10 @@
-import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 import { prisma } from '$lib/server/prisma';
 
 export async function GET() {
 	const weeklyPmtPicks = await prisma.pick.findMany({
 		where: {
-			year: new Date().getFullYear(),
+			year: parseInt(CURRENT_YEAR),
 			week: parseInt(CURRENT_WEEK),
 			pmtPersona: true
 		},

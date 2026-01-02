@@ -10,6 +10,7 @@ import { fullNameToMascot, mascotToFullName } from '$lib/utils/matching-format';
 
 import { ODDS_API_KEY } from '$env/static/private';
 import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
 
 const PickDataObjectSchema = z.object({
 	person: z.string(),
@@ -86,7 +87,6 @@ export const actions: Actions = {
 
 		const parsedPicks_ = JSON.parse(picksJson);
 		const parsedPicks = parsedPicks_.filter((p: any) => p.pickTeam);
-		console.log('parsedPicks', parsedPicks);
 
 		// Validate the data using Zod
 		try {
@@ -108,7 +108,7 @@ export const actions: Actions = {
 			try {
 				for (let i = 0; i < picks.length; i++) {
 					console.log('picks[i].pickTeam', picks[i].pickTeam);
-					let gameOdds = weeklyOddsGames.filter(
+					const gameOdds = weeklyOddsGames.filter(
 						(game) =>
 							fullNameToMascot[game.home_team] === picks[i].pickTeam ||
 							fullNameToMascot[game.away_team] === picks[i].pickTeam
@@ -142,7 +142,7 @@ export const actions: Actions = {
 						data: {
 							id: generateSecureRandomString(18),
 							gameId: gameOdds.id,
-							year: new Date().getFullYear(),
+							year: parseInt(CURRENT_YEAR),
 							show: 'PMT',
 							week: parseInt(CURRENT_WEEK),
 							person: picks[i].person,

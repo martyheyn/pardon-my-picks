@@ -14,8 +14,8 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 		!url.pathname.includes('user') &&
 		url.pathname.split('/').length > 2
 	) {
-		let year = url.pathname.split('/')[1];
-		let week = url.pathname.split('/')[2];
+		const year = url.pathname.split('/')[1];
+		const week = url.pathname.split('/')[2];
 
 		if (isNaN(parseInt(year)) || isNaN(parseInt(week))) {
 			console.error('REDIRECTING TO 404');

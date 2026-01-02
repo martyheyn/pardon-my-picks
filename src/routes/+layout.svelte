@@ -51,6 +51,7 @@
 
 	const setSidenavActive = (page: Page<Record<string, string>, string | null>) => {
 		const route = $page.route.id;
+
 		if (route && !page.params.year && !page.params.week) {
 			active.set(route);
 			return;
