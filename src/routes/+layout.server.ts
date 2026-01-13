@@ -22,7 +22,7 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 			throw redirect(302, '/404');
 		}
 
-		if (parseInt(week) < 1 || parseInt(week) > 18) {
+		if (parseInt(week) < 1 || parseInt(week) > 21) {
 			console.error('REDIRECTING TO 404');
 			throw redirect(302, '/404');
 		}
