@@ -9,12 +9,31 @@
 
 	type statsType = 'wins' | 'tails' | 'fades';
 
-	// stat switches/pagination flow through form actions (form?.x || x below), never
-	// through data reloading, so this is intentionally a one-time snapshot of the initial load.
-	const { wins, tails, fades, totalCounts } = untrack(() => data);
-	let winsData = $derived(form?.wins || wins);
-	let tailsData = $derived(form?.tails || tails);
-	let fadesData = $derived(form?.fades || fades);
+	// stat switches/pagination/year changes flow through form actions, never through data
+	// reloading, so this is intentionally a one-time snapshot of the initial load.
+	const { wins, tails, fades, totalCounts, years, selectedYear: initialYear } = untrack(() => data);
+
+	let winsData = $state(wins);
+	let tailsData = $state(tails);
+	let fadesData = $state(fades);
+	let winsTotalCount = $state(totalCounts.wins);
+	let tailsTotalCount = $state(totalCounts.tails);
+	let fadesTotalCount = $state(totalCounts.fades);
+
+	// each action response only carries results for the stat type it was submitted for,
+	// so sync just that slice in rather than deriving the whole set from `form`.
+	$effect(() => {
+		if (form?.wins) {
+			winsData = form.wins;
+			winsTotalCount = form.total;
+		} else if (form?.tails) {
+			tailsData = form.tails;
+			tailsTotalCount = form.total;
+		} else if (form?.fades) {
+			fadesData = form.fades;
+			fadesTotalCount = form.total;
+		}
+	});
 
 	let selectedStats: statsType = $state('wins');
 	const selectedStatsArr: statsType[] = ['wins', 'tails', 'fades'];
@@ -25,9 +44,22 @@
 		fades: fadesData
 	});
 
+	let totalCountsData = $derived({
+		wins: winsTotalCount,
+		tails: tailsTotalCount,
+		fades: fadesTotalCount
+	});
+
+	// most recent season first, so index 0 is the newest year
+	const sortedYears = [...years].sort((a, b) => b - a);
+	let selectedYear = $state(initialYear);
+	let yearIndex = $derived(sortedYears.indexOf(selectedYear));
+	let hasOlderYear = $derived(yearIndex < sortedYears.length - 1);
+	let hasNewerYear = $derived(yearIndex > 0);
+
 	// pagination
 	let currentPage = $state(1);
-	let totalPages = $derived(Math.ceil(Number(totalCounts[selectedStats]) / 10));
+	let totalPages = $derived(Math.ceil(Number(totalCountsData[selectedStats]) / 10));
 
 	const pageIndices = (count: number) => Array.from({ length: count }, (_, i) => i);
 </script>
@@ -44,7 +76,7 @@
 			<div class="grid grid-cols-3 mt-2">
 				{#each selectedStatsArr as statType}
 					<form
-						action="?/{statType}Total&page=0"
+						action="?/{statType}Total&page=0&year={selectedYear}"
 						method="POST"
 						use:enhance={() => {
 							selectedStats = statType;
@@ -52,7 +84,7 @@
 						}}
 					>
 						<button
-							class={`w-full h-full text-slate-900 dark:text-white transition-all duration-300 
+							class={`w-full h-full text-slate-900 dark:text-white transition-all duration-300
 									ease-in-out cursor-pointer py-4 rounded-md ${
 										selectedStats === statType
 											? 'underline underline-offset-4 bg-primary text-white dark:bg-[#1f1f1f]'
@@ -67,9 +99,64 @@
 		</div>
 
 		<div class="my-2 mx-4 p-2 flex flex-col justify-center items-center gap-y-2">
-			<h4 class="text-2xl font-header mb-4">
+			<h4 class="text-2xl font-header mb-2">
 				{selectedStats.charAt(0).toUpperCase() + selectedStats.slice(1)} Leaderboard
 			</h4>
+
+			<div class="flex items-center justify-center gap-x-4 mb-2">
+				<form
+					action="?/{selectedStats}Total&page=0&year={sortedYears[yearIndex + 1] ?? selectedYear}"
+					method="POST"
+					use:enhance={() => {
+						currentPage = 1;
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								await applyAction(result);
+								selectedYear = sortedYears[yearIndex + 1] ?? selectedYear;
+							} else if (result.type === 'failure') {
+								await applyAction(result);
+							}
+						};
+					}}
+				>
+					<button
+						type="submit"
+						disabled={!hasOlderYear}
+						aria-label="Previous year"
+						class="text-xl leading-none px-2 disabled:opacity-30 disabled:cursor-not-allowed hover:text-primary transition-all"
+					>
+						‹
+					</button>
+				</form>
+
+				<span class="font-semibold font-header text-lg w-16 text-center">{selectedYear}</span>
+
+				<form
+					action="?/{selectedStats}Total&page=0&year={sortedYears[yearIndex - 1] ?? selectedYear}"
+					method="POST"
+					use:enhance={() => {
+						currentPage = 1;
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								await applyAction(result);
+								selectedYear = sortedYears[yearIndex - 1] ?? selectedYear;
+							} else if (result.type === 'failure') {
+								await applyAction(result);
+							}
+						};
+					}}
+				>
+					<button
+						type="submit"
+						disabled={!hasNewerYear}
+						aria-label="Next year"
+						class="text-xl leading-none px-2 disabled:opacity-30 disabled:cursor-not-allowed hover:text-primary transition-all"
+					>
+						›
+					</button>
+				</form>
+			</div>
+
 			{#if stats[selectedStats].length === 0}
 				<p class="text-xl">No stats for this leaderboard yet</p>
 			{/if}
@@ -111,7 +198,7 @@
 					{#if totalPages <= 3}
 						{#each pageIndices(totalPages) as pageIdx}
 							<form
-								action="?/{selectedStats}Total&page={pageIdx}"
+								action="?/{selectedStats}Total&page={pageIdx}&year={selectedYear}"
 								method="POST"
 								use:enhance={() => {
 									return async ({ result }) => {
@@ -143,7 +230,7 @@
 						</button>
 
 						<form
-							action="?/{selectedStats}Total&page=1"
+							action="?/{selectedStats}Total&page=1&year={selectedYear}"
 							method="POST"
 							use:enhance={() => {
 								return async ({ result }) => {
@@ -165,7 +252,7 @@
 						<div>...</div>
 
 						<form
-							action="?/{selectedStats}Total&page={totalPages - 1}"
+							action="?/{selectedStats}Total&page={totalPages - 1}&year={selectedYear}"
 							method="POST"
 							use:enhance={() => {
 								return async ({ result }) => {
@@ -187,7 +274,7 @@
 						</form>
 					{:else}
 						<form
-							action="?/{selectedStats}Total&page={currentPage - 2}"
+							action="?/{selectedStats}Total&page={currentPage - 2}&year={selectedYear}"
 							method="POST"
 							use:enhance={() => {
 								return async ({ result }) => {
@@ -208,13 +295,13 @@
 
 						<button
 							disabled={true}
-							class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white text-white 
+							class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white text-white
 									rounded-full py-2 px-4 bg-darkHover`}>{currentPage}</button
 						>
 
 						{#if currentPage !== totalPages}
 							<form
-								action="?/{selectedStats}Total&page={currentPage}"
+								action="?/{selectedStats}Total&page={currentPage}&year={selectedYear}"
 								method="POST"
 								use:enhance={() => {
 									return async ({ result }) => {
@@ -238,7 +325,7 @@
 							<div>...</div>
 
 							<form
-								action="?/{selectedStats}Total&page={totalPages - 1}"
+								action="?/{selectedStats}Total&page={totalPages - 1}&year={selectedYear}"
 								method="POST"
 								use:enhance={() => {
 									return async ({ result }) => {
