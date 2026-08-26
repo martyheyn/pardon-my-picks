@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import {
 		personasLabelToslug,
 		personaAvatarPath,
@@ -15,35 +15,46 @@
 	import { enhance } from '$app/forms';
 	// import Alert from '$lib/components/alert.svelte';
 
-	export let data: PageData;
-	export let form;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	$: ({ typeBets, specialBets, personData } = form || data);
-
-	$: personData.sort((a, b) => {
-		return (
-			sortOrder[a.person as keyof typeof sortOrder] - sortOrder[b.person as keyof typeof sortOrder]
-		);
+	let { typeBets, specialBets, personData } = $derived.by(() => {
+		const result = form || data;
+		// sort a copy - result.personData may itself be a $derived/$state value elsewhere,
+		// and .sort() mutates in place
+		const sortedPersonData = [...result.personData].sort((a, b) => {
+			return (
+				sortOrder[a.person as keyof typeof sortOrder] -
+				sortOrder[b.person as keyof typeof sortOrder]
+			);
+		});
+		return {
+			typeBets: result.typeBets,
+			specialBets: result.specialBets,
+			personData: sortedPersonData
+		};
 	});
 
 	// dropdown selector for stat aggregation
 	enum StatHeaders {
-		CURR_YEAR = '2025 NFL Season Stats',
+		CURR_YEAR = '2026 NFL Season Stats',
+		STATS_2025 = '2025 NFL Season Stats',
 		STATS_2024 = '2024 NFL Season Stats',
 		STATS_2023 = '2023 NFL Season Stats',
 		ALLTIME = 'All Time Stats'
 	}
 
 	const statsHeaderYearNum = {
+		'2026 NFL Season Stats': 2026,
 		'2025 NFL Season Stats': 2025,
 		'2024 NFL Season Stats': 2024,
 		'2023 NFL Season Stats': 2023,
 		'All Time Stats': 0
 	};
 
-	let selectedStat: StatHeaders = StatHeaders.ALLTIME;
+	let selectedStat: StatHeaders = $state(StatHeaders.ALLTIME);
 	const selectStatHeaders: StatHeaders[] = [
 		StatHeaders.CURR_YEAR,
+		StatHeaders.STATS_2025,
 		StatHeaders.STATS_2024,
 		StatHeaders.STATS_2023,
 		StatHeaders.ALLTIME
@@ -63,7 +74,7 @@
 		return betTypeStats[0].record;
 	};
 
-	let specialBetOpen: string[] | undefined = undefined;
+	let specialBetOpen: string[] | undefined = $state(undefined);
 	const handleSpecialBetOpen = (person: string) => {
 		if (specialBetOpen?.includes(person)) {
 			specialBetOpen = specialBetOpen?.filter((p) => p !== person);
@@ -80,9 +91,14 @@
 		}[];
 	};
 
-	$: tailFadeOpen = personData
-		.filter((person) => parseInt(person.total_tails) > 0 || parseInt(person.total_fades) > 0)
-		.map((person) => person.person);
+	let tailFadeOpen: string[] | undefined = $state(undefined);
+
+	$effect(() => {
+		tailFadeOpen = personData
+			.filter((person) => parseInt(person.total_tails) > 0 || parseInt(person.total_fades) > 0)
+			.map((person) => person.person);
+	});
+
 	const handleTailFadeOpen = (person: string) => {
 		if (tailFadeOpen?.includes(person)) {
 			tailFadeOpen = tailFadeOpen?.filter((p) => p !== person);
@@ -92,18 +108,22 @@
 	};
 
 	// want this indexed so it can be easily accessed in the loop for jsx
-	$: specialBetsData = specialBets.reduce((acc: SpecialBet, bet: any) => {
-		const { person } = bet;
-		acc[person] = acc[person] || [];
-		const betData = {
-			specialBet: bet.specialBet,
-			wins: bet._sum.winner,
-			pushes: bet._sum.push,
-			totalGames: bet._count.winner
-		};
-		acc[person].push(betData);
-		return acc;
-	}, {});
+	let specialBetsData = $derived(
+		specialBets.reduce((acc: SpecialBet, bet) => {
+			const { person } = bet;
+			acc[person] = acc[person] || [];
+			const betData = {
+				// the where clause excludes empty specialBet values, but Prisma's groupBy
+				// return type doesn't reflect that filter
+				specialBet: bet.specialBet as SpecialBetKey,
+				wins: bet._sum.winner ?? 0,
+				pushes: bet._sum.push ?? 0,
+				totalGames: bet._count.winner
+			};
+			acc[person].push(betData);
+			return acc;
+		}, {})
+	);
 
 	const getSpecialBetRecord = (person: string) => {
 		const betRecord = specialBetsData[person].reduce(
@@ -141,10 +161,10 @@
 	};
 
 	// modal
-	let showModal = false;
-	let profilePic = '';
+	let showModal = $state(false);
+	let profilePic = $state('');
 
-	let dropdownOpen = false;
+	let dropdownOpen = $state(false);
 </script>
 
 <svelte:head>
@@ -167,18 +187,18 @@
 		dark:border-white dark:border-opacity-100 shadow-lg w-fit
 		transition-all duration-300 ease-in-out"
 	>
-		<button
-			class={`w-full transition-all duration-300 ease-in-out py-1.5 sm:py-2 pl-3 sm:pl-4 pr-2 flex gap-x-3 
-			justify-between items-center border border-black border-opacity-20 group cursor-auto 
+		<div
+			class={`w-full transition-all duration-300 ease-in-out py-1.5 sm:py-2 pl-3 sm:pl-4 pr-2 flex gap-x-3
+			justify-between items-center border border-black border-opacity-20 group cursor-auto
 			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
 			<h2 class="text-base">
-				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023, 2024 & 2025)' : selectedStat}
+				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023, 2024, 2025 & 2026)' : selectedStat}
 			</h2>
 			<button
-				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2 
+				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2
 				sm:group-hover:opacity-100 sm:group-hover:translate-y-0 cursor-pointer`}
-				on:click={() => (dropdownOpen = !dropdownOpen)}
+				onclick={() => (dropdownOpen = !dropdownOpen)}
 			>
 				<Icon
 					class={`${
@@ -189,7 +209,7 @@
 					iconName="arrow"
 				/>
 			</button>
-		</button>
+		</div>
 		{#if dropdownOpen}
 			<div
 				class={`transition-all duration-300 ease-in-out	flex flex-col text-left`}
@@ -205,7 +225,7 @@
 							}
 							hover:bg-gray-200 transition-all duration-300 ease-in-out`}
 							type="submit"
-							on:click={() => {
+							onclick={() => {
 								selectedStat = stat;
 								dropdownOpen = false;
 							}}>{stat}</button
@@ -227,7 +247,7 @@
 						{persona.person}
 					</p>
 					<button
-						on:click={() => {
+						onclick={() => {
 							showModal = true;
 							profilePic = personaAvatarPath(persona.person);
 						}}
@@ -246,8 +266,8 @@
 							parseFloat(persona.record_pct) > 50
 								? 'text-green-500 dark:text-green-300'
 								: parseFloat(persona.record_pct) < 50
-								? 'text-red-500 dark:text-red-300'
-								: 'text-yellow-500 dark:text-yellow-300'
+									? 'text-red-500 dark:text-red-300'
+									: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
 						{parseFloat(persona.record_pct).toFixed(1)}%
@@ -291,7 +311,7 @@
 					{#if parseInt(persona.total_tails) > 0 || parseInt(persona.total_fades) > 0}
 						<div class="flex flex-row justify-start gap-x-3 mt-2 px-1">
 							<h2 class="text-md pl-1">Tail / Fade</h2>
-							<button class="pr-3" on:click={() => handleTailFadeOpen(persona.person)}>
+							<button class="pr-3" onclick={() => handleTailFadeOpen(persona.person)}>
 								<Icon
 									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer
 							 			hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit
@@ -313,10 +333,12 @@
 											class="text-xs text-muteTextColor dark:text-darkMuteTextColor uppercase bg-gray-200
 										dark:bg-gray-700 border-b"
 										>
-											<th scope="col" class="font-extrabold px-4 py-3">Times Tailed</th>
-											<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
-											<th scope="col" class="font-extrabold px-4 py-3">Times Faded</th>
-											<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
+											<tr>
+												<th scope="col" class="font-extrabold px-4 py-3">Times Tailed</th>
+												<th scope="col" class="font-extrabold px-4 py-3">Tail %</th>
+												<th scope="col" class="font-extrabold px-4 py-3">Times Faded</th>
+												<th scope="col" class="font-extrabold px-4 py-3">Fade %</th>
+											</tr>
 										</thead>
 										<tbody>
 											<tr
@@ -333,8 +355,8 @@
 														parseInt(persona.tails_pct) > 50
 															? 'text-green-500 dark:text-green-300'
 															: parseInt(persona.tails_pct) < 50
-															? 'text-red-500 dark:text-red-300'
-															: 'text-yellow-500 dark:text-yellow-300'
+																? 'text-red-500 dark:text-red-300'
+																: 'text-yellow-500 dark:text-yellow-300'
 													} px-4 py-3 border-r`}
 													>{persona.tails_pct === 'NaN'
 														? 'NA'
@@ -346,8 +368,8 @@
 														parseInt(persona.fades_pct) > 50
 															? 'text-green-500 dark:text-green-300'
 															: parseInt(persona.fades_pct) < 50
-															? 'text-red-500 dark:text-red-300'
-															: 'text-yellow-500 dark:text-yellow-300'
+																? 'text-red-500 dark:text-red-300'
+																: 'text-yellow-500 dark:text-yellow-300'
 													} px-4 py-3`}
 												>
 													{persona.fades_pct === 'NaN'
@@ -366,7 +388,7 @@
 						<div class="flex flex-row justify-start gap-x-3 mt-2 px-1">
 							<h2 class="text-md pl-1">Special Bets</h2>
 							<p class="">{getSpecialBetRecord(persona.person)}</p>
-							<button class="pr-3" on:click={() => handleSpecialBetOpen(persona.person)}>
+							<button class="pr-3" onclick={() => handleSpecialBetOpen(persona.person)}>
 								<Icon
 									class={`transition-all duration-300 ease-in-out fill-black cursor-pointer
 							 	hover:bg-gray-300 hover:bg-opacity-50 rounded-full w-fit
@@ -388,9 +410,11 @@
 											class="text-xs uppercase bg-gray-200 border-b
 										dark:bg-gray-700 text-muteTextColor dark:text-darkMuteTextColor"
 										>
-											<th scope="col" class="font-extrabold px-4 py-3">Special Bet</th>
-											<th scope="col" class="font-extrabold px-4 py-3">Record</th>
-											<th scope="col" class="font-extrabold px-4 py-3">Results</th>
+											<tr>
+												<th scope="col" class="font-extrabold px-4 py-3">Special Bet</th>
+												<th scope="col" class="font-extrabold px-4 py-3">Record</th>
+												<th scope="col" class="font-extrabold px-4 py-3">Results</th>
+											</tr>
 										</thead>
 										<tbody>
 											{#each specialBetsData[persona.person] as bet, i}

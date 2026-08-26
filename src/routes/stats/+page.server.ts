@@ -34,12 +34,16 @@ type BetData = {
 	record: string;
 };
 
+const safePct = (numerator: number, denominator: number) => {
+	return denominator === 0 ? 0 : (numerator / denominator) * 100;
+};
+
 const getRecordPct = (total_picks: number, wins: number, pushes: number) => {
-	return parseFloat(`${(wins / (Number(total_picks) - pushes)) * 100}`);
+	return safePct(wins, Number(total_picks) - pushes);
 };
 
 export const load: PageServerLoad = async () => {
-	let currYear = Number(CURRENT_YEAR);
+	const currYear = Number(CURRENT_YEAR);
 	// get all of the tail and fade data by person
 	const rawPersonData: RawPersonData[] = await prisma.$queryRaw`
 			SELECT p.person,
@@ -59,7 +63,7 @@ export const load: PageServerLoad = async () => {
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
 				-- AND p.year = ${currYear}
-				AND p.year IN (2023,2024,2025)
+				AND p.year IN (2023,2024,2025,2026)
 				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) p LEFT JOIN (
@@ -72,7 +76,7 @@ export const load: PageServerLoad = async () => {
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
 				-- AND p.year = ${currYear}
-				AND p.year IN (2023,2024,2025)
+				AND p.year IN (2023,2024,2025,2026)
 				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) t ON p.person = t.person
@@ -86,7 +90,7 @@ export const load: PageServerLoad = async () => {
 				WHERE p.pmt_persona = true
 				AND p.barstool_employee = true
 				-- AND p.year = ${currYear}
-				AND p.year IN (2023,2024,2025)
+				AND p.year IN (2023,2024,2025,2026)
 				AND p.winner IS NOT NULL
 				GROUP BY p.person
 			) f ON p.person = f.person
@@ -107,13 +111,11 @@ export const load: PageServerLoad = async () => {
 				Number(person.pushes)
 			).toString(),
 			total_tails: Number(person.total_tails).toString(),
-			tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100)
+			tails_pct: safePct(Number(person.tail_wins), Number(person.total_tails))
 				.toFixed(1)
 				.toString(),
 			total_fades: Number(person.total_fades).toString(),
-			fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100)
-				.toFixed(1)
-				.toString()
+			fades_pct: safePct(Number(person.fade_wins), Number(person.total_fades)).toFixed(1).toString()
 		});
 	});
 
@@ -134,14 +136,14 @@ export const load: PageServerLoad = async () => {
 			barstoolEmployee: true,
 			// year: currYear
 			year: {
-				in: [2023, 2024, 2025]
+				in: [2023, 2024, 2025, 2026]
 			}
 		}
 	});
 
 	typeBet.map((bet) => {
-		let winCount = bet._sum.winner ? bet._sum.winner : 0;
-		let pushCount = bet._sum.push ? bet._sum.push : 0;
+		const winCount = bet._sum.winner ? bet._sum.winner : 0;
+		const pushCount = bet._sum.push ? bet._sum.push : 0;
 		typeBetData.push({
 			person: bet.person,
 			type: bet.type === 'spreads' ? 'spread' : bet.type,
@@ -168,7 +170,7 @@ export const load: PageServerLoad = async () => {
 			barstoolEmployee: true,
 			// year: Number(CURRENT_YEAR)
 			year: {
-				in: [2023, 2024, 2025]
+				in: [2023, 2024, 2025, 2026]
 			}
 		}
 	});
@@ -181,16 +183,18 @@ export const load: PageServerLoad = async () => {
 };
 
 const yearHeaderMap = {
+	'2026 NFL Season Stats': [2026],
 	'2025 NFL Season Stats': [2025],
 	'2024 NFL Season Stats': [2024],
 	'2023 NFL Season Stats': [2023],
-	'All Time Stats': [2023, 2024, 2025]
+	'All Time Stats': [2023, 2024, 2025, 2026]
 };
 
 export const actions: Actions = {
 	selectStats: async (event) => {
 		const form = await event.request.formData();
 		const year = form.get('year') as
+			| '2026 NFL Season Stats'
 			| '2025 NFL Season Stats'
 			| '2024 NFL Season Stats'
 			| '2023 NFL Season Stats'
@@ -313,11 +317,11 @@ export const actions: Actions = {
 					Number(person.pushes)
 				).toString(),
 				total_tails: Number(person.total_tails).toString(),
-				tails_pct: ((Number(person.tail_wins) / Number(person.total_tails)) * 100)
+				tails_pct: safePct(Number(person.tail_wins), Number(person.total_tails))
 					.toFixed(2)
 					.toString(),
 				total_fades: Number(person.total_fades).toString(),
-				fades_pct: ((Number(person.fade_wins) / Number(person.total_fades)) * 100)
+				fades_pct: safePct(Number(person.fade_wins), Number(person.total_fades))
 					.toFixed(2)
 					.toString()
 			});
@@ -346,8 +350,8 @@ export const actions: Actions = {
 		});
 
 		typeBet.map((bet) => {
-			let winCount = bet._sum.winner ? bet._sum.winner : 0;
-			let pushCount = bet._sum.push ? bet._sum.push : 0;
+			const winCount = bet._sum.winner ? bet._sum.winner : 0;
+			const pushCount = bet._sum.push ? bet._sum.push : 0;
 			typeBetData.push({
 				person: bet.person,
 				type: bet.type === 'spreads' ? 'spread' : bet.type,

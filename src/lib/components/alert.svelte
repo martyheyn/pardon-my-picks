@@ -6,23 +6,20 @@
 
 	const alert: Writable<Alert> = getContext('alert');
 
-	export let ms = 3000;
-	let visible: boolean = false;
+	let { ms = 3000 }: { ms?: number } = $props();
+	let visible = $state(false);
 	let timeout: number | undefined;
 
-	let color: string;
-
-	$: switch ($alert.alertType) {
-		case 'error':
-			color = 'bg-lightRed dark:bg-darkRed dark:text-white';
-			break;
-		case 'success':
-			color = 'bg-lightGreen dark:bg-darkGreen dark:text-white';
-			break;
-		default:
-			color = 'bg-gray-100 text-gray-800';
-			break;
-	}
+	let color = $derived.by(() => {
+		switch ($alert.alertType) {
+			case 'error':
+				return 'bg-lightRed dark:bg-darkRed dark:text-white';
+			case 'success':
+				return 'bg-lightGreen dark:bg-darkGreen dark:text-white';
+			default:
+				return 'bg-gray-100 text-gray-800';
+		}
+	});
 
 	const onMessageChange = (message: string | undefined, ms: number) => {
 		clearTimeout(timeout);
@@ -39,7 +36,9 @@
 		}
 	};
 
-	$: onMessageChange($alert.text, ms); // whenever the alert store or the ms props changes run onMessageChange
+	$effect(() => {
+		onMessageChange($alert.text, ms); // whenever the alert store or the ms prop changes run onMessageChange
+	});
 
 	onDestroy(() => clearTimeout(timeout)); // make sure we clean-up the timeout
 </script>

@@ -1,53 +1,21 @@
-import { type $Enums, type Tail, type Fade, Prisma } from '@prisma/client';
-
-type Pick = {
-	tail?: Tail[] | null;
-	fade?: Fade[] | null;
-} & {
-	id: string;
-	createdAt: Date;
-	updatedAt: Date;
-	year: number;
-	show: string;
-	week: number | null;
-	person: string;
-	userId: string | null;
-	private: boolean;
-	type: string;
-	description: string;
-	homeTeam: $Enums.NFLTeam;
-	awayTeam: $Enums.NFLTeam;
-	homeTeamScore: number | null;
-	awayTeamScore: number | null;
-	isLive: boolean;
-	winner: number | null;
-	push: number | null;
-	gameDate: Date | null;
-	result: string | null;
-	league: string;
-	betLink: string | null;
-	espnLink: string | null;
-	highlighLink: string | null;
-	specialBet: string;
-	nerdNugget: string | null;
-};
-
-export type PickByPerson = {
-	[key: string]: Pick[];
-};
+import { type $Enums, Prisma } from '@prisma/client';
 
 export type Alert = {
 	text: string | undefined;
 	alertType: 'error' | 'success' | undefined;
 };
 
-export const picksWithTaisAndFades = Prisma.validator<Prisma.PickArgs>()({
+export const picksWithTaisAndFades = Prisma.validator<Prisma.PickDefaultArgs>()({
 	include: {
 		tail: true,
 		fade: true
 	}
 });
 export type PicksWithTailsAndFades = Prisma.PickGetPayload<typeof picksWithTaisAndFades>;
+
+export type PickByPerson = {
+	[key: string]: PicksWithTailsAndFades[];
+};
 
 export type Scores = {
 	away_team: $Enums.NFLTeam;

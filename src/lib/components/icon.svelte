@@ -1,13 +1,21 @@
 <script lang="ts">
-	import { draw } from 'svelte/transition';
+	let {
+		iconName,
+		width,
+		height,
+		fillRule = null,
+		clipRule = null,
+		class: className = undefined
+	}: {
+		iconName: string;
+		width: string;
+		height: string;
+		fillRule?: 'inherit' | 'nonzero' | 'evenodd' | null;
+		clipRule?: 'inherit' | 'nonzero' | 'evenodd' | null;
+		class?: string;
+	} = $props();
 
-	export let iconName: string;
-	export let width: string;
-	export let height: string;
-	export let fillRule: 'inherit' | 'nonzero' | 'evenodd' | null | undefined = null;
-	export let clipRule: 'inherit' | 'nonzero' | 'evenodd' | null | undefined = null;
-
-	let icons: { [key: string]: { box: number; box2?: number; svg: string } } = {
+	const icons: { [key: string]: { box: number; box2?: number; svg: string } } = {
 		stats: {
 			box: 32,
 			svg: `
@@ -131,14 +139,16 @@
 			svg: `<path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7" class="stroke-white fill-none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path d="M15 7h6v6" class="stroke-white fill-none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`
 		}
 	};
-	let displayIcon = icons[iconName];
+	let displayIcon = $derived(icons[iconName]);
 </script>
 
 <svg
-	class={$$props.class}
+	class={className}
 	{width}
 	{height}
 	viewBox="0 0 {displayIcon.box} {displayIcon.box2 ? displayIcon.box2 : displayIcon.box}"
 	fill-rule={fillRule}
-	clip-rule={clipRule}>{@html displayIcon.svg}</svg
+	clip-rule={clipRule}
+	><!-- eslint-disable-next-line svelte/no-at-html-tags -- displayIcon.svg is always one of the hardcoded entries in the `icons` map above, never user input -->
+	{@html displayIcon.svg}</svg
 >

@@ -406,6 +406,18 @@ export const sortOrder = {
 	Jake: 7
 };
 
+// groups picks-by-person into an array of single-person entries, sorted by sortOrder
+export function sortPicksByPerson<T>(picksByPerson: { [person: string]: T }) {
+	return Object.entries(picksByPerson)
+		.map(([person, personPicks]) => ({ [person]: personPicks }))
+		.sort((a, b) => {
+			return (
+				sortOrder[Object.keys(a)[0] as keyof typeof sortOrder] -
+				sortOrder[Object.keys(b)[0] as keyof typeof sortOrder]
+			);
+		});
+}
+
 export type SpecialBetKey =
 	| 'lunder'
 	| 'timezone'

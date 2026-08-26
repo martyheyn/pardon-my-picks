@@ -6,31 +6,36 @@
 	import AlertFlash from '$lib/components/alert.svelte';
 	import type { Alert } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
-	import { getContext } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 
 	import { navigating } from '$app/stores';
 
-	export let data;
+	let { data } = $props();
 
 	const alert: Writable<Alert> = getContext('alert');
 
-	const { form, errors } = superForm(data.form);
+	// superForm is meant to be initialized once with the load function's initial data
+	const { form, errors } = superForm(untrack(() => data.form));
 
-	$: if ($errors && $errors._errors) {
-		alert.set({
-			text: $errors._errors[0],
-			alertType: 'error'
-		});
-	}
+	$effect(() => {
+		if ($errors && $errors._errors) {
+			alert.set({
+				text: $errors._errors[0],
+				alertType: 'error'
+			});
+		}
+	});
 
 	// wanted to implement ui rate limiting on btns
-	let disableSubmit = false;
-	$: if ($errors && $errors._errors && $errors._errors[0].includes('rate limit')) {
-		disableSubmit = true;
-		setTimeout(() => {
-			disableSubmit = false;
-		}, 60000);
-	}
+	let disableSubmit = $state(false);
+	$effect(() => {
+		if ($errors && $errors._errors && $errors._errors[0].includes('rate limit')) {
+			disableSubmit = true;
+			setTimeout(() => {
+				disableSubmit = false;
+			}, 60000);
+		}
+	});
 
 	const lastPage = $navigating?.from?.route.id;
 </script>

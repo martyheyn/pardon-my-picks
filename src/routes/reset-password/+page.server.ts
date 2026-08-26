@@ -41,7 +41,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	default: async (event: any) => {
+	default: async (event) => {
 		const form = await superValidate(event, zod(ResetFormSchema));
 
 		// rate limiter: Every call to isLimited counts as a hit towards the rate limit for the event.

@@ -36,14 +36,18 @@ type total = {
 };
 
 export const load: PageServerLoad = async () => {
-	let currYear = Number(CURRENT_YEAR);
+	const currYear = Number(CURRENT_YEAR);
 
 	const winsByUser: WinsByUser[] = await prisma.$queryRaw`
 	SELECT u.username as username,
 		COUNT(p.id) as total_picks,
     	SUM(p.winner) as wins,
     	SUM(p.push) as pushes,
-		(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0)) as win_pct
+		CASE
+			WHEN COUNT(p.id) - SUM(p.push) = 0 THEN .1
+		ELSE
+			(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0))
+		END as win_pct
 	   FROM "User" u
 	   LEFT JOIN "Pick" p ON u.id = p.user_id
 	   WHERE p.year = ${currYear}
@@ -60,7 +64,8 @@ export const load: PageServerLoad = async () => {
 		const totalPicks = Number(user.total_picks);
 		const pushes = Number(user.pushes);
 
-		const pct = parseFloat(((wins / (totalPicks - pushes)) * 100).toFixed(0));
+		const pct =
+			totalPicks - pushes === 0 ? 0 : parseFloat(((wins / (totalPicks - pushes)) * 100).toFixed(0));
 
 		return {
 			username: user.username,
@@ -131,7 +136,10 @@ export const load: PageServerLoad = async () => {
 		const totalTails = Number(user.total_tails);
 		const tailPush = Number(user.tail_push);
 
-		const tail_pct = parseFloat(((tailWins / (totalTails - tailPush)) * 100).toFixed(0));
+		const tail_pct =
+			totalTails - tailPush === 0
+				? 0
+				: parseFloat(((tailWins / (totalTails - tailPush)) * 100).toFixed(0));
 
 		return {
 			username: user.username,
@@ -147,7 +155,10 @@ export const load: PageServerLoad = async () => {
 		const totalFades = Number(user.total_fades);
 		const fadePush = Number(user.fade_push);
 
-		const fade_pct = parseFloat(((fadeWins / (totalFades - fadePush)) * 100).toFixed(0));
+		const fade_pct =
+			totalFades - fadePush === 0
+				? 0
+				: parseFloat(((fadeWins / (totalFades - fadePush)) * 100).toFixed(0));
 
 		return {
 			username: user.username,
@@ -195,7 +206,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 	winsTotal: async ({ url }: { url: URL }) => {
-		let currYear = Number(CURRENT_YEAR);
+		const currYear = Number(CURRENT_YEAR);
 		const page = Number(url.searchParams.get('page'));
 
 		const winsByUser: WinsByUser[] = await prisma.$queryRaw`
@@ -203,7 +214,11 @@ export const actions: Actions = {
 			COUNT(p.id) as total_picks,
 			SUM(p.winner) as wins,
 			SUM(p.push) as pushes,
-			(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0)) as win_pct
+			CASE
+				WHEN COUNT(p.id) - SUM(p.push) = 0 THEN .1
+			ELSE
+				(SUM(p.winner)* 100.0) / ((COUNT(p.id)* 100.0) - (SUM(p.push)* 100.0))
+			END as win_pct
 			FROM "User" u
 			LEFT JOIN "Pick" p ON u.id = p.user_id
 			WHERE p.year = ${currYear}
@@ -220,7 +235,10 @@ export const actions: Actions = {
 			const totalPicks = Number(user.total_picks);
 			const pushes = Number(user.pushes);
 
-			const pct = parseFloat(((wins / (totalPicks - pushes)) * 100).toFixed(0));
+			const pct =
+				totalPicks - pushes === 0
+					? 0
+					: parseFloat(((wins / (totalPicks - pushes)) * 100).toFixed(0));
 
 			return {
 				username: user.username,
@@ -237,7 +255,7 @@ export const actions: Actions = {
 	},
 
 	tailsTotal: async ({ url }: { url: URL }) => {
-		let currYear = Number(CURRENT_YEAR);
+		const currYear = Number(CURRENT_YEAR);
 
 		const page = Number(url.searchParams.get('page'));
 
@@ -273,7 +291,10 @@ export const actions: Actions = {
 			const totalTails = Number(user.total_tails);
 			const tailPush = Number(user.tail_push);
 
-			const tail_pct = parseFloat(((tailWins / (totalTails - tailPush)) * 100).toFixed(0));
+			const tail_pct =
+				totalTails - tailPush === 0
+					? 0
+					: parseFloat(((tailWins / (totalTails - tailPush)) * 100).toFixed(0));
 
 			return {
 				username: user.username,
@@ -290,7 +311,7 @@ export const actions: Actions = {
 	},
 
 	fadesTotal: async ({ url }: { url: URL }) => {
-		let currYear = Number(CURRENT_YEAR);
+		const currYear = Number(CURRENT_YEAR);
 
 		const page = Number(url.searchParams.get('page'));
 
@@ -327,7 +348,10 @@ export const actions: Actions = {
 			const totalFades = Number(user.total_fades);
 			const fadePush = Number(user.fade_push);
 
-			const fade_pct = parseFloat(((fadeWins / (totalFades - fadePush)) * 100).toFixed(0));
+			const fade_pct =
+				totalFades - fadePush === 0
+					? 0
+					: parseFloat(((fadeWins / (totalFades - fadePush)) * 100).toFixed(0));
 
 			return {
 				username: user.username,

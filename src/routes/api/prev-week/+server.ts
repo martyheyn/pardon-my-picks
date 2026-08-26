@@ -1,12 +1,13 @@
 import { prisma } from '$lib/server/prisma';
-import { fail } from '@sveltejs/kit';
 
 // get the previous weeks results
 // have to make a seperate call becasue I cant pass params to the ServerLoad call
 export async function GET({ url }: { url: URL }) {
 	const currWeek = url.searchParams.get('currWeek');
 	if (!currWeek) {
-		return fail(400, { message: 'Invalid request no currWeek' });
+		return new Response(JSON.stringify({ message: 'Invalid request no currWeek' }), {
+			status: 400
+		});
 	}
 
 	try {
@@ -27,5 +28,8 @@ export async function GET({ url }: { url: URL }) {
 		return new Response(JSON.stringify(prevWeek));
 	} catch (error) {
 		console.error(error);
+		return new Response(JSON.stringify({ message: 'Error fetching previous week results' }), {
+			status: 500
+		});
 	}
 }

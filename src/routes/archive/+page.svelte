@@ -4,13 +4,15 @@
 
 	import Icon from '$lib/components/icon.svelte';
 	import { quadInOut } from 'svelte/easing';
+	import { PUBLIC_CURRENT_YEAR } from '$env/static/public';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
-	$: ({ yearsMaxWeek } = data);
+	let { yearsMaxWeek } = $derived(data);
 
-	// TODO:: get years from the db and lop through them
-	let selectedYear = 2024;
+	let selectedYear = $state(Number(PUBLIC_CURRENT_YEAR));
+
+	const weekNumbers = (max: number) => Array.from({ length: max }, (_, i) => i + 1);
 </script>
 
 <div class="max-w-2xl" in:fade={{ duration: 400, easing: quadInOut, delay: 200 }}>
@@ -27,7 +29,7 @@
 			<div class="flex justify-between items-center">
 				<h4 class="font-header text-xl">{yearWeek.year}</h4>
 
-				<button on:click={() => (selectedYear = yearWeek.year)}>
+				<button onclick={() => (selectedYear = yearWeek.year)}>
 					<Icon
 						class={`${
 							selectedYear === yearWeek.year ? 'rotate-[270deg]' : 'rotate-90'
@@ -41,10 +43,10 @@
 
 			{#if selectedYear === yearWeek.year}
 				<div class="grid grid-cols-4 gap-y-3" transition:slide={{ duration: 300 }}>
-					{#each Array.from({ length: yearWeek._max.week ? yearWeek._max.week : 18 }) as _, i}
+					{#each weekNumbers(yearWeek._max.week ? yearWeek._max.week : 18) as weekNum}
 						<div class="font-paragraph dark:text-blue-100 hover:text-darkMuteTextColor">
-							<a href={`${yearWeek.year}/${i + 1}`}>
-								Week {i + 1}
+							<a href={`${yearWeek.year}/${weekNum}`}>
+								Week {weekNum}
 							</a>
 						</div>
 					{/each}

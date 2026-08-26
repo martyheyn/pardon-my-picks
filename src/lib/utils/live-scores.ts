@@ -27,10 +27,14 @@ export const getLiveGames = async () => {
 	const scores = await fetch(
 		`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
 	);
-	const scoresDataRaw: Scores[] = await scores.json();
+	const scoresDataRaw = await scores.json();
 
-	// only pull games that are currently being played (and teams that are in the enum)
-	if (!scoresDataRaw || scoresDataRaw.length === 0) return [];
+	// the Odds API returns an error object (not an array) on a bad/expired key,
+	// rate limit, or when there's nothing to report - don't let that 500 the page
+	if (!scores.ok || !Array.isArray(scoresDataRaw)) {
+		console.error('getLiveGames: unexpected Odds API response', scores.status, scoresDataRaw);
+		return [];
+	}
 
 	const scoresLive: Scores[] = scoresDataRaw.filter(
 		(game: Scores) =>

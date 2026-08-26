@@ -1,6 +1,12 @@
 import type { Odds, PickData } from '$lib/utils/types';
 import { generateSecureRandomString } from '$lib/utils/helpers';
-import { ODDS_API_KEY, CURRENT_WEEK, GAMES_START_DATE, GAMES_END_DATE } from '$env/static/private';
+import {
+	ODDS_API_KEY,
+	CURRENT_WEEK,
+	CURRENT_YEAR,
+	GAMES_START_DATE,
+	GAMES_END_DATE
+} from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { prisma } from '$lib/server/prisma';
 
@@ -10,7 +16,7 @@ const getDbUserPicks = async (userId: string) => {
 	const dbUserPicks: PickData[] = await prisma.pick.findMany({
 		where: {
 			userId: userId,
-			year: new Date().getFullYear(),
+			year: parseInt(CURRENT_YEAR),
 			week: currentWeek
 		},
 		select: {

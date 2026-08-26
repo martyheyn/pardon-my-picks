@@ -13,34 +13,41 @@
 	import { beforeNavigate } from '$app/navigation';
 	import Modal from '$lib/components/modal.svelte';
 
-	export let data: PageData;
-	export let form: ActionData;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	$: ({ user } = data);
+	let { user } = $derived(data);
 
 	const alert: Writable<Alert> = getContext('alert');
 
-	let odds: Odds[];
-	let bettingOpen: boolean;
-	let dbPicks: PickData[];
-	let usersPicks: PickData[] = [];
+	let odds: Odds[] = $state([]);
+	let bettingOpen: boolean = $state(false);
+	let dbPicks: PickData[] = $state([]);
+	let usersPicks: PickData[] = $state([]);
 
-	let stoppedToSave = 0;
+	let stoppedToSave = $state(0);
 	onMount(async () => {
-		const oddsRes = await fetch(`/api/odds`);
-		let oddsData = await oddsRes.json();
-		odds = oddsData.odds;
-		bettingOpen = oddsData.bettingOpen;
+		try {
+			const oddsRes = await fetch(`/api/odds`);
+			let oddsData = await oddsRes.json();
+			odds = oddsData.odds;
+			bettingOpen = oddsData.bettingOpen;
 
-		const dbPicksRes = await fetch(`/api/db-picks`);
-		let dbPicksData = await dbPicksRes.json();
-		dbPicks = dbPicksData.picks;
-		usersPicks = dbPicksData.picks;
+			const dbPicksRes = await fetch(`/api/db-picks`);
+			let dbPicksData = await dbPicksRes.json();
+			dbPicks = dbPicksData.picks;
+			usersPicks = dbPicksData.picks;
+		} catch (err) {
+			console.error('Failed to fetch odds/picks:', err);
+		}
 	});
-	$: dbPicks = form?.picks && form?.picks?.length > 1 ? form?.picks : dbPicks;
+	$effect(() => {
+		if (form?.picks && form?.picks?.length > 1) {
+			dbPicks = form.picks;
+		}
+	});
 
-	$: hiddenInput = JSON.stringify(usersPicks) as unknown as HTMLInputElement;
-	let errorId: string;
+	let hiddenInput = $derived(JSON.stringify(usersPicks) as unknown as HTMLInputElement);
+	let errorId: string = $state('');
 
 	// TODO: clean this function up, seems like there are way too many inputs and there is a better way to format this
 	const addPick = async (
@@ -155,8 +162,6 @@
 		otherTeam?: string
 	) => {
 		let description = '';
-		if (betNumber) {
-		}
 
 		switch (type) {
 			case 'spread':
@@ -180,7 +185,7 @@
 	const tzoffset = new Date().getTimezoneOffset() * 60000;
 	const estDate = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 
-	let showModal = false;
+	let showModal = $state(false);
 	beforeNavigate(({ cancel }) => {
 		if (usersPicks.length > 0 && dbPicks.length < 1 && stoppedToSave === 0) {
 			showModal = true;
@@ -189,18 +194,14 @@
 		}
 	});
 
-	const updateAlert = () => {
+	$effect(() => {
 		if (form) {
 			alert.set({
 				text: form.message,
 				alertType: form.success ? 'success' : 'error'
 			});
 		}
-		return;
-	};
-
-	// alerts
-	$: form, updateAlert();
+	});
 </script>
 
 <svelte:head>
@@ -237,8 +238,7 @@
 		<AlertFlash />
 	</div>
 
-	<form use:enhance action="?/addPicks" method="post">
-		<input type="hidden" name="userPicks" bind:value={hiddenInput} />
+	<div>
 		{#if usersPicks.length > 0}
 			<div class="w-full mt-4 card max-w-6xl" transition:slide={{ duration: 300 }}>
 				<div
@@ -249,17 +249,20 @@
 						<h2 class="font-header text-2xl">Your Picks</h2>
 					{:else if dbPicks.length < 2 && usersPicks.length === 2}
 						<div class="w-full flex justify-end">
-							<button
-								type="submit"
-								disabled={dbPicks === usersPicks || usersPicks.length !== 2}
-								class={`btn-primary ${
-									usersPicks.length < 2
-										? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
-										: ''
-								}`}
-							>
-								Save Picks
-							</button>
+							<form use:enhance action="?/addPicks" method="post">
+								<input type="hidden" name="userPicks" value={hiddenInput} />
+								<button
+									type="submit"
+									disabled={dbPicks === usersPicks || usersPicks.length !== 2}
+									class={`btn-primary ${
+										usersPicks.length < 2
+											? 'bg-disabled hover:bg-disabled dark:hover:bg-disabled text-muteTextColor border-black'
+											: ''
+									}`}
+								>
+									Save Picks
+								</button>
+							</form>
 						</div>
 					{:else if usersPicks.length < 2}
 						<h2 class="font-header text-2xl">Make 2 Picks & Save Them</h2>
@@ -298,10 +301,10 @@
 										pick.marked === false
 											? ''
 											: pick.winner
-											? 'bg-lightGreen dark:bg-darkGreen px-3 py-2 shadow-lg rounded-md'
-											: pick.push
-											? 'bg-lightYellow dark:bg-darkYellow px-3 py-2 shadow-lg rounded-md'
-											: 'bg-lightRed dark:bg-darkRed px-3 py-2 shadow-lg rounded-md'
+												? 'bg-lightGreen dark:bg-darkGreen px-3 py-2 shadow-lg rounded-md'
+												: pick.push
+													? 'bg-lightYellow dark:bg-darkYellow px-3 py-2 shadow-lg rounded-md'
+													: 'bg-lightRed dark:bg-darkRed px-3 py-2 shadow-lg rounded-md'
 									} w-fit flex justify-start items-center`}
 								>
 									{pick.description}
@@ -340,7 +343,7 @@
 										}}
 									>
 										<input type="hidden" name="pickId" value={pick.id} />
-										<input type="hidden" name="usersPicks" bind:value={hiddenInput} />
+										<input type="hidden" name="usersPicks" value={hiddenInput} />
 
 										<button
 											class="w-full px-4 py-1.5 rounded-md bg-lightRed hover:bg-lightRedHover dark:bg-darkRed
@@ -362,7 +365,7 @@
 		font-paragraph transition-all duration-300 ease-in-out"
 		>
 			{#if odds !== undefined && odds.length > 0}
-				{#each odds as odd, i}
+				{#each odds as odd}
 					<div class="card pb-4 pt-2 px-4 sm:px-6">
 						<!-- min-w-[360px] -->
 						{#if errorId === odd.id && $alert.text}
@@ -376,13 +379,9 @@
 
 						<div class="grid grid-cols-8 gap-x-4">
 							<div class="col-span-3 grid grid-rows-3 gap-4 place-content-start w-full">
-								<div />
+								<div></div>
 								<div class="flex gap-x-6 justify-start items-center">
-									<img
-										src={logo[fullNameToMascot[odd.away_team]]}
-										alt="helmet"
-										class="w-10 h-10"
-									/>
+									<img src={logo[fullNameToMascot[odd.away_team]]} alt="helmet" class="w-10 h-10" />
 									<div class="flex flex-col">
 										<p class="text-xs sm:text-sm text-muteTextColor dark:text-darkMuteTextColor">
 											{fullNameToAbrv[odd.away_team].abbr}
@@ -393,11 +392,7 @@
 									</div>
 								</div>
 								<div class="flex gap-x-6 justify-start items-center">
-									<img
-										src={logo[fullNameToMascot[odd.home_team]]}
-										alt="helmet"
-										class="w-10 h-10"
-									/>
+									<img src={logo[fullNameToMascot[odd.home_team]]} alt="helmet" class="w-10 h-10" />
 
 									<div class="flex flex-col">
 										<p class="text-xs sm:text-sm text-muteTextColor dark:text-darkMuteTextColor">
@@ -413,9 +408,7 @@
 							<div class="w-full col-span-5 flex flex-row gap-x-4 sm:gap-x-6 justify-end">
 								{#each odd.bookmakers[0].markets as bets}
 									<div class="grid grid-rows-3 gap-y-4 place-content-center">
-										<div
-											class="flex justify-center items-center font-header font-semibold text-lg"
-										>
+										<div class="flex justify-center items-center font-header font-semibold text-lg">
 											{bets.key.charAt(0).toUpperCase() + bets.key.slice(1)}
 										</div>
 										{#each bets.outcomes as outcome, outcomeIndex}
@@ -434,7 +427,7 @@
 														.includes(true) ||
 														!user ||
 														!bettingOpen}
-													on:click={(e) => {
+													onclick={(e) => {
 														let outcomeId = generateSecureRandomString(16);
 														outcome.id = outcomeId;
 														e.preventDefault();
@@ -446,9 +439,13 @@
 															getDescription(
 																bets.key,
 																outcome.point,
-																bets.key === 'spreads' ? fullNameToAbrv[outcome.name].mascot : fullNameToAbrv[odd.home_team].mascot,
+																bets.key === 'spreads'
+																	? fullNameToAbrv[outcome.name].mascot
+																	: fullNameToAbrv[odd.home_team].mascot,
 																bets.key === 'totals' ? outcome.name : undefined,
-																bets.key === 'totals' ? fullNameToAbrv[odd.away_team].mascot: undefined
+																bets.key === 'totals'
+																	? fullNameToAbrv[odd.away_team].mascot
+																	: undefined
 															), // getDescription(type, betNumber, team, overUnder, otherTeam)
 															odd.home_team,
 															odd.away_team,
@@ -463,10 +460,10 @@
 														{bets.key === 'spreads' && outcome.point > 0
 															? `+${outcome.point}`
 															: bets.key === 'spreads' && outcome.point < 0
-															? `${outcome.point}`
-															: bets.key === 'totals' && outcomeIndex % 2 === 0
-															? `O ${outcome.point}`
-															: `U ${outcome.point}`}
+																? `${outcome.point}`
+																: bets.key === 'totals' && outcomeIndex % 2 === 0
+																	? `O ${outcome.point}`
+																	: `U ${outcome.point}`}
 													</span>
 												</button>
 											</div>
@@ -479,7 +476,7 @@
 				{/each}
 			{/if}
 		</div>
-	</form>
+	</div>
 </div>
 
 <Modal bind:showModal>

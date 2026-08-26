@@ -27,7 +27,7 @@ export const load: LayoutServerLoad = async ({ url, locals }) => {
 			throw redirect(302, '/404');
 		}
 
-		if (parseInt(year) < 2023 || parseInt(year) > 2025) {
+		if (parseInt(year) < 2023 || parseInt(year) > 2026) {
 			console.error('REDIRECTING TO 404');
 			throw redirect(302, '/404');
 		}

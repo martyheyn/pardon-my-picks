@@ -1,32 +1,28 @@
 <script lang="ts">
 	import Icon from './icon.svelte';
 
-	export let betType: string;
+	let { betType }: { betType: string } = $props();
 
-	let betText: string;
-	$: switch (betType) {
-		case 'lunder':
-			betText = "L'Under";
-			break;
-		case 'gunder':
-			betText = "G'Under";
-			break;
-		case 'timezone':
-			betText = 'Timezone';
-			break;
-		case 'huh':
-			betText = 'Huh ???';
-		case 'thanksgiving':
-			betText = 'Thanksgiving';
-			break;
-		case 'holiday':
-			betText = 'Holiday';
-		case 'malikWillis':
-			betText = 'Malik Willis';
-			break;
-		case 'spunder':
-			betText = "Sp'Under"
-	}
+	let betText = $derived.by(() => {
+		switch (betType) {
+			case 'lunder':
+				return "L'Under";
+			case 'gunder':
+				return "G'Under";
+			case 'timezone':
+				return 'Timezone';
+			case 'huh':
+				return 'Huh ???';
+			case 'thanksgiving':
+				return 'Thanksgiving';
+			case 'holiday':
+				return 'Holiday';
+			case 'malikWillis':
+				return 'Malik Willis';
+			case 'spunder':
+				return "Sp'Under";
+		}
+	});
 </script>
 
 <div class="">

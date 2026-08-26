@@ -1,5 +1,5 @@
 import { prisma } from '$lib/server/prisma';
-import type { Actions, PageServerLoad } from '../../archive/$types';
+import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { generateSecureRandomString } from '$lib/utils/helpers';
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 	}
 
 	if (user.role !== 'admin') {
-		return fail(400, { message: 'Forbidden', success: false });
+		throw redirect(303, '/');
 	}
 
 	return {
@@ -40,12 +40,19 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 };
 
 export const actions: Actions = {
-	addPicks: async (event: any) => {
+	addPicks: async (event) => {
 		// throw error if user is not logged in
 		const { user } = event.locals;
 		if (!user) {
 			return fail(401, {
 				message: 'Unauthorized brah!!',
+				success: false
+			});
+		}
+
+		if (user.role !== 'admin') {
+			return fail(403, {
+				message: 'Forbidden',
 				success: false
 			});
 		}
@@ -56,22 +63,18 @@ export const actions: Actions = {
 		const commenceTimeFrom = `${formData.getAll('commenceTimeFrom')}T00:00:00Z`;
 		const commenceTimeTo = `${formData.getAll('commenceTimeTo')}T00:00:00Z`;
 
-		const person = formData.getAll('person');
-		const type = formData.getAll('betType');
-		const teamNames = formData.getAll('teamName');
-		const overUnders = formData.getAll('overUnder');
-		const points = formData.getAll('points');
+		const person = formData.getAll('person') as string[];
+		const type = formData.getAll('betType') as string[];
+		const teamNames = formData.getAll('teamName') as string[];
+		const overUnders = formData.getAll('overUnder') as string[];
+		const points = formData.getAll('points') as string[];
 
 		// Build array of objects
-		const picks = teamNames.map((team: string, i: number) => ({
-			person: person[i] as string,
-			type: type[i] as string,
+		const picks = teamNames.map((team, i) => ({
+			person: person[i],
+			type: type[i],
 			pickTeam: fullNameToMascot[team] as $Enums.NFLTeam,
-			pickTotalType: Array.isArray(overUnders)
-				? overUnders[i] !== ''
-					? (overUnders[i] as string)
-					: undefined
-				: (formData.get('overUnder') as string) || undefined,
+			pickTotalType: overUnders[i] !== '' ? overUnders[i] : undefined,
 			pickScore: parseFloat(points[i])
 		}));
 
@@ -125,9 +128,11 @@ export const actions: Actions = {
 							picks[i].pickScore > 0 ? `+${picks[i].pickScore}` : picks[i].pickScore
 						}`;
 					} else {
-						description = `${gameOdds.home_team} vs ${gameOdds.away_team} ${picks[i].pickTotalType
+						// pickTotalType is always set for totals bets - the form requires choosing over/under
+						const totalType = picks[i].pickTotalType as string;
+						description = `${gameOdds.home_team} vs ${gameOdds.away_team} ${totalType
 							.charAt(0)
-							.toUpperCase()}${picks[i].pickTotalType.slice(1)} ${picks[i].pickScore}`;
+							.toUpperCase()}${totalType.slice(1)} ${picks[i].pickScore}`;
 					}
 
 					const tzoffset = new Date().getTimezoneOffset() * 6000;
@@ -155,7 +160,9 @@ export const actions: Actions = {
 							completed: false,
 							marked: false,
 							pickTeam: picks[i].pickTotalType ? null : picks[i]?.pickTeam,
-							pickTotalType: picks[i].pickTotalType ? picks[i]?.pickTotalType : null,
+							pickTotalType: picks[i].pickTotalType
+								? (picks[i]?.pickTotalType as $Enums.TotalType)
+								: null,
 							pickScore: picks[i].pickScore,
 							gameDate: estGameDate,
 							private: false,

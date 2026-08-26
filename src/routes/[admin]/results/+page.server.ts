@@ -1,9 +1,9 @@
 import { prisma } from '$lib/server/prisma';
-import type { Actions, PageServerLoad } from '../../archive/$types';
+import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 
-import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 const resultLinksSchema = z.object({
 	gameId: z.string(),
@@ -22,12 +22,12 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 	}
 
 	if (user.role !== 'admin') {
-		return fail(400, { message: 'Forbidden', success: false });
+		throw redirect(303, '/');
 	}
 
 	const pmtWeeklyPicks = await prisma.pick.findMany({
 		where: {
-			year: new Date().getFullYear(),
+			year: parseInt(CURRENT_YEAR),
 			week: parseInt(CURRENT_WEEK),
 			pmtPersona: true,
 			barstoolEmployee: true,
@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 };
 
 export const actions: Actions = {
-	addLinks: async (event: any) => {
+	addLinks: async (event) => {
 		// throw error if user is not logged in
 		const { user } = event.locals;
 		if (!user) {
@@ -60,18 +60,25 @@ export const actions: Actions = {
 			});
 		}
 
+		if (user.role !== 'admin') {
+			return fail(403, {
+				message: 'Forbidden',
+				success: false
+			});
+		}
+
 		// get all the user input, or only one input at a time?
 		const formData = await event.request.formData();
 
-		const gameIds = formData.getAll('gameId');
-		const espnLinks = formData.getAll('espnLink');
-		const youtubeLinks = formData.getAll('youtubeLink');
+		const gameIds = formData.getAll('gameId') as string[];
+		const espnLinks = formData.getAll('espnLink') as string[];
+		const youtubeLinks = formData.getAll('youtubeLink') as string[];
 
 		// Build array of objects
-		const resultLinks = gameIds.map((gameId: string, i: number) => ({
-			gameId: gameId,
-			espnLink: espnLinks[i] as string,
-			youtubeLink: youtubeLinks[i] as string
+		const resultLinks = gameIds.map((gameId, i) => ({
+			gameId,
+			espnLink: espnLinks[i],
+			youtubeLink: youtubeLinks[i]
 		}));
 
 		// Now you’ve got clean JSON

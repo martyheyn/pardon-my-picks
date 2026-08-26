@@ -11,10 +11,10 @@ const pool = new Pool({
 	ssl: true
 });
 
-const WEEK = 7;
-const YEAR = 2025;
-const GAMES_START = '1015';
-const GAMES_END = '1022';
+const WEEK = 1;
+const YEAR = 2026;
+const GAMES_START = '0909';
+const GAMES_END = '0915';
 
 const markGames = async () => {
 	console.log('Here markGames\n');
@@ -46,7 +46,9 @@ const markGames = async () => {
 			if (scoresDataRaw.length === 0 || !scoresDataRaw) return [];
 
 			// see if the game is done
-			scoresDataRaw = scoresDataRaw.filter((sg) => sg.hasOwnProperty('winner'));
+			scoresDataRaw = scoresDataRaw.filter((sg) =>
+				Object.prototype.hasOwnProperty.call(sg, 'winner')
+			);
 			const homeTeams = scoresDataRaw.filter((score) => score.homeAway === 'home');
 			const awayTeams = scoresDataRaw.filter((score) => score.homeAway === 'away');
 			console.log('homeTeams', homeTeams);

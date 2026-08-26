@@ -1,23 +1,25 @@
 <script lang="ts">
-	export let showModal: boolean;
+	let { showModal = $bindable(), imgSrc }: { showModal: boolean; imgSrc: string } = $props();
 
-	let dialog: HTMLDialogElement;
+	let dialog: HTMLDialogElement | undefined = $state();
 
-	export let imgSrc: string;
-
-	$: if (dialog && showModal) dialog.showModal();
+	$effect(() => {
+		if (dialog && showModal) dialog.showModal();
+	});
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog
 	bind:this={dialog}
-	on:close={() => (showModal = false)}
-	on:click|self={() => dialog.close()}
+	onclose={() => (showModal = false)}
+	onclick={(e) => {
+		if (e.target === e.currentTarget) dialog?.close();
+	}}
 	class="p-0 rounded-full"
 >
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
-		on:click|stopPropagation
+		onclick={(e) => e.stopPropagation()}
 		class=" overflow-hidden transition-all duration-300 ease-in-out rounded-full"
 	>
 		<img src={imgSrc} alt="Profile Pic" class="object-cover w-[400px] h-[400px]" />

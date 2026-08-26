@@ -9,8 +9,9 @@ import { type $Enums } from '@prisma/client';
 import { type PickData } from '$lib/utils/types';
 
 import { fullNameToMascot } from '$lib/utils/matching-format';
+import { getDayOfWeek, isBettingOpen } from '$lib/utils/helpers';
 
-import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 // TODO: make the teams emuns and the type 'spread' or 'total'
 // Define the schema for the PickData object
@@ -37,10 +38,6 @@ const PickDataSchema = z.array(PickDataObjectSchema);
 // 	usersPicks: z.array(PickDataObjectSchema)
 // });
 
-const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-const dayOfWeek = new Date(date).getDay();
-const bettingOpen = dayOfWeek !== 0 && dayOfWeek !== 1;
-
 export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = locals;
 
@@ -60,7 +57,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (!bettingOpen) {
+		if (!isBettingOpen(getDayOfWeek())) {
 			return fail(400, {
 				message: 'Betting is open Tuesday - Saturday',
 				success: false
@@ -93,7 +90,7 @@ export const actions: Actions = {
 			const picks: PickData[] = result.data;
 
 			// check if user has already made either pick
-			let userDbPicks = await prisma.user.findUnique({
+			const userDbPicks = await prisma.user.findUnique({
 				where: {
 					id: user.id
 				},
@@ -101,7 +98,7 @@ export const actions: Actions = {
 					picks: {
 						where: {
 							week: parseInt(CURRENT_WEEK),
-							year: new Date().getFullYear()
+							year: parseInt(CURRENT_YEAR)
 						}
 					}
 				}
@@ -119,7 +116,7 @@ export const actions: Actions = {
 				await prisma.pick.deleteMany({
 					where: {
 						userId: user.id,
-						year: new Date().getFullYear(),
+						year: parseInt(CURRENT_YEAR),
 						week: parseInt(CURRENT_WEEK)
 					}
 				});
@@ -140,6 +137,10 @@ export const actions: Actions = {
 					);
 					const gameOddsJson: Odds[] = await gameOddsRes.json();
 					const gameOdds = gameOddsJson[0];
+
+					if (!gameOdds) {
+						return fail(400, { message: 'Odds not available for this game', success: false });
+					}
 
 					const tzoffset = new Date().getTimezoneOffset() * 120000;
 					const dt = new Date(new Date(gameOdds.commence_time).getTime());
@@ -170,7 +171,7 @@ export const actions: Actions = {
 						data: {
 							id: picks[i].id,
 							gameId: gameOdds.id,
-							year: new Date().getFullYear(),
+							year: parseInt(CURRENT_YEAR),
 							show: 'PMT',
 							week: parseInt(CURRENT_WEEK),
 							person: user.username,
@@ -277,7 +278,7 @@ export const actions: Actions = {
 			picks = await prisma.pick.findMany({
 				where: {
 					userId: user.id,
-					year: new Date().getFullYear(),
+					year: parseInt(CURRENT_YEAR),
 					week: parseInt(CURRENT_WEEK)
 				},
 				select: {

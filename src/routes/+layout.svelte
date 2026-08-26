@@ -1,15 +1,15 @@
 <script lang="ts">
 	import '../app.css';
 	import type { PageData } from './$types';
-	export let data: PageData;
+	import type { Snippet } from 'svelte';
 
 	// create store
-	import { getContext, onMount, setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import { dev } from '$app/environment';
 	import { inject } from '@vercel/analytics';
 	import { page } from '$app/stores';
-	import { sideNavItems } from '$lib/utils/sidenav-tree';
+	import { sideNavItems } from '$lib/utils/sidenav-tree.svelte';
 
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
@@ -17,9 +17,11 @@
 	import type { Page } from '@sveltejs/kit';
 	import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
 
+	let { data, children }: { data: PageData; children?: Snippet } = $props();
+
 	const sideNavCollasped = writable(true);
-	const currYear = writable(PUBLIC_CURRENT_YEAR);
-	const currWeek = writable(PUBLIC_CURRENT_WEEK);
+	const currYear = writable(Number(PUBLIC_CURRENT_YEAR));
+	const currWeek = writable(Number(PUBLIC_CURRENT_WEEK));
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);
@@ -27,15 +29,6 @@
 		text: '',
 		alertType: undefined
 	});
-
-	$: if ($page.route) {
-		if ($page.route.id?.includes('week')) {
-			active.set('Week');
-		}
-		if ($page.route.id?.includes('stats')) {
-			active.set('Stats');
-		}
-	}
 
 	setContext('sideNavCollasped', sideNavCollasped);
 	setContext('currWeek', currWeek);
@@ -45,31 +38,44 @@
 	setContext('fullPageHeight', fullPageHeight);
 	setContext('alert', alert);
 
-	let scrollY: number;
+	let scrollY: number = $state(0);
+	let sidenavElement: HTMLElement | undefined = $state();
 
-	$: mobile = $screenWidth < 640;
+	let mobile = $derived($screenWidth < 640);
 
-	const setSidenavActive = (page: Page<Record<string, string>, string | null>) => {
-		const route = $page.route.id;
+	const setSidenavActive = (currentPage: Page<Record<string, string>, string | null>) => {
+		const route = currentPage.route.id;
 
-		if (route && !page.params.year && !page.params.week) {
+		if (route && !currentPage.params.year && !currentPage.params.week) {
 			active.set(route);
 			return;
 		}
 
-		if (page.params && page.params.year && page.params.week) {
+		if (currentPage.params && currentPage.params.year && currentPage.params.week) {
 			active.set(`/week`);
 			return;
 		}
 	};
-	$: $page.route.id, setSidenavActive($page);
+
+	$effect(() => {
+		if ($page.route) {
+			if ($page.route.id?.includes('week')) {
+				active.set('Week');
+			}
+			if ($page.route.id?.includes('stats')) {
+				active.set('Stats');
+			}
+		}
+	});
+
+	$effect(() => {
+		setSidenavActive($page);
+	});
 
 	// Inject the Analytics functionality
 	inject({ mode: dev ? 'development' : 'production' });
 
-	let sidenavElement: HTMLElement;
-
-	onMount(() => {				
+	onMount(() => {
 		// close sidenav subitems onmount if open
 		sideNavItems.forEach((navItem, i) => {
 			if (navItem.subItemsOpen) {
@@ -168,7 +174,7 @@
 				 scroll-smooth h-full overflow-y-auto`}
 				style="min-height: calc(100vh - 56px);"
 			>
-				<slot />
+				{@render children?.()}
 			</div>
 		</div>
 	</div>

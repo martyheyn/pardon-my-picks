@@ -13,6 +13,7 @@ declare global {
 			session: Session | null;
 		}
 	}
+	// eslint-disable-next-line no-var -- `declare global` requires `var` to augment globalThis; let/const don't work here
 	var prisma: PrismaClient;
 }
 

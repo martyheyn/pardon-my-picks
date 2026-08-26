@@ -51,11 +51,11 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	default: async (event: any) => {
+	default: async (event) => {
 		const form = await superValidate(event, zod(RegisterFormSchema));
 
 		// check if the form is tries to manipulate the role
-		if ((form.data as any).role) {
+		if ((form.data as Record<string, unknown>).role) {
 			return setError(form, 'Nope. Nice try. Blocking your IP brah.');
 		}
 

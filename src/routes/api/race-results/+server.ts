@@ -6,10 +6,10 @@ export type weeklyPersonDataType = {
 		img: string;
 		link: string;
 		data: {
-			week: any;
-			wins: any;
-			losses: any;
-			pushes: any;
+			week: number;
+			wins: number;
+			losses: number;
+			pushes: number;
 			record: string;
 			points: number;
 		}[];
@@ -27,7 +27,7 @@ type raceResultsType = {
 
 export async function GET({ url }) {
 	const year = Number(url.searchParams.get('year'));
-	if (typeof year !== 'number') {
+	if (!year || Number.isNaN(year)) {
 		return new Response('Invalid query', { status: 400 });
 	}
 
@@ -67,13 +67,13 @@ export async function GET({ url }) {
 			return new Response(JSON.stringify(raceResults));
 		}
 
-		let weeklyDataByPerson: weeklyPersonDataType = {};
+		const weeklyDataByPerson: weeklyPersonDataType = {};
 		raceResults.forEach((x) => {
 			// add the previous week's record to the current week
 			// TODO: could be a reduce function
-			let record = `${x.wins}-${x.losses}-${x.pushes}`;
-			let points = Number(x.wins) + Number(x.pushes) * 0.5;
-			let recordByWeek = {
+			const record = `${x.wins}-${x.losses}-${x.pushes}`;
+			const points = Number(x.wins) + Number(x.pushes) * 0.5;
+			const recordByWeek = {
 				week: x.week,
 				wins: x.wins,
 				losses: x.losses,
@@ -94,5 +94,8 @@ export async function GET({ url }) {
 		return new Response(JSON.stringify(weeklyDataByPerson));
 	} catch (error) {
 		console.error(error);
+		return new Response(JSON.stringify({ message: 'Error fetching race results' }), {
+			status: 500
+		});
 	}
 }

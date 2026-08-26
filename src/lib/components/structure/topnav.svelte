@@ -4,8 +4,8 @@
 	import Icon from '../icon.svelte';
 	import type { User } from '@prisma/client';
 
-	export let user: User | null;
-	let showSocials = false;
+	let { user }: { user: User | null } = $props();
+	let showSocials = $state(false);
 </script>
 
 <div
@@ -35,7 +35,7 @@
 			{/if}
 		</form>
 
-		<button class="cursor-pointer hidden sm:block" on:click={() => (showSocials = !showSocials)}>
+		<button class="cursor-pointer hidden sm:block" onclick={() => (showSocials = !showSocials)}>
 			<img
 				class="w-10 h-10 rounded-[20px] border-2 border-white"
 				src="$lib/assets/pmt-icon.jpg"

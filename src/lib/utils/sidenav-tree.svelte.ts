@@ -29,6 +29,8 @@ for (let i = 1; i <= Number(PUBLIC_CURRENT_WEEK); i++) {
 	});
 }
 
+const EARLIEST_HISTORY_YEAR = 2023;
+
 const yearRoute = (year: number) => {
 	const weeksSubNavArr: { label: string; icon: string; route: string }[] = [];
 
@@ -44,7 +46,18 @@ const yearRoute = (year: number) => {
 	return weeksSubNavArr;
 };
 
-export const sideNavItems: sideNavItems = [
+const historySubNavArr: subItems[] = [];
+for (let year = Number(PUBLIC_CURRENT_YEAR); year >= EARLIEST_HISTORY_YEAR; year--) {
+	historySubNavArr.push({
+		label: `${year}`,
+		icon: 'calendar',
+		route: '',
+		subItems: yearRoute(year),
+		subItemsOpen: false
+	});
+}
+
+export const sideNavItems: sideNavItems = $state([
 	{
 		label: 'Week',
 		icon: 'calendar',
@@ -66,22 +79,7 @@ export const sideNavItems: sideNavItems = [
 		label: 'History',
 		icon: 'history',
 		route: '/archive',
-		subItems: [
-			{
-				label: '2024',
-				icon: 'calendar',
-				route: ``,
-				subItems: yearRoute(2024),
-				subItemsOpen: false
-			},
-			{
-				label: '2023',
-				icon: 'calendar',
-				route: ``,
-				subItems: yearRoute(2023),
-				subItemsOpen: false
-			}
-		],
+		subItems: historySubNavArr,
 		subItemsOpen: false
 	},
 	{
@@ -94,4 +92,4 @@ export const sideNavItems: sideNavItems = [
 		icon: 'leaderBoard',
 		route: '/leaderboard'
 	}
-];
+]);

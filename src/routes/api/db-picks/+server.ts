@@ -1,12 +1,12 @@
 import type { PickData } from '$lib/utils/types';
-import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 import { prisma } from '$lib/server/prisma';
 
 const getDbUserPicks = async (userId: string) => {
 	const dbUserPicks: PickData[] = await prisma.pick.findMany({
 		where: {
 			userId: userId,
-			year: new Date().getFullYear(),
+			year: parseInt(CURRENT_YEAR),
 			week: parseInt(CURRENT_WEEK)
 		},
 		select: {

@@ -13,24 +13,33 @@
 	import blankAvatar from '$lib/assets/blank_avatar.png';
 	import { logo, teamLink } from '$lib/utils/matching-format';
 
-	export let data: PageData;
-	export let form: ActionData;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	$: ({ user, stats, picks, usersProfile } = data);
+	let { user, stats, picks, usersProfile } = $derived(data);
 
 	const alert: Writable<Alert> = getContext('alert');
 	const currWeek: Writable<number> = getContext('currWeek');
 
-	let editting = false;
-	let infoDisplayed = false;
-	let disableSave = false;
-	let selectedWeekPicks: number = $currWeek;
+	let editting = $state(false);
+	let infoDisplayed = $state(false);
+	let disableSave = $state(false);
+	let selectedWeekPicks: number = $state($currWeek);
 	// get all unique weeks from picks
-	$: weekPicks = Array.from(new Set(picks.map((p) => p.week)));
-	let photoKey: string | null;
-	$: photoKey = user.avatar;
+	let weekPicks = $derived(Array.from(new Set(picks.map((p) => p.week))));
+	let photoKey: string | null = $state(null);
+	$effect(() => {
+		photoKey = user.avatar;
+	});
 
-	let avatar: File | undefined;
+	// editable local copies - can't bind directly into `user` since it comes from $derived(data)
+	let editableUsername = $state('');
+	let editableEmail: string | null = $state('');
+	$effect(() => {
+		editableUsername = user.username;
+		editableEmail = user.email;
+	});
+
+	let avatar: File | undefined = $state();
 
 	const handleEdit = () => {
 		disableSave = true;
@@ -72,18 +81,14 @@
 	};
 
 	// update alert based on form response
-	// TODO:: clean this up, maybe put it in a function somewhere else
-	const updateAlert = () => {
+	$effect(() => {
 		if (form) {
 			alert.set({
 				text: form.message,
 				alertType: form.success ? 'success' : 'error'
 			});
 		}
-		return;
-	};
-	// alerts
-	$: form, updateAlert();
+	});
 </script>
 
 <div
@@ -138,7 +143,7 @@
 							type="file"
 							accept=".jpg, .jpeg, .png"
 							data-max-size="1048576"
-							on:change={(e) => onFileSelected(e)}
+							onchange={(e) => onFileSelected(e)}
 						/>
 						<input type="hidden" name="photoKey" id="photoKey" bind:value={photoKey} />
 					</div>
@@ -211,7 +216,7 @@
 						w-full rounded-md transition duration-150 ease-in-out dark:bg-dark focus:dark:bg-gray-600
 						bg-stone-50`}
 							disabled={!editting}
-							bind:value={user.username}
+							bind:value={editableUsername}
 						/>
 					</div>
 
@@ -222,7 +227,7 @@
 						>
 							<div class="flex justify-between items-center pr-2">
 								<span class="pl-1">Email</span>
-								<button on:click={() => (infoDisplayed = !infoDisplayed)} type="button">
+								<button onclick={() => (infoDisplayed = !infoDisplayed)} type="button">
 									<Icon
 										class={`transition-all duration-300 ease-in-out cursor-pointer rounded-full hover:scale-110 `}
 										fillRule="evenodd"
@@ -252,7 +257,7 @@
 						w-full rounded-md transition duration-150 ease-in-out dark:bg-dark focus:dark:bg-gray-600
 						bg-stone-50`}
 							disabled={!editting}
-							bind:value={user.email}
+							bind:value={editableEmail}
 						/>
 					</div>
 				</div>
@@ -260,7 +265,7 @@
 				<div class={`flex ${editting ? 'justify-between' : 'justify-start'}`}>
 					<button
 						in:fly={{ x: -40, duration: 300, delay: 750 }}
-						on:click={handleEdit}
+						onclick={handleEdit}
 						disabled={disableSave}
 						class={`mt-4 ${disableSave && 'bg-gray-400'} btn-primary`}
 						>{editting ? 'Cancel' : 'Edit Profile'}</button
@@ -305,9 +310,9 @@
 							(stats?.tails.wins / stats.tails.total) * 100 > 50
 								? 'text-green-500 dark:text-green-300'
 								: (stats?.tails.wins > 0 || stats?.tails.losses > 0) &&
-								  (stats?.tails.wins / stats.tails.total) * 100 < 50
-								? 'text-red-500 dark:text-red-300'
-								: 'text-yellow-500 dark:text-yellow-300'
+									  (stats?.tails.wins / stats.tails.total) * 100 < 50
+									? 'text-red-500 dark:text-red-300'
+									: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
 						{stats?.tails.total && (stats?.tails.wins > 0 || stats?.tails.losses > 0)
@@ -338,9 +343,9 @@
 							(stats?.fades.wins / stats.fades.total) * 100 > 50
 								? 'text-green-500 dark:text-green-300'
 								: (stats?.fades.wins > 0 || stats?.fades.losses > 0) &&
-								  (stats?.fades.wins / stats.fades.total) * 100 < 50
-								? 'text-red-500 dark:text-red-300'
-								: 'text-yellow-500 dark:text-yellow-300'
+									  (stats?.fades.wins / stats.fades.total) * 100 < 50
+									? 'text-red-500 dark:text-red-300'
+									: 'text-yellow-500 dark:text-yellow-300'
 						}`}
 					>
 						{stats?.fades.total && (stats?.fades.wins > 0 || stats?.fades.losses > 0)
@@ -369,7 +374,7 @@
 						}`}
 					>
 						<h4 class="text-lg font-semibold">Week {week}</h4>
-						<button on:click={() => showWeekPicks(week)}>
+						<button onclick={() => showWeekPicks(week)}>
 							<Icon
 								class={`${
 									selectedWeekPicks === week ? 'rotate-[270deg]' : 'rotate-90'
@@ -401,10 +406,10 @@
 												pick.homeTeamScore === null || pick.homeTeamScore === undefined
 													? 'bg-slate-300 bg-opacity-70'
 													: pick.winner
-													? 'bg-lightGreen dark:bg-darkGreen'
-													: pick.push
-													? 'bg-lightYellow dark:bg-darkYellow'
-													: 'bg-lightRed dark:bg-darkRed'
+														? 'bg-lightGreen dark:bg-darkGreen'
+														: pick.push
+															? 'bg-lightYellow dark:bg-darkYellow'
+															: 'bg-lightRed dark:bg-darkRed'
 											} w-fit rounded-md flex justify-start items-center`}
 										>
 											{pick.description}

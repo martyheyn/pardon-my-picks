@@ -3,9 +3,9 @@
 	import { page } from '$app/stores';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { quadInOut } from 'svelte/easing';
-	import { getContext } from 'svelte';
-	import { logo, personaImgPath, sortOrder, teamLink } from '$lib/utils/matching-format';
-	import type { PickByPerson } from '$lib/utils/types';
+	import { getContext, untrack } from 'svelte';
+	import { logo, personaImgPath, sortPicksByPerson, teamLink } from '$lib/utils/matching-format';
+	import type { PickByPerson, PicksWithTailsAndFades } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 
@@ -15,41 +15,31 @@
 	import AlertFlash from '$lib/components/alert.svelte';
 	import type { Alert } from '$lib/utils/types';
 
-	export let data: PageData;
-	export let form: ActionData;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	$: ({ picks, user, bettingOpen } = data);
+	let { picks, user, bettingOpen } = $derived(data);
 
-	$: ({ year, week } = $page.params);
+	let { year, week } = $derived($page.params);
 
 	// set current week so users cant fade/tail games that have already happened
 	const currWeek: Writable<number> = getContext('currWeek');
 	const currYear: Writable<number> = getContext('currYear');
 	const alert: Writable<Alert> = getContext('alert');
 
-	let cardWidth: number;
+	let cardWidth: number = $state(0);
 
-	$: picksByPerson = picks.reduce((acc: PickByPerson, pick: any) => {
-		const { person } = pick;
-		acc[person] = acc[person] || [];
-		acc[person].push(pick);
-		return acc;
-	}, {});
+	let picksByPerson = $derived(
+		picks.reduce((acc: PickByPerson, pick: PicksWithTailsAndFades) => {
+			const { person } = pick;
+			acc[person] = acc[person] || [];
+			acc[person].push(pick);
+			return acc;
+		}, {})
+	);
 
-	$: picksArr = [picksByPerson];
-	$: for (const x in picksByPerson) {
-		picksArr.push({ [x]: picksByPerson[x] });
-	}
-	// remove first element and sort
-	$: picksArr.shift();
-	$: picksArr.sort((a, b) => {
-		return (
-			sortOrder[Object.keys(a)[0] as keyof typeof sortOrder] -
-			sortOrder[Object.keys(b)[0] as keyof typeof sortOrder]
-		);
-	});
+	let picksArr = $derived(sortPicksByPerson(picksByPerson));
 
-	let showNerdNug: { person: string; indx: number } | undefined;
+	let showNerdNug: { person: string; indx: number } | undefined = $state(undefined);
 
 	const toggleNerdNug = (person: string, indx: number) => {
 		if (showNerdNug === undefined || showNerdNug.person !== person || showNerdNug.indx !== indx) {
@@ -59,29 +49,35 @@
 		}
 	};
 
-	let btnsDivWidth: number = 0;
+	let btnsDivWidth: number = $state(0);
 
-	const updateAlert = () => {
-		if (form?.pickId) {
+	// local mirror of the `form` prop: the tail/fade success alert clears itself after
+	// 3s, which needs to mutate this, and props can't be reassigned directly under runes.
+	// Kept in sync with the prop via the $effect below. untrack() marks the initial read
+	// as an intentional one-time snapshot, not a missed reactive dependency.
+	let localForm = $state(untrack(() => form));
+
+	$effect(() => {
+		localForm = form;
+	});
+
+	$effect(() => {
+		if (localForm?.pickId) {
 			alert.set({
-				text: form.message,
-				alertType: form.success ? 'success' : 'error'
+				text: localForm.message,
+				alertType: localForm.success ? 'success' : 'error'
 			});
 
 			setTimeout(() => {
-				form = {
-					...form,
+				localForm = {
+					...localForm,
 					pickId: ''
 				};
 			}, 3000);
 		}
+	});
 
-		return;
-	};
-	// alerts
-	$: form, updateAlert();
-
-	$: alertBool = $alert.text ? true : false;
+	let alertBool = $derived($alert.text ? true : false);
 
 	const now = new Date();
 
@@ -165,10 +161,10 @@
 												pick.winner === null || pick.winner === undefined
 													? 'bg-slate-300 dark:bg-[#1f1f1f]  bg-opacity-70'
 													: pick.winner
-													? 'bg-lightGreen dark:bg-darkGreen'
-													: pick.push
-													? 'bg-lightYellow dark:bg-darkYellow'
-													: 'bg-lightRed dark:bg-darkRed'
+														? 'bg-lightGreen dark:bg-darkGreen'
+														: pick.push
+															? 'bg-lightYellow dark:bg-darkYellow'
+															: 'bg-lightRed dark:bg-darkRed'
 											} w-fit px-6 rounded-md flex justify-start items-center`}
 										>
 											{pick.description}
@@ -240,7 +236,7 @@
 												<p class="font-semibold">Nerd Nugget</p>
 												<button
 													class="p-0.5 transition-all duration-300 ease-in-out cursor-pointer hover:bg-gray-300 hover:bg-opacity-50 rounded-full"
-													on:click={() => (showNerdNug = undefined)}
+													onclick={() => (showNerdNug = undefined)}
 												>
 													<Icon
 														class={`transition-all duration-300 ease-in-out fill-black cursor-pointer rotate-[270deg]`}
@@ -294,7 +290,7 @@
 														? 'bg-gray-300 bg-opacity-50'
 														: ''
 												}`}
-												on:click={() => toggleNerdNug(Object.keys(pickPerson)[0], i)}
+												onclick={() => toggleNerdNug(Object.keys(pickPerson)[0], i)}
 											>
 												<Icon
 													class={`transition-all duration-300 ease-in-out cursor-pointer fill-none`}
@@ -352,7 +348,7 @@
 													</div>
 												</div>
 
-												<div class="w-[.8px] h-4 mb-[1px] bg-black bg-opacity-10" />
+												<div class="w-[.8px] h-4 mb-[1px] bg-black bg-opacity-10"></div>
 
 												<div class="h-full flex flex-col justify-center items-center gap-y-2">
 													<div class="flex flex-row justify-center items-center gap-x-2">
@@ -409,7 +405,7 @@
 																? (pick.tail.length / (pick.tail.length + pick.fade.length)) * 100
 																: 100
 														}%`}
-													/>
+													></div>
 													<div
 														class={`h-full bg-lightRed bg-opacity-90 
 											${
@@ -424,13 +420,13 @@
 																? (pick.fade.length / (pick.tail.length + pick.fade.length)) * 100
 																: 100
 														}%`}
-													/>
+													></div>
 												</div>
 											{/if}
 										</div>
 									</div>
 
-									{#if form && form.pickId && pick.id === form.pickId}
+									{#if localForm && localForm.pickId && pick.id === localForm.pickId}
 										<div transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 											<AlertFlash />
 										</div>

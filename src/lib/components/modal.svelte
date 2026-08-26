@@ -1,31 +1,37 @@
 <script lang="ts">
-	export let showModal: boolean = false;
+	import type { Snippet } from 'svelte';
 
-	let dialog: HTMLDialogElement;
+	let { showModal = $bindable(false), children }: { showModal?: boolean; children?: Snippet } =
+		$props();
 
-	$: if (dialog && showModal) dialog.showModal();
+	let dialog: HTMLDialogElement | undefined = $state();
+
+	$effect(() => {
+		if (dialog && showModal) dialog.showModal();
+	});
 </script>
-
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 
 <dialog
 	class="w-[50vw] border-none p-0 backdrop:blur-lg rounded-md overflow-x-hidden no-scrollbar transition-all duration-300 ease-in-out"
 	bind:this={dialog}
-	on:close={() => (showModal = false)}
-	on:click|self={() => dialog.close()}
+	onclose={() => (showModal = false)}
+	onclick={(e) => {
+		if (e.target === e.currentTarget) dialog?.close();
+	}}
 >
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
-		on:click|stopPropagation
+		onclick={(e) => e.stopPropagation()}
 		class="px-1.5 py-2 md:pb-8 md:px-8 md:py-8 w-full h-full transition-all duration-300 ease-in-out
 		dark:border dark:border-slate-100 dark:bg-darkSecondary dark:text-white rounded-md"
 	>
-		<!-- svelte-ignore a11y-autofocus -->
+		<!-- svelte-ignore a11y_autofocus -->
 		<button
 			class=" absolute top-2.5 right-2.5 fill-slate-700 hover:fill-slate-600
 			hover:scale-[1.04] transition-all duration-1500 ease-linear dark:fill-slate-100 dark:hover:fill-slate-200"
 			autofocus
-			on:click={() => dialog.close()}
+			onclick={() => dialog?.close()}
 		>
 			<!-- <img src="/close.svg" alt="close svg" /> -->
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="16px" height="16px">
@@ -35,7 +41,7 @@
 				/></svg
 			>
 		</button>
-		<slot />
+		{@render children?.()}
 	</div>
 </dialog>
 

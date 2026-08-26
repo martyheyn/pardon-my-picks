@@ -3,29 +3,33 @@
 	import type { ActionData, PageData } from './$types';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
+	import { untrack } from 'svelte';
 
-	export let data: PageData;
-	export let form: ActionData;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	type statsType = 'wins' | 'tails' | 'fades';
 
-	const { wins, tails, fades, totalCounts } = data;
-	$: winsData = form?.wins || wins;
-	$: tailsData = form?.tails || tails;
-	$: fadesData = form?.fades || fades;
+	// stat switches/pagination flow through form actions (form?.x || x below), never
+	// through data reloading, so this is intentionally a one-time snapshot of the initial load.
+	const { wins, tails, fades, totalCounts } = untrack(() => data);
+	let winsData = $derived(form?.wins || wins);
+	let tailsData = $derived(form?.tails || tails);
+	let fadesData = $derived(form?.fades || fades);
 
-	let selectedStats: statsType = 'wins';
-	let selectedStatsArr: statsType[] = ['wins', 'tails', 'fades'];
+	let selectedStats: statsType = $state('wins');
+	const selectedStatsArr: statsType[] = ['wins', 'tails', 'fades'];
 
-	$: stats = {
+	let stats = $derived({
 		wins: winsData,
 		tails: tailsData,
 		fades: fadesData
-	};
+	});
 
 	// pagination
-	let currentPage = 1;
-	$: totalPages = Math.ceil(Number(totalCounts[selectedStats]) / 10);
+	let currentPage = $state(1);
+	let totalPages = $derived(Math.ceil(Number(totalCounts[selectedStats]) / 10));
+
+	const pageIndices = (count: number) => Array.from({ length: count }, (_, i) => i);
 </script>
 
 <div
@@ -92,8 +96,8 @@
 								stat.pct > 50
 									? 'text-green-500 dark:text-green-300'
 									: stat.pct < 50
-									? 'text-red-500 dark:text-red-300'
-									: 'text-yellow-500 dark:text-yellow-300'
+										? 'text-red-500 dark:text-red-300'
+										: 'text-yellow-500 dark:text-yellow-300'
 							}`}
 						>
 							{stat.pct}%
@@ -105,15 +109,15 @@
 			<div class="mt-8">
 				<div class="flex flex-row gap-x-4">
 					{#if totalPages <= 3}
-						{#each Array.from({ length: totalPages }) as _, i}
+						{#each pageIndices(totalPages) as pageIdx}
 							<form
-								action="?/{selectedStats}Total&page={i}"
+								action="?/{selectedStats}Total&page={pageIdx}"
 								method="POST"
 								use:enhance={() => {
 									return async ({ result }) => {
 										if (result.type === 'success') {
 											await applyAction(result);
-											currentPage = i + 1;
+											currentPage = pageIdx + 1;
 										} else if (result.type === 'failure') {
 											await applyAction(result);
 										}
@@ -121,11 +125,13 @@
 								}}
 							>
 								<button
-									disabled={currentPage === i + 1}
+									disabled={currentPage === pageIdx + 1}
 									class={`hover:bg-primaryHover dark:hover:bg-darkHover hover:text-white rounded-full py-2 px-4 ${
-										currentPage === i + 1 ? 'bg-primaryHover dark:bg-darkHover text-white' : ''
+										currentPage === pageIdx + 1
+											? 'bg-primaryHover dark:bg-darkHover text-white'
+											: ''
 									}`}
-									>{i + 1}
+									>{pageIdx + 1}
 								</button>
 							</form>
 						{/each}

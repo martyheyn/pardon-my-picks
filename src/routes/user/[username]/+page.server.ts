@@ -35,12 +35,7 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 	const buffer = Buffer.from(arrayBuffer);
 
 	// Define parameters for uploading
-	const params: {
-		Bucket: string;
-		Key: string;
-		Body: any;
-		ContentType: string;
-	} = {
+	const params = {
 		Bucket: AWS_S3_BUCKET_NAME,
 		Key: `${username}-${generateSecureRandomString(10)}`, // Key must be unique for each photo
 		Body: buffer,
@@ -52,8 +47,7 @@ const uploadPhotoToS3 = async (photoFile: File, username: string) => {
 
 	// Upload photo to S3
 	try {
-		const data = await s3Client.send(command);
-		const photoUrl = `https://${params.Bucket}.s3.${s3Client.config.region}.amazonaws.com/${params.Key}`; // Return the URL of the uploaded photo
+		await s3Client.send(command);
 		return params.Key;
 	} catch (err) {
 		console.error('Error uploading photo:', err);
@@ -92,7 +86,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	// initialize forms
 	const form = await superValidate(zod(ProfileFormSchema));
 
-	const user = usersProfile ? locals.user : existingUser;
+	const user = locals.user && locals.user.username === username ? locals.user : existingUser;
 
 	// get the statsssss
 	const tails = existingUser.tail;
@@ -214,7 +208,15 @@ export const actions: Actions = {
 
 		const form = await event.request.formData();
 		// const form = await superValidate(event, zod(ProfilePicFormSchema));
-		const image = form.get('avatar') as File;
+		const image = form.get('avatar');
+
+		if (!(image instanceof File) || image.size === 0) {
+			return fail(400, {
+				error: true,
+				message: 'Please choose a photo to upload',
+				uploadPic: true
+			});
+		}
 
 		// check if user already has a profile picture, if so delete it
 		if (user.avatar) {
@@ -224,7 +226,7 @@ export const actions: Actions = {
 			};
 
 			try {
-				const data = await s3Client.send(new DeleteObjectCommand(deleteParams));
+				await s3Client.send(new DeleteObjectCommand(deleteParams));
 			} catch (err) {
 				console.error('Error deleting photo:', err);
 				return {

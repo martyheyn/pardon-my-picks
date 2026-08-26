@@ -1,16 +1,15 @@
 import type { Actions, PageServerLoad } from './$types';
-import { generateSecureRandomString } from '$lib/utils/helpers';
+import { generateSecureRandomString, getDayOfWeek, isBettingOpen } from '$lib/utils/helpers';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
 import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
 import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
-const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-const dayOfWeek = new Date(date).getDay();
-const bettingOpen = dayOfWeek !== 0 && dayOfWeek !== 1;
-
 export const load: PageServerLoad = async ({ params, locals }) => {
+	const dayOfWeek = getDayOfWeek();
+	const bettingOpen = isBettingOpen(dayOfWeek);
+
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
 			week: parseInt(params.week),
@@ -32,22 +31,28 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// only get live scores on Sunday
 	if (dayOfWeek === 0) {
-		const scoresLive = await getLiveGames();
+		try {
+			const scoresLive = await getLiveGames();
 
-		scoresLive.map(async (game: Scores) => {
-			const { homeTeamScore, awayTeamScore } = await getTeamScores(game);
+			await Promise.all(
+				scoresLive.map(async (game: Scores) => {
+					const { homeTeamScore, awayTeamScore } = await getTeamScores(game);
 
-			await prisma.pick.updateMany({
-				where: {
-					gameId: game.id
-				},
-				data: {
-					// isLive: game.completed ? false : true,
-					homeTeamScore: homeTeamScore,
-					awayTeamScore: awayTeamScore
-				}
-			});
-		});
+					await prisma.pick.updateMany({
+						where: {
+							gameId: game.id
+						},
+						data: {
+							// isLive: game.completed ? false : true,
+							homeTeamScore: homeTeamScore,
+							awayTeamScore: awayTeamScore
+						}
+					});
+				})
+			);
+		} catch (error) {
+			console.error('Error updating live scores:', error);
+		}
 	}
 
 	return {
@@ -67,7 +72,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let pickId: string = id;
+		const pickId: string = id;
 		if (!pickId) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -81,7 +86,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (!bettingOpen) {
+		if (!isBettingOpen(getDayOfWeek())) {
 			return fail(401, {
 				message: 'Can only fade picks Friday and Saturday',
 				success: false,
@@ -152,8 +157,8 @@ export const actions: Actions = {
 					id: generateSecureRandomString(18),
 					userId: locals.user.id,
 					pickId: pickId,
-					winner: pick?.winner ? (pick?.winner ? 0 : 1) : null,
-					push: pick?.push ? (pick?.push === 1 ? 1 : 0) : null
+					winner: pick?.winner != null ? (pick.winner === 1 ? 0 : 1) : null,
+					push: pick?.push != null ? pick.push : null
 				}
 			});
 		} catch (error) {
@@ -176,7 +181,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
 
-		let pickId: string = id;
+		const pickId: string = id;
 		if (!pickId) {
 			return fail(400, { message: 'Invalid request', success: false });
 		}
@@ -190,7 +195,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (!bettingOpen) {
+		if (!isBettingOpen(getDayOfWeek())) {
 			return fail(401, {
 				message: 'Can only tail picks Friday and Saturday',
 				success: false,
@@ -262,8 +267,8 @@ export const actions: Actions = {
 					id: generateSecureRandomString(18),
 					userId: locals.user.id,
 					pickId: pickId,
-					winner: pick?.winner ? (pick?.winner === 1 ? 1 : 0) : null,
-					push: pick?.push ? (pick?.push === 1 ? 1 : 0) : null
+					winner: pick?.winner != null ? pick.winner : null,
+					push: pick?.push != null ? pick.push : null
 				}
 			});
 		} catch (error) {
