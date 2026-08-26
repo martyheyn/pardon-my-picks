@@ -80,7 +80,7 @@
 						<h4
 							class="font-semibold font-header max-w-36 sm:max-w-none break-words hover:scale-[1.02] transition-all ease-in-out duration-300"
 						>
-							<a href={`/user/${stat.username}`}>
+							<a href={`/user/${encodeURIComponent(stat.username)}`}>
 								{stat.username}
 							</a>
 						</h4>

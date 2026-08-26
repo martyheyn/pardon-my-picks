@@ -12,7 +12,7 @@
 			const weeklyPickMadeRes = await fetch(`/api/picks-made`);
 			const weeklyPickMade = await weeklyPickMadeRes.json();
 
-			currWeek.set(weeklyPickMade.weeklyPmtPicks ? $currWeek : $currWeek - 1);
+			currWeek.set(weeklyPickMade.weeklyPmtPicks ? $currWeek : Math.max(1, $currWeek - 1));
 		} catch (err) {
 			console.error('Failed to fetch weekly picks:', err);
 		}

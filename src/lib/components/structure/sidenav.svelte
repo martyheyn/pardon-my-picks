@@ -140,7 +140,7 @@
 				<a
 					class={`w-full flex items-center h-12 no-underline transition-all duration-300 ease-in-out pl-[14px] relative`}
 					href={navItem.label === 'Profile' && user
-						? `${navItem.route}/${user.username}`
+						? `${navItem.route}/${encodeURIComponent(user.username)}`
 						: navItem.label === 'Week'
 							? `${navItem.route}/${$currWeek}`
 							: navItem.route}
