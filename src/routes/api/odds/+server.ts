@@ -65,6 +65,7 @@ export async function GET({ locals }) {
 		const oddsData: Odds[] | { message: string; error_code: string; details_url: string } =
 			await odds.json();
 		if (!Array.isArray(oddsData)) {
+			console.error('The Odds API returned a non-array response:', oddsData);
 			return new Response(
 				JSON.stringify({
 					success: false,
