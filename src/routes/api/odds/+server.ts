@@ -78,9 +78,7 @@ export async function GET({ locals }) {
 			(game) =>
 				game.bookmakers.length > 0 &&
 				game.bookmakers[0].markets.length > 1 &&
-				new Date(game.commence_time).toLocaleString('en-US', {
-					timeZone: 'America/New_York'
-				}) > date
+				new Date(game.commence_time) > new Date(date)
 		);
 
 		oddsDataClean = oddsDataFiltered.map((game) => {
