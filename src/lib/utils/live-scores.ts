@@ -1,48 +1,72 @@
-import type { Scores } from './types';
+import type { $Enums } from '@prisma/client';
 import { fullNameToMascot } from '$lib/utils/matching-format';
-import { ODDS_API_KEY } from '$env/static/private';
 
-export const getTeamScores = async (scores: Scores) => {
-	if (!scores) {
-		return {
-			homeTeamScore: null,
-			awayTeamScore: null
-		};
-	}
-
-	const ht_score = scores.scores?.find((sc) => sc.name === scores.home_team)?.score;
-	const at_score = scores.scores?.find((sc) => sc.name === scores.away_team)?.score;
-
-	const homeTeamScore = ht_score ? parseInt(ht_score) : null;
-	const awayTeamScore = at_score ? parseInt(at_score) : null;
-
-	return {
-		homeTeamScore,
-		awayTeamScore
-	};
+// the parts of ESPN's events response this file reads (same feed scripts/mark-games.js grades from)
+export type EspnScoreEvent = {
+	competitions: Array<{
+		status: { type: { state: 'pre' | 'in' | 'post' } };
+		competitors: Array<{
+			homeAway: 'home' | 'away';
+			team: { displayName: string };
+			score?: { value: number };
+		}>;
+	}>;
 };
 
-export const getLiveGames = async () => {
-	// get live scores if the games have already started (americanfootball_nfl)
-	const scores = await fetch(
-		`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/scores/?daysFrom=1&apiKey=${ODDS_API_KEY}`
-	);
-	const scoresDataRaw = await scores.json();
+export type GameScore = {
+	homeTeam: $Enums.NFLTeam;
+	awayTeam: $Enums.NFLTeam;
+	homeTeamScore: number;
+	awayTeamScore: number;
+};
 
-	// the Odds API returns an error object (not an array) on a bad/expired key,
-	// rate limit, or when there's nothing to report - don't let that 500 the page
-	if (!scores.ok || !Array.isArray(scoresDataRaw)) {
-		console.error('getLiveGames: unexpected Odds API response', scores.status, scoresDataRaw);
+// games that haven't kicked off still come back with a 0-0 score, so this goes by ESPN's game
+// state instead of whether a score exists. Finished games are kept too, so a score that changed
+// on the last play isn't stuck at its in-game value until mark-games.js grades the pick
+export const getStartedGameScores = (events: EspnScoreEvent[]): GameScore[] => {
+	const gameScores: GameScore[] = [];
+
+	for (const event of events) {
+		const competition = event.competitions[0];
+		if (!competition || competition.status.type.state === 'pre') continue;
+
+		const home = competition.competitors.find((c) => c.homeAway === 'home');
+		const away = competition.competitors.find((c) => c.homeAway === 'away');
+		if (!home?.score || !away?.score) continue;
+
+		// skips anything that isn't a regular NFL matchup, like the Pro Bowl
+		const homeTeam = fullNameToMascot[home.team.displayName];
+		const awayTeam = fullNameToMascot[away.team.displayName];
+		if (!homeTeam || !awayTeam) continue;
+
+		gameScores.push({
+			homeTeam: homeTeam as $Enums.NFLTeam,
+			awayTeam: awayTeam as $Enums.NFLTeam,
+			homeTeamScore: home.score.value,
+			awayTeamScore: away.score.value
+		});
+	}
+
+	return gameScores;
+};
+
+export const getLiveGames = async (): Promise<GameScore[]> => {
+	// ESPN's dates param is an Eastern calendar day, so this still includes the Sunday night game
+	// after it crosses midnight UTC
+	const today = new Date()
+		.toLocaleDateString('en-CA', { timeZone: 'America/New_York' })
+		.replaceAll('-', '');
+
+	const res = await fetch(
+		`https://partners.api.espn.com/v2/sports/football/nfl/events?dates=${today}&limit=100`
+	);
+	const eventsJson = await res.json();
+
+	// don't let a bad ESPN response 500 the page
+	if (!res.ok || !Array.isArray(eventsJson?.events)) {
+		console.error('getLiveGames: unexpected ESPN response', res.status);
 		return [];
 	}
 
-	const scoresLive: Scores[] = scoresDataRaw.filter(
-		(game: Scores) =>
-			game.scores !== null &&
-			game.completed === false &&
-			fullNameToMascot[game.home_team] &&
-			fullNameToMascot[game.away_team]
-	);
-
-	return scoresLive;
+	return getStartedGameScores(eventsJson.events);
 };

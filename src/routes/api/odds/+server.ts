@@ -1,5 +1,10 @@
 import type { Odds, PickData } from '$lib/utils/types';
-import { generateSecureRandomString } from '$lib/utils/helpers';
+import {
+	generateSecureRandomString,
+	getDayOfWeek,
+	hasGameStarted,
+	isBettingOpen
+} from '$lib/utils/helpers';
 import {
 	ODDS_API_KEY,
 	CURRENT_WEEK,
@@ -44,9 +49,7 @@ export async function GET({ locals }) {
 	}
 
 	// this will be the end of Friday or early Sunday
-	const date = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-	const dayOfWeek = new Date(date).getDay();
-	const bettingOpen = dayOfWeek !== 0 && dayOfWeek !== 1;
+	const bettingOpen = isBettingOpen(getDayOfWeek());
 	// const showOdds = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
 
 	// times for testing
@@ -78,7 +81,7 @@ export async function GET({ locals }) {
 			(game) =>
 				game.bookmakers.length > 0 &&
 				game.bookmakers[0].markets.length > 1 &&
-				new Date(game.commence_time) > new Date(date)
+				!hasGameStarted(game.commence_time)
 		);
 
 		oddsDataClean = oddsDataFiltered.map((game) => {
@@ -112,13 +115,12 @@ export async function GET({ locals }) {
 					.sort((a, b) => a.sorted - b.sorted);
 			});
 
+			// commence_time stays the UTC ISO string the-odds-api sends - a locale string like
+			// "10/25/2026, 8:20:00 PM" drops the timezone, so the browser would read it as its own local time
 			return {
 				...game,
 				id: generateSecureRandomString(18),
-				gameId: game.id,
-				commence_time: new Date(game.commence_time).toLocaleString('en-US', {
-					timeZone: 'America/New_York'
-				})
+				gameId: game.id
 			};
 		});
 	} catch (error) {

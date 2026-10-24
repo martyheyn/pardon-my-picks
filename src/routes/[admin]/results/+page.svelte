@@ -60,7 +60,7 @@
 									name="espnLink"
 									type="text"
 									placeholder="ESPN Link"
-									class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+									class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 								/>
 							</label>
 
@@ -71,7 +71,7 @@
 									name="youtubeLink"
 									type="text"
 									placeholder="Youtube Link"
-									class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+									class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 								/>
 							</label>
 						</div>

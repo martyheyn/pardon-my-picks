@@ -75,7 +75,7 @@
 							<select
 								name="teamName"
 								id="team-name-select"
-								class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+								class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 							>
 								<option value="">--Choose Team--</option>
 								{#each nflTeams as team}
@@ -90,7 +90,7 @@
 								name="points"
 								type="text"
 								placeholder="Points"
-								class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+								class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 							/>
 						</label>
 					</div>
@@ -103,7 +103,7 @@
 							<select
 								name="teamName"
 								id="team-name-select"
-								class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+								class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 							>
 								<option value="">--Choose Team--</option>
 								{#each nflTeams as team}
@@ -115,7 +115,7 @@
 							<select
 								name="overUnder"
 								id="over-under-select"
-								class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+								class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 							>
 								<option value="">--Over / Under--</option>
 								<option value="under">Under</option>
@@ -128,7 +128,7 @@
 								name="points"
 								type="text"
 								placeholder="Points"
-								class="py-2 w-full text-black !bg-[#fcfeff] indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
+								class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 							/>
 						</label>
 					</div>

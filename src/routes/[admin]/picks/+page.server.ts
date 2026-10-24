@@ -12,6 +12,27 @@ import { ODDS_API_KEY } from '$env/static/private';
 import { CURRENT_WEEK } from '$env/static/private';
 import { CURRENT_YEAR } from '$env/static/private';
 
+type EspnEvent = {
+	id: string;
+	date: string;
+	status?: { type?: { completed?: boolean } };
+	competitions: Array<{
+		competitors: Array<{
+			homeAway: 'home' | 'away';
+			team: { displayName: string };
+		}>;
+	}>;
+};
+
+// the fields the pick-creation flow needs, whether they came from the-odds-api or ESPN
+type GameInfo = {
+	id: string;
+	home_team: string;
+	away_team: string;
+	commence_time: string;
+	completed?: boolean;
+};
+
 const PickDataObjectSchema = z.object({
 	person: z.string(),
 	type: z.enum(['spreads', 'totals']),
@@ -60,8 +81,10 @@ export const actions: Actions = {
 		// get all the user input, or only one input at a time?
 		const formData = await event.request.formData();
 
-		const commenceTimeFrom = `${formData.getAll('commenceTimeFrom')}T00:00:00Z`;
-		const commenceTimeTo = `${formData.getAll('commenceTimeTo')}T00:00:00Z`;
+		const commenceTimeFromRaw = formData.getAll('commenceTimeFrom').toString();
+		const commenceTimeToRaw = formData.getAll('commenceTimeTo').toString();
+		const commenceTimeFrom = `${commenceTimeFromRaw}T00:00:00Z`;
+		const commenceTimeTo = `${commenceTimeToRaw}T00:00:00Z`;
 
 		const person = formData.getAll('person') as string[];
 		const type = formData.getAll('betType') as string[];
@@ -78,22 +101,13 @@ export const actions: Actions = {
 			pickScore: parseFloat(points[i])
 		}));
 
-		// Now you’ve got clean JSON
-		const picksJson = JSON.stringify(picks);
-
-		if (typeof picksJson !== 'string') {
-			return fail(400, {
-				message: 'Invalid data format',
-				success: false
-			});
-		}
-
-		const parsedPicks_ = JSON.parse(picksJson);
-		const parsedPicks = parsedPicks_.filter((p: any) => p.pickTeam);
+		// rows where no team was chosen are personas sitting out that bet this week
+		const filledPicks = picks.filter((pick) => pick.pickTeam);
+		console.log('filledPicks', filledPicks);
 
 		// Validate the data using Zod
 		try {
-			const result = PickDataSchema.safeParse(parsedPicks);
+			const result = PickDataSchema.safeParse(filledPicks);
 			if (!result.success) {
 				return fail(400, {
 					message: result.error.toString(),
@@ -108,40 +122,89 @@ export const actions: Actions = {
 			const weeklyOddsGames: Odds[] = await weeklyGameOddsRes.json();
 			console.log('weeklyOddsGames', weeklyOddsGames);
 
+			// the-odds-api only lists games that haven't kicked off yet, so once a game
+			// starts it disappears from that feed - fall back to ESPN's schedule (same
+			// source scripts/mark-games.js already uses to grade results) so picks can
+			// still be entered for games already in progress
+			let espnEvents: EspnEvent[] | null = null;
+			const getEspnEvents = async (): Promise<EspnEvent[]> => {
+				if (espnEvents) return espnEvents;
+				const espnDatesFrom = commenceTimeFromRaw.replaceAll('-', '');
+				const espnDatesTo = commenceTimeToRaw.replaceAll('-', '');
+				const espnRes = await fetch(
+					`https://partners.api.espn.com/v2/sports/football/nfl/events?dates=${espnDatesFrom}-${espnDatesTo}&limit=1000`
+				);
+				const espnJson = await espnRes.json();
+				const events: EspnEvent[] = espnJson.events ?? [];
+				espnEvents = events;
+				return events;
+			};
+
+			const findEspnGameForTeam = (events: EspnEvent[], team: string): GameInfo | null => {
+				const event = events.find((e) =>
+					e.competitions[0]?.competitors.some((c) => fullNameToMascot[c.team.displayName] === team)
+				);
+				if (!event) return null;
+
+				const home = event.competitions[0].competitors.find((c) => c.homeAway === 'home');
+				const away = event.competitions[0].competitors.find((c) => c.homeAway === 'away');
+				if (!home || !away) return null;
+
+				return {
+					id: event.id,
+					home_team: home.team.displayName,
+					away_team: away.team.displayName,
+					commence_time: event.date,
+					completed: event.status?.type?.completed ?? false
+				};
+			};
+
 			try {
-				for (let i = 0; i < picks.length; i++) {
-					console.log('picks[i].pickTeam', picks[i].pickTeam);
-					const gameOdds = weeklyOddsGames.filter(
+				for (let i = 0; i < filledPicks.length; i++) {
+					const pick = filledPicks[i];
+					console.log('pick.pickTeam', pick.pickTeam);
+					let gameOdds: GameInfo | undefined = weeklyOddsGames.filter(
 						(game) =>
-							fullNameToMascot[game.home_team] === picks[i].pickTeam ||
-							fullNameToMascot[game.away_team] === picks[i].pickTeam
+							fullNameToMascot[game.home_team] === pick.pickTeam ||
+							fullNameToMascot[game.away_team] === pick.pickTeam
 					)[0];
 					console.log('gameOdds', gameOdds);
 
 					if (!gameOdds) {
-						return fail(400, { message: 'ODDS API NOT WORKING', success: false });
+						const events = await getEspnEvents();
+						const espnMatch = findEspnGameForTeam(events, pick.pickTeam as string);
+
+						if (!espnMatch) {
+							return fail(400, {
+								message: 'Could not find this game in the odds API or the ESPN schedule',
+								success: false
+							});
+						}
+
+						if (espnMatch.completed) {
+							return fail(400, { message: 'Game has already finished', success: false });
+						}
+
+						gameOdds = espnMatch;
 					}
 
 					let description;
-					if (picks[i].type === 'spreads') {
-						description = `${mascotToFullName[picks[i].pickTeam]} ${
-							picks[i].pickScore > 0 ? `+${picks[i].pickScore}` : picks[i].pickScore
+					if (pick.type === 'spreads') {
+						description = `${mascotToFullName[pick.pickTeam]} ${
+							pick.pickScore > 0 ? `+${pick.pickScore}` : pick.pickScore
 						}`;
 					} else {
 						// pickTotalType is always set for totals bets - the form requires choosing over/under
-						const totalType = picks[i].pickTotalType as string;
+						const totalType = pick.pickTotalType as string;
 						description = `${gameOdds.home_team} vs ${gameOdds.away_team} ${totalType
 							.charAt(0)
-							.toUpperCase()}${totalType.slice(1)} ${picks[i].pickScore}`;
+							.toUpperCase()}${totalType.slice(1)} ${pick.pickScore}`;
 					}
 
-					const tzoffset = new Date().getTimezoneOffset() * 6000;
-					const dt = new Date(new Date(gameOdds.commence_time).getTime());
-					const estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
-
-					if (new Date(estGameDate) < new Date()) {
-						return fail(400, { message: 'Game has already started', success: false });
-					}
+					// commence_time is already UTC (both the-odds-api and ESPN send a trailing Z) and
+					// game_date is timestamptz, so store it as-is - shifting by the server's timezone
+					// offset makes the saved kickoff depend on which machine runs this action
+					const gameDate = new Date(gameOdds.commence_time);
 
 					await prisma.pick.create({
 						data: {
@@ -150,8 +213,8 @@ export const actions: Actions = {
 							year: parseInt(CURRENT_YEAR),
 							show: 'PMT',
 							week: parseInt(CURRENT_WEEK),
-							person: picks[i].person,
-							type: picks[i].type,
+							person: pick.person,
+							type: pick.type,
 							description: description,
 							league: 'NFL',
 							homeTeam: fullNameToMascot[gameOdds.home_team] as $Enums.NFLTeam,
@@ -159,12 +222,10 @@ export const actions: Actions = {
 							isLive: false,
 							completed: false,
 							marked: false,
-							pickTeam: picks[i].pickTotalType ? null : picks[i]?.pickTeam,
-							pickTotalType: picks[i].pickTotalType
-								? (picks[i]?.pickTotalType as $Enums.TotalType)
-								: null,
-							pickScore: picks[i].pickScore,
-							gameDate: estGameDate,
+							pickTeam: pick.pickTotalType ? null : pick?.pickTeam,
+							pickTotalType: pick.pickTotalType ? (pick?.pickTotalType as $Enums.TotalType) : null,
+							pickScore: pick.pickScore,
+							gameDate: gameDate,
 							private: false,
 							userId: null,
 							barstoolEmployee: true,

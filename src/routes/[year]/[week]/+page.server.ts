@@ -1,14 +1,50 @@
 import type { Actions, PageServerLoad } from './$types';
-import { generateSecureRandomString, getDayOfWeek, isBettingOpen } from '$lib/utils/helpers';
+import {
+	generateSecureRandomString,
+	getDayOfWeek,
+	hasGameStarted,
+	isBettingOpen
+} from '$lib/utils/helpers';
 import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
-import type { PicksWithTailsAndFades, Scores } from '$lib/utils/types';
-import { getLiveGames, getTeamScores } from '$lib/utils/live-scores';
+import type { PicksWithTailsAndFades } from '$lib/utils/types';
+import { getLiveGames } from '$lib/utils/live-scores';
 import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const dayOfWeek = getDayOfWeek();
 	const bettingOpen = isBettingOpen(dayOfWeek);
+
+	// only get live scores on Sunday
+	// runs before the picks query below so this page load shows the scores it just saved
+	if (dayOfWeek === 0) {
+		try {
+			const gameScores = await getLiveGames();
+
+			await Promise.all(
+				gameScores.map((game) =>
+					prisma.pick.updateMany({
+						// matched on teams + week instead of gameId - picks entered through the admin ESPN
+						// fallback store ESPN's event id, everything else stores the-odds-api's id, and a
+						// matchup only happens once a week. Graded picks are left to mark-games.js
+						where: {
+							homeTeam: game.homeTeam,
+							awayTeam: game.awayTeam,
+							year: parseInt(CURRENT_YEAR),
+							week: parseInt(CURRENT_WEEK),
+							marked: false
+						},
+						data: {
+							homeTeamScore: game.homeTeamScore,
+							awayTeamScore: game.awayTeamScore
+						}
+					})
+				)
+			);
+		} catch (error) {
+			console.error('Error updating live scores:', error);
+		}
+	}
 
 	const picks: PicksWithTailsAndFades[] = await prisma.pick.findMany({
 		where: {
@@ -22,38 +58,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			fade: true
 		}
 	});
-
-	// move pick.gameDate up 4 hours
-	picks.map((pick) => {
-		if (!pick.gameDate) return;
-		pick.gameDate.setHours(pick.gameDate.getHours() + 4);
-	});
-
-	// only get live scores on Sunday
-	if (dayOfWeek === 0) {
-		try {
-			const scoresLive = await getLiveGames();
-
-			await Promise.all(
-				scoresLive.map(async (game: Scores) => {
-					const { homeTeamScore, awayTeamScore } = await getTeamScores(game);
-
-					await prisma.pick.updateMany({
-						where: {
-							gameId: game.id
-						},
-						data: {
-							// isLive: game.completed ? false : true,
-							homeTeamScore: homeTeamScore,
-							awayTeamScore: awayTeamScore
-						}
-					});
-				})
-			);
-		} catch (error) {
-			console.error('Error updating live scores:', error);
-		}
-	}
 
 	return {
 		picks,
@@ -102,6 +106,26 @@ export const actions: Actions = {
 			});
 		}
 
+		// used to block fades after kickoff, and to fill in the fade's winner if the pick is already graded
+		const pick = await prisma.pick.findUnique({
+			where: {
+				id: pickId
+			}
+		});
+
+		if (!pick) {
+			return fail(404, { message: 'Pick not found', success: false, pickId });
+		}
+
+		// checked before the unfade branch too, so a fade can't be pulled once the game is underway
+		if (pick.gameDate && hasGameStarted(pick.gameDate)) {
+			return fail(401, {
+				message: 'This game already kicked off, too late to fade it',
+				success: false,
+				pickId
+			});
+		}
+
 		// check if user has already faded this pick
 		const fade = await prisma.fade.findMany({
 			where: {
@@ -144,13 +168,6 @@ export const actions: Actions = {
 					}
 				});
 			}
-
-			// just for now, get the pick to fill in if its a winner or not
-			const pick = await prisma.pick.findUnique({
-				where: {
-					id: pickId
-				}
-			});
 
 			await prisma.fade.create({
 				data: {
@@ -211,6 +228,26 @@ export const actions: Actions = {
 			});
 		}
 
+		// used to block tails after kickoff, and to fill in the tail's winner if the pick is already graded
+		const pick = await prisma.pick.findUnique({
+			where: {
+				id: pickId
+			}
+		});
+
+		if (!pick) {
+			return fail(404, { message: 'Pick not found', success: false, pickId });
+		}
+
+		// checked before the untail branch too, so a tail can't be pulled once the game is underway
+		if (pick.gameDate && hasGameStarted(pick.gameDate)) {
+			return fail(401, {
+				message: 'This game already kicked off, too late to tail it',
+				success: false,
+				pickId
+			});
+		}
+
 		// check if user has already tailed this pick
 		const tail = await prisma.tail.findMany({
 			where: {
@@ -253,13 +290,6 @@ export const actions: Actions = {
 					}
 				});
 			}
-
-			// just for now, get the pick to fill in if its a winner or not
-			const pick = await prisma.pick.findUnique({
-				where: {
-					id: pickId
-				}
-			});
 
 			// TODO:: make a function to go back and update the tail winner if the pick wins
 			await prisma.tail.create({

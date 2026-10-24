@@ -2,7 +2,11 @@
 	import { applyAction, enhance } from '$app/forms';
 	import { fade, fly, slide } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
-	import { generateSecureRandomString } from '$lib/utils/helpers';
+	import {
+		generateSecureRandomString,
+		hasGameStarted,
+		normalizePickType
+	} from '$lib/utils/helpers';
 	import { linear, quadInOut } from 'svelte/easing';
 	import { fullNameToAbrv, fullNameToMascot, logo } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
@@ -63,13 +67,6 @@
 		pickScore?: number,
 		gameDate?: string
 	) => {
-		let estGameDate: string = '';
-		if (gameDate) {
-			const tzoffset = new Date().getTimezoneOffset() * 60000;
-			const dt = new Date(gameDate);
-			estGameDate = new Date(dt.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
-		}
-
 		// add this data
 		const userPick: PickData = {
 			id,
@@ -82,7 +79,8 @@
 			pickTeam: pickTeam ? (fullNameToMascot[pickTeam] as $Enums.NFLTeam) : null,
 			pickTotalType: pickTotalType?.toLocaleLowerCase() as 'over' | 'under' | undefined,
 			pickScore: pickScore,
-			gameDate: estGameDate,
+			// commence_time from /api/odds is a UTC ISO string, same format dbPicks' gameDate comes back in
+			gameDate: gameDate,
 			marked: false
 		};
 
@@ -126,7 +124,10 @@
 
 		// check if the user has already made that type of pick
 		if (usersPicks.length > 0) {
-			const pickType = usersPicks.find((pick) => pick.type === type);
+			// a saved spread comes back as 'spreads' while a new one is 'spread', so compare normalized
+			const pickType = usersPicks.find(
+				(pick) => normalizePickType(pick.type) === normalizePickType(type)
+			);
 			if (pickType) {
 				alert.set({
 					text: `You have already made a ${type} pick. Please choose a different type or remove the selected pick.`,
@@ -179,11 +180,6 @@
 		}
 		return description;
 	};
-
-	// get EST for gameDate comparison
-	const date = new Date();
-	const tzoffset = new Date().getTimezoneOffset() * 60000;
-	const estDate = new Date(date.getTime() - tzoffset).toISOString().split('.')[0] + 'Z';
 
 	let showModal = $state(false);
 	beforeNavigate(({ cancel }) => {
@@ -311,7 +307,7 @@
 								</p>
 							</div>
 
-							{#if pick.gameDate && pick.gameDate > estDate}
+							{#if pick.gameDate && !hasGameStarted(pick.gameDate)}
 								<div
 									class="flex flex-row gap-x-4"
 									in:slide={{ duration: 300 }}

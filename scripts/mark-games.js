@@ -11,10 +11,10 @@ const pool = new Pool({
 	ssl: true
 });
 
-const WEEK = 1;
+const WEEK = 2;
 const YEAR = 2026;
-const GAMES_START = '0909';
-const GAMES_END = '0915';
+const GAMES_START = '0916';
+const GAMES_END = '0923';
 
 const markGames = async () => {
 	console.log('Here markGames\n');
