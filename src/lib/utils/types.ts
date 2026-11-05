@@ -5,6 +5,19 @@ export type Alert = {
 	alertType: 'error' | 'success' | undefined;
 };
 
+// a page's link preview tags (og/twitter), rendered by the root layout
+export type PageMeta = {
+	title: string;
+	description: string;
+	url: string;
+	image: {
+		url: string;
+		width: number;
+		height: number;
+		alt: string;
+	};
+};
+
 export const picksWithTaisAndFades = Prisma.validator<Prisma.PickDefaultArgs>()({
 	include: {
 		tail: true,
