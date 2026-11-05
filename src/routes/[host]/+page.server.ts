@@ -1,4 +1,5 @@
 import type { PageServerLoad } from './$types';
+import { CURRENT_WEEK } from '$env/static/private';
 import { hostPath } from '$lib/config/hosts';
 import { getHostSeason, getHostSeasons } from '$lib/server/host-stats';
 import { hostCardFields, hostCardVersion } from '$lib/server/cards/data';
@@ -54,6 +55,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			href: hostPath(host.slug, other)
 		})),
 		cardUrl,
+		// the week page, scrolled to this host, where their picks can be faded or tailed. Only the
+		// current week takes fades and tails, so an old season has nowhere to send anyone
+		pickSide: season.isCurrent
+			? { week: Number(CURRENT_WEEK), href: `/${season.year}/${CURRENT_WEEK}#${host.slug}` }
+			: null,
 		summary: {
 			record: formatRecord(hostStats.record),
 			winPct: hostStats.winPct,

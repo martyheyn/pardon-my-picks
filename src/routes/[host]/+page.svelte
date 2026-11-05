@@ -11,7 +11,13 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let { host, season, summary, meta } = $derived(data);
+	let { host, season, summary, meta, pickSide } = $derived(data);
+
+	// logged out goes through login first, which sends them on to the week page afterwards
+	let pickSideHref = $derived(
+		pickSide &&
+			(data.user ? pickSide.href : `/login?redirectTo=${encodeURIComponent(pickSide.href)}`)
+	);
 
 	const alert: Writable<Alert> = getContext('alert');
 
@@ -117,19 +123,42 @@
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 font-paragraph">
-		<div class="card md:col-span-3 border-secondary dark:border-secondary">
-			<p
-				class="font-header text-lg uppercase tracking-wide text-muteTextColor dark:text-darkMuteTextColor"
-			>
-				Fade {host.displayName}
-			</p>
+		{#snippet fadeStats()}
 			<p class="font-header text-5xl">{summary.fadeRecord}</p>
 			<p class="text-lg">
 				<span class="font-semibold">{fadeVerdict(summary.fadeNet)}</span>
 				taking the other side of every {host.displayName} pick
 				{season.isCurrent ? 'this season' : `in ${season.year}`}.
 			</p>
-		</div>
+		{/snippet}
+
+		{#if pickSide && pickSideHref}
+			<a
+				href={pickSideHref}
+				class="group card md:col-span-3 border-secondary dark:border-secondary hover:-translate-y-1 hover:shadow-xl focus-visible:-translate-y-1"
+			>
+				<div class="flex flex-wrap justify-between items-center gap-3">
+					<p
+						class="font-header text-lg uppercase tracking-wide text-muteTextColor dark:text-darkMuteTextColor"
+					>
+						Fade or tail {host.displayName}
+					</p>
+					<span class="btn-primary group-hover:bg-primaryHover dark:group-hover:bg-darkHover">
+						{data.user ? `Week ${pickSide.week} picks →` : 'Log in to fade or tail →'}
+					</span>
+				</div>
+				{@render fadeStats()}
+			</a>
+		{:else}
+			<div class="card md:col-span-3 border-secondary dark:border-secondary">
+				<p
+					class="font-header text-lg uppercase tracking-wide text-muteTextColor dark:text-darkMuteTextColor"
+				>
+					Fade {host.displayName}
+				</p>
+				{@render fadeStats()}
+			</div>
+		{/if}
 
 		<div class="card">
 			<p class="text-sm text-muteTextColor dark:text-darkMuteTextColor">Record</p>

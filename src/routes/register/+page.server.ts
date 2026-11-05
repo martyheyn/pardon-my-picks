@@ -1,5 +1,5 @@
 import { createSession } from '$lib/server/auth';
-import { generateSecureRandomString } from '$lib/utils/helpers';
+import { generateSecureRandomString, safeRedirectPath } from '$lib/utils/helpers';
 import { prisma } from '$lib/server/prisma';
 import { fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from 'oslo/password';
@@ -39,7 +39,7 @@ const RegisterFormSchema = z.object({
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		redirect(303, '/');
+		redirect(303, safeRedirectPath(event.url.searchParams.get('redirectTo')));
 	}
 
 	await limiter.cookieLimiter?.preflight(event);
@@ -121,6 +121,7 @@ export const actions: Actions = {
 			maxAge: 60 * 60 * 24 * 120
 		});
 
-		throw redirect(303, '/');
+		// back to wherever sent them here (e.g. a host page's fade or tail link), or home
+		throw redirect(303, safeRedirectPath(event.url.searchParams.get('redirectTo')));
 	}
 };

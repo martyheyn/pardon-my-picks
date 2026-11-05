@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hostPath, matchHostSlug, parseSeason, resolveHosts, slugify } from './hosts';
+import { hostPath, hostSlug, matchHostSlug, parseSeason, resolveHosts, slugify } from './hosts';
 
 describe('slugify', () => {
 	it('lowercases and drops everything but letters and numbers', () => {
@@ -29,6 +29,13 @@ describe('resolveHosts', () => {
 
 	it('keeps the order it was given', () => {
 		expect(resolveHosts(['PFT', 'Hank']).map((host) => host.slug)).toEqual(['pft', 'hank']);
+	});
+});
+
+describe('hostSlug', () => {
+	it('uses the configured slug, falling back to one built from the name', () => {
+		expect(hostSlug('Big Cat')).toBe('bigcat');
+		expect(hostSlug('Mr Cat')).toBe('mrcat');
 	});
 });
 

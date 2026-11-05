@@ -91,6 +91,9 @@ export function resolveHosts(persons: string[]): HostConfig[] {
 	});
 }
 
+// the slug a person's host page lives at - also the anchor for their picks on the week page
+export const hostSlug = (person: string) => resolveHosts([person])[0].slug;
+
 export type HostMatch = {
 	host: HostConfig;
 	// false when the url used an alias or different casing and should redirect to host.slug

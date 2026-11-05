@@ -7,6 +7,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { PEPPER } from '$env/static/private';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
+import { safeRedirectPath } from '$lib/utils/helpers';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -30,7 +31,7 @@ const LoginFormSchema = z.object({
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		redirect(303, '/');
+		redirect(303, safeRedirectPath(event.url.searchParams.get('redirectTo')));
 	}
 
 	/**
@@ -110,6 +111,7 @@ export const actions: Actions = {
 			maxAge: 60 * 60 * 24 * 120
 		});
 
-		throw redirect(302, '/');
+		// back to wherever sent them here (e.g. a host page's fade or tail link), or home
+		throw redirect(302, safeRedirectPath(event.url.searchParams.get('redirectTo')));
 	}
 };

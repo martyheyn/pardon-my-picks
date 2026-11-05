@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { quadInOut } from 'svelte/easing';
-	import { getContext, untrack } from 'svelte';
+	import { getContext, onMount, untrack } from 'svelte';
 	import { logo, personaImgPath, sortPicksByPerson, teamLink } from '$lib/utils/matching-format';
 	import type { PickByPerson, PicksWithTailsAndFades } from '$lib/utils/types';
 	import type { Writable } from 'svelte/store';
@@ -14,6 +14,7 @@
 	import SpecialBet from '$lib/components/special-bet.svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
 	import type { Alert } from '$lib/utils/types';
+	import { hostSlug } from '$lib/config/hosts';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -79,6 +80,14 @@
 
 	let alertBool = $derived($alert.text ? true : false);
 
+	// the layout only renders pages once it's in the browser, after the browser has already tried
+	// (and failed) to jump to a #host anchor - so a fresh load of /2026/10#pft, like a host page link
+	// opened in a new tab, does the jump here instead
+	onMount(() => {
+		if (!location.hash) return;
+		document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+	});
+
 	const now = new Date();
 
 	const displayDate = (date: Date | null) => {
@@ -133,8 +142,10 @@
 			class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-6 md:gap-y-12 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 		>
 			{#each picksArr as pickPerson}
+				<!-- id matches the host page slug, so a host page can link straight to /2026/10#pft -->
 				<div
-					class="flex flex-row justify-start items-center md:items-start md:flex-col gap-x-4 md:col-span-2"
+					id={hostSlug(Object.keys(pickPerson)[0])}
+					class="flex flex-row justify-start items-center md:items-start md:flex-col gap-x-4 md:col-span-2 scroll-mt-4"
 				>
 					<h2 class="text-2xl pl-3 font-semibold text-left">{Object.keys(pickPerson)}</h2>
 					<img

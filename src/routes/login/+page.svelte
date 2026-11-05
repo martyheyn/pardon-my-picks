@@ -8,7 +8,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext, untrack } from 'svelte';
 
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 
 	let { data } = $props();
 
@@ -38,6 +38,9 @@
 	});
 
 	const lastPage = $navigating?.from?.route.id;
+
+	// carries ?redirectTo= over to sign up, so a new account still lands where they were headed
+	let registerHref = $derived(`/register${$page.url.search}`);
 </script>
 
 <div class="w-full h-full flex justify-center">
@@ -123,7 +126,7 @@
 				<div class="flex flex-col gap-y-1.5">
 					<div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
 						<p>Don't have an account?</p>
-						<a href="/register" class="">
+						<a href={registerHref} class="">
 							<span class="text-blue-500 dark:text-blue-200">Sign Up</span></a
 						>
 					</div>
