@@ -1,0 +1,9 @@
+{
+	"name": "pardon-my-picks-scripts",
+	"private": true,
+	"type": "module",
+	"description": "Standalone scripts run outside the app - the grading GitHub Action installs just these deps",
+	"dependencies": {
+		"pg": "^8.16.3"
+	}
+}

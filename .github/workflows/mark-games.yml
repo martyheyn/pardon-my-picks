@@ -1,32 +1,38 @@
-name: Run Mark Games Script
+name: Grade games
 
+# grades every finished game with picks on it - see scripts/mark-games.js. Nothing here needs
+# changing week to week. GitHub only runs schedules from the default branch
 on:
   schedule:
-    - cron: '59 23 * * 4' # Runs at 11:59, only on Thursday
-    - cron: '30 16 * * 0' # Runs at 4:30, only on Sunday
-    - cron: '20 19 * * 0' # Runs at 7:20, only on Sunday
-    - cron: '50 19 * * 0' # Runs at 7:50, only on Sunday
-    - cron: '59 23 * * 0' # Runs at 11:59, only on Sunday
-    - cron: '59 23 * * 1' # Runs at 11:59, only on Monday
+    # UTC. Hourly through Sunday and Monday UTC, which covers Sunday's games through Sunday night
+    # football. Every 3 hours the rest of the week catches Monday night (graded by 06:00 UTC
+    # Tuesday), Thursday night, Saturday and holiday games. A run with nothing finished just exits
+    - cron: '0 * * * 0,1'
+    - cron: '0 */3 * * 2-6'
   workflow_dispatch:
+
+# a slow run and the next scheduled one never grade at the same time
+concurrency:
+  group: mark-games
+  cancel-in-progress: false
 
 jobs:
   mark-games:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: ./scripts
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: npm install
+          node-version: 24
+          cache: npm
+          cache-dependency-path: scripts/package-lock.json
+      - run: npm ci
       - run: node mark-games.js
         env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-          CURRENT_WEEK: ${{ secrets.CURRENT_WEEK }}
-          CURRENT_YEAR: ${{ secrets.CURRENT_YEAR }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
           DB_HOST: ${{ secrets.DB_HOST }}
