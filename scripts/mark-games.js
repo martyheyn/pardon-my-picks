@@ -116,8 +116,9 @@ async function gradeFinishedPicks(pool) {
 	console.log(`${DRY_RUN ? 'Would grade' : 'Graded'} ${graded} of ${pending.length} pending picks`);
 }
 
-// copies each graded pick's result onto the tails and fades that haven't been settled yet. Same
-// rules as the script this replaced, in the same order
+// copies each graded pick's result onto the tails and fades that haven't been settled yet. Push
+// is checked first: a pushed pick is saved as winner 0 + push 1, so checking winner first would
+// settle every push as a tail loss and a fade win
 async function markTailFade(pool) {
 	const { rows: tails } = await pool.query(`
 		SELECT t.id AS t_id, p.winner AS p_winner, p.push AS p_push
@@ -132,9 +133,9 @@ async function markTailFade(pool) {
 
 	for (const tail of tails) {
 		let result = null;
-		if (tail.p_winner === 1) result = { winner: 1, push: 0 };
+		if (tail.p_push === 1) result = { winner: 0, push: 1 };
+		else if (tail.p_winner === 1) result = { winner: 1, push: 0 };
 		else if (tail.p_winner === 0) result = { winner: 0, push: 0 };
-		else if (tail.p_push === 1) result = { winner: 0, push: 1 };
 		if (!result) continue;
 
 		await pool.query(`UPDATE "Tail" SET winner = $1, push = $2 WHERE id = $3`, [
@@ -157,9 +158,9 @@ async function markTailFade(pool) {
 
 	for (const fade of fades) {
 		let result = null;
-		if (fade.p_winner === 1) result = { winner: 0, push: 0 };
+		if (fade.p_push === 1) result = { winner: 0, push: 1 };
+		else if (fade.p_winner === 1) result = { winner: 0, push: 0 };
 		else if (fade.p_winner === 0) result = { winner: 1, push: 0 };
-		else if (fade.p_push === 1) result = { winner: 0, push: 1 };
 		if (!result) continue;
 
 		await pool.query(`UPDATE "Fade" SET winner = $1, push = $2 WHERE id = $3`, [

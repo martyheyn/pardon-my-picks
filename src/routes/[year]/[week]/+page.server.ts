@@ -174,7 +174,8 @@ export const actions: Actions = {
 					id: generateSecureRandomString(18),
 					userId: locals.user.id,
 					pickId: pickId,
-					winner: pick?.winner != null ? (pick.winner === 1 ? 0 : 1) : null,
+					// a fade flips a decided pick, but a push is a push for both sides
+					winner: pick?.winner != null ? (pick.winner === 1 || pick.push === 1 ? 0 : 1) : null,
 					push: pick?.push != null ? pick.push : null
 				}
 			});
