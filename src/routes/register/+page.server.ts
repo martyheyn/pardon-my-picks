@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
 
 import type { Actions, PageServerLoad } from './$types';
-import { PEPPER } from '$env/static/private';
+import { PEPPER, RATE_LIMIT_SECRET } from '$env/static/private';
 
 const limiter = new RateLimiter({
 	// A rate is defined as [number, unit]
@@ -18,7 +18,8 @@ const limiter = new RateLimiter({
 	cookie: {
 		// Cookie limiter
 		name: 'limiterid', // Unique cookie name for this limiter
-		secret: 'SECRETKEY-SERVER-ONLY', // Use $env/static/private
+		// signs the limiter's cookie - from env so it can't be read off the repo and forged
+		secret: RATE_LIMIT_SECRET,
 		rate: [10, 'm'],
 		preflight: true // Require preflight call (see load function)
 	}
