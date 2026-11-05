@@ -1,16 +1,23 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 import type { PrismaClient, User, Session } from '@prisma/client';
+import type { PageMeta } from '$lib/utils/types';
 
 declare global {
 	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
 		// interface Platform {}
+		interface Error {
+			message: string;
+			// set by the host page's 404 so it can link to every host instead
+			hosts?: { slug: string; displayName: string }[];
+		}
 		interface Locals {
 			user: User | null;
 			session: Session | null;
+		}
+		interface PageData {
+			// per-page link previews - the root layout uses the site-wide ones when a page leaves this out
+			meta?: PageMeta;
 		}
 	}
 	// eslint-disable-next-line no-var -- `declare global` requires `var` to augment globalThis; let/const don't work here

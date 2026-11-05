@@ -13,11 +13,28 @@
 
 	import Sidenav from '$lib/components/structure/sidenav.svelte';
 	import Topnav from '$lib/components/structure/topnav.svelte';
-	import type { Alert } from '$lib/utils/types';
+	import type { Alert, PageMeta } from '$lib/utils/types';
 	import type { Page } from '@sveltejs/kit';
 	import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
 
 	let { data, children }: { data: PageData; children?: Snippet } = $props();
+
+	// pages can set their own link preview by returning `meta` from load (host pages do) -
+	// everything else gets the site-wide one
+	const DEFAULT_META: PageMeta = {
+		title: 'Pardon My Picks - Weekly Football Picks',
+		description: 'Weekly football picks by Pardon My Take.',
+		url: 'https://pardonmypicks.com',
+		image: {
+			url: 'https://pardonmypicks.com/pmp_screenshot.png',
+			width: 1200,
+			height: 630,
+			alt: 'Pardon My Picks'
+		}
+	};
+
+	let pageMeta = $derived($page.data.meta);
+	let meta = $derived(pageMeta ?? DEFAULT_META);
 
 	const sideNavCollasped = writable(true);
 	const currYear = writable(Number(PUBLIC_CURRENT_YEAR));
@@ -116,33 +133,34 @@
 		rel="stylesheet"
 	/>
 	<!-- Page Title -->
-	<title>Pardon My Picks</title>
+	<title>{pageMeta ? `${pageMeta.title} | Pardon My Picks` : 'Pardon My Picks'}</title>
 
 	<!-- Meta Description -->
-	<meta name="description" content="Weekly football picks by Pardon My Take." />
+	<meta name="description" content={meta.description} />
 
 	<!-- Keywords (Note: Google doesn't rely heavily on meta keywords, but they can still be used) -->
 	<meta name="keywords" content="Pardon My Take, Football Picks, NFL Picks, Weekly Picks" />
 
 	<!-- Canonical URL -->
-	<link rel="canonical" href="https://pardonmypicks.com" />
+	<link rel="canonical" href={meta.url} />
 
 	<!-- Open Graph Meta Tags (for social media and search engines) -->
-	<meta property="og:url" content="https://pardonmypicks.com" />
+	<meta property="og:url" content={meta.url} />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="Pardon My Picks - Weekly Football Picks" />
-	<meta property="og:description" content="Weekly football picks by Pardon My Take." />
-	<meta property="og:image" content="https://pardonmypicks.com/pmp_screenshot.png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="Pardon My Picks" />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:image" content={meta.image.url} />
+	<meta property="og:image:width" content={`${meta.image.width}`} />
+	<meta property="og:image:height" content={`${meta.image.height}`} />
+	<meta property="og:image:alt" content={meta.image.alt} />
 	<meta property="og:site_name" content="Pardon My Picks" />
 
 	<!-- Twitter Card Meta Tags -->
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Pardon My Picks - Weekly Football Picks" />
-	<meta name="twitter:description" content="Weekly football picks by Pardon My Take." />
-	<meta name="twitter:image" content="https://pardonmypicks.com/pmp_screenshot.png" />
+	<meta name="twitter:title" content={meta.title} />
+	<meta name="twitter:description" content={meta.description} />
+	<meta name="twitter:image" content={meta.image.url} />
+	<meta name="twitter:image:alt" content={meta.image.alt} />
 </svelte:head>
 
 <svelte:window bind:innerWidth={$screenWidth} bind:scrollY bind:innerHeight={$fullPageHeight} />

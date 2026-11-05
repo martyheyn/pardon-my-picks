@@ -13,6 +13,20 @@ export function isBettingOpen(dayOfWeek: number): boolean {
 	return dayOfWeek !== 0 && dayOfWeek !== 1;
 }
 
+// where ?redirectTo= is allowed to send someone after they log in or sign up: paths on this site
+// only, so a crafted link can't bounce a fresh login off to another site. Resolving against a
+// placeholder origin catches the tricks a plain startsWith('/') misses - '//evil.com', '/\evil.com'
+// and tabs or newlines that browsers strip out - since they all resolve to a different host
+export function safeRedirectPath(target: string | null, fallback = '/'): string {
+	if (!target || !target.startsWith('/')) return fallback;
+
+	const placeholder = 'http://placeholder.invalid';
+	const resolved = new URL(target, placeholder);
+	if (resolved.origin !== placeholder) return fallback;
+
+	return `${resolved.pathname}${resolved.search}${resolved.hash}`;
+}
+
 // gameDate is a real UTC instant - a Date from prisma, or an ISO string once it has gone through
 // JSON - so comparing epoch millis gives the same answer no matter what timezone this runs in
 export function hasGameStarted(gameDate: Date | string, now: Date = new Date()): boolean {

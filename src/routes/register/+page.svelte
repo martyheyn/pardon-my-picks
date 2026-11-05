@@ -8,7 +8,7 @@
 	import type { Writable } from 'svelte/store';
 	import { getContext, untrack } from 'svelte';
 
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 
 	let { data } = $props();
 
@@ -37,6 +37,9 @@
 	});
 
 	const lastPage = $navigating?.from?.route.id;
+
+	// carries ?redirectTo= back over to log in, so switching forms doesn't lose where they were headed
+	let loginHref = $derived(`/login${$page.url.search}`);
 </script>
 
 <div class="w-full h-full flex justify-center">
@@ -143,7 +146,7 @@
 
 				<div class="text-xs text-gray-500 dark:text-white flex gap-x-2">
 					<p>Got an account already?</p>
-					<a href="/login" class="">
+					<a href={loginHref} class="">
 						<span class="text-blue-500 dark:text-blue-200">Log In</span></a
 					>
 				</div>

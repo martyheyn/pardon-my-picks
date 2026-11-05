@@ -5,8 +5,9 @@ import { Argon2id } from 'oslo/password';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import { PEPPER } from '$env/static/private';
+import { PEPPER, RATE_LIMIT_SECRET } from '$env/static/private';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
+import { safeRedirectPath } from '$lib/utils/helpers';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -17,7 +18,8 @@ const limiter = new RateLimiter({
 	cookie: {
 		// Cookie limiter
 		name: 'limiterid', // Unique cookie name for this limiter
-		secret: 'SECRETKEY-SERVER-ONLY', // Use $env/static/private
+		// signs the limiter's cookie - from env so it can't be read off the repo and forged
+		secret: RATE_LIMIT_SECRET,
 		rate: [10, 'm'],
 		preflight: true // Require preflight call (see load function)
 	}
@@ -30,7 +32,7 @@ const LoginFormSchema = z.object({
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		redirect(303, '/');
+		redirect(303, safeRedirectPath(event.url.searchParams.get('redirectTo')));
 	}
 
 	/**
@@ -110,6 +112,7 @@ export const actions: Actions = {
 			maxAge: 60 * 60 * 24 * 120
 		});
 
-		throw redirect(302, '/');
+		// back to wherever sent them here (e.g. a host page's fade or tail link), or home
+		throw redirect(302, safeRedirectPath(event.url.searchParams.get('redirectTo')));
 	}
 };

@@ -7,6 +7,7 @@ import { prisma } from '$lib/server/prisma';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
+import { RATE_LIMIT_SECRET } from '$env/static/private';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -17,7 +18,8 @@ const limiter = new RateLimiter({
 	cookie: {
 		// Cookie limiter
 		name: 'limiterid', // Unique cookie name for this limiter
-		secret: 'SECRETKEY-SERVER-ONLY', // Use $env/static/private
+		// signs the limiter's cookie - from env so it can't be read off the repo and forged
+		secret: RATE_LIMIT_SECRET,
 		rate: [10, 'm'],
 		preflight: true // Require preflight call (see load function)
 	}
