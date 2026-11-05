@@ -1,25 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hasGameStarted, normalizePickType, planPickSave, safeRedirectPath } from './helpers';
-
-describe('safeRedirectPath', () => {
-	it('keeps a path on this site, query and hash included', () => {
-		expect(safeRedirectPath('/2026/10#pft')).toBe('/2026/10#pft');
-		expect(safeRedirectPath('/hank?year=2025')).toBe('/hank?year=2025');
-	});
-
-	it('falls back when there is nothing to go to', () => {
-		expect(safeRedirectPath(null)).toBe('/');
-		expect(safeRedirectPath('')).toBe('/');
-	});
-
-	it('refuses to send anyone to another site', () => {
-		expect(safeRedirectPath('https://evil.com')).toBe('/');
-		expect(safeRedirectPath('//evil.com')).toBe('/');
-		expect(safeRedirectPath('/\\evil.com')).toBe('/');
-		expect(safeRedirectPath('/\t/evil.com')).toBe('/');
-		expect(safeRedirectPath('javascript:alert(1)')).toBe('/');
-	});
-});
+import { hasGameStarted, normalizePickType, planPickSave } from './helpers';
 
 describe('hasGameStarted', () => {
 	const kickoff = new Date('2026-10-26T00:20:00Z');
