@@ -10,7 +10,7 @@ import { fullNameToMascot, mascotToFullName } from '$lib/utils/matching-format';
 
 import { ODDS_API_KEY } from '$env/static/private';
 import { CURRENT_YEAR } from '$env/static/private';
-import { getCurrentWeek } from '$lib/utils/nfl-week';
+import { getCurrentWeek, getWeekDates } from '$lib/utils/nfl-week';
 
 type EspnEvent = {
 	id: string;
@@ -56,7 +56,9 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 	}
 
 	return {
-		user: user ? true : false
+		user: user ? true : false,
+		// defaults for the form's date range - the same Wednesday-to-Wednesday window pickem's odds use
+		weekDates: getWeekDates(Number(CURRENT_YEAR), getCurrentWeek(Number(CURRENT_YEAR)))
 	};
 };
 

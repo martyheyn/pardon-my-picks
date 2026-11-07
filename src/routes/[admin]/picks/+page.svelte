@@ -2,14 +2,14 @@
 	import { enhance } from '$app/forms';
 	import { fade, fly } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import AlertFlash from '$lib/components/alert.svelte';
 	import { nflTeams } from '$lib/utils/matching-format';
 	import type { Writable } from 'svelte/store';
 	import type { Alert } from '$lib/utils/types';
 	import { getContext } from 'svelte';
 
-	let { form }: { form: ActionData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const alert: Writable<Alert> = getContext('alert');
 
@@ -48,7 +48,7 @@
 				type="date"
 				name="commenceTimeFrom"
 				id="commenceTimeFrom"
-				value="2026-09-01"
+				value={data.weekDates.start}
 			/>
 		</div>
 
@@ -59,7 +59,7 @@
 				type="date"
 				name="commenceTimeTo"
 				id="commenceTimeTo"
-				value="2026-09-01"
+				value={data.weekDates.end}
 			/>
 		</div>
 		{#each personas as person}
