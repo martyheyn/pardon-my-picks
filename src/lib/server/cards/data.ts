@@ -5,7 +5,8 @@ import {
 	formatRecord,
 	type HostStats,
 	type SeasonStats,
-	type StatsPick
+	type StatsPick,
+	weekFade
 } from '$lib/utils/host-stats';
 import {
 	hostHeadline,
@@ -30,7 +31,7 @@ export const CARD_VERSION = 2;
 // it for the card url without loading any images
 export type HostCardFields = Omit<HostCardData, 'persona'>;
 
-const nameLookup = (hosts: HostConfig[]) => (person: string) =>
+export const nameLookup = (hosts: HostConfig[]) => (person: string) =>
 	hosts.find((host) => host.person === person)?.displayName ?? person;
 
 const lastRank = (stats: SeasonStats<StatsPick>) =>
@@ -79,8 +80,6 @@ export async function hostCardData(fields: HostCardFields, person: string): Prom
 	return { ...fields, persona: await loadPngImage(personaImgPath(person)) };
 }
 
-const hasDecisions = (host: HostStats<StatsPick>) => host.record.wins + host.record.losses > 0;
-
 async function fridayPick(pick: StatsPick): Promise<FridayFadePick> {
 	const teams = pick.pickTotalType ? [pick.awayTeam, pick.homeTeam] : [pick.pickTeam];
 	const logos = await Promise.all(teams.map((team) => (team ? loadStaticImage(logo[team]) : null)));
@@ -99,13 +98,7 @@ export async function fridayFadeData(
 	hosts: HostConfig[]
 ): Promise<FridayFadeData> {
 	const nameOf = nameLookup(hosts);
-	const playing = stats.standings.filter((host) =>
-		weekPicks.some((pick) => pick.person === host.person)
-	);
-
-	// nobody is the fade until someone has a record to fade
-	const lastPlace = playing[playing.length - 1];
-	const fade = lastPlace && hasDecisions(lastPlace) ? lastPlace : null;
+	const { playing, fade } = weekFade(stats, weekPicks);
 
 	const rows = await Promise.all(
 		playing.map(async (host) => ({

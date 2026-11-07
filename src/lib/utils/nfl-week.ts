@@ -52,10 +52,33 @@ export function getCurrentWeek(season: number, now: Date = new Date()): number {
 	return Math.min(Math.max(week, 1), LAST_WEEK);
 }
 
+const weekStart = (season: number, week: number) =>
+	new Date(weekOneStart(season).getTime() + (week - 1) * WEEK_MS);
+
 // a week's Wednesday and the next one, as 'YYYY-MM-DD' - the range the-odds-api is asked for games in
 export function getWeekDates(season: number, week: number): { start: string; end: string } {
-	const start = new Date(weekOneStart(season).getTime() + (week - 1) * WEEK_MS);
+	const start = weekStart(season, week);
 	const end = new Date(start.getTime() + WEEK_MS);
 
 	return { start: toDateString(start), end: toDateString(end) };
+}
+
+// whole days in New York since a week's Wednesday: 0 is that Wednesday, 6 its Tuesday, 7 the next
+// Wednesday. Negative before the week starts. Counted from the week asked for rather than the
+// current one, so it keeps counting past week 21 where getCurrentWeek stops
+export function daysSinceWeekStart(season: number, week: number, now: Date = new Date()): number {
+	return Math.round((easternDate(now).getTime() - weekStart(season, week).getTime()) / DAY_MS);
+}
+
+// the hour (0-23) on a New York clock
+export function easternHour(now: Date = new Date()): number {
+	const hour = new Intl.DateTimeFormat('en-US', {
+		timeZone: 'America/New_York',
+		hour: 'numeric',
+		hourCycle: 'h23'
+	})
+		.formatToParts(now)
+		.find((part) => part.type === 'hour')?.value;
+
+	return Number(hour);
 }

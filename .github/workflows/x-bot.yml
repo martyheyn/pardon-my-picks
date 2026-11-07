@@ -1,0 +1,47 @@
+name: X bot
+
+# asks the site to post anything that's ready to X - the "who to fade" card once the week's picks are
+# in, and the standings card once a week is graded. The site decides and dedupes (see
+# src/lib/server/x-bot/run.ts), so running this more often than needed is harmless: a run with
+# nothing ready just reports what it's waiting on. GitHub only runs schedules and workflow_run
+# triggers from the default branch
+on:
+  # straight after every grading run, so standings go out as soon as the week's last game is graded.
+  # Grading runs hourly Sunday and Monday UTC, which also covers weekend fade posts
+  workflow_run:
+    workflows: ['Grade games']
+    types: [completed]
+  schedule:
+    # UTC. Hourly Tuesday through Saturday for fade picks entered midweek and standings held for
+    # the morning - half past, so it doesn't land on top of a grading run
+    - cron: '30 * * * 2-6'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'run: post whatever is ready. check: test the X keys (which account, and that a card uploads) without posting'
+        type: choice
+        options: [run, check]
+        default: run
+
+# two runs never post at the same time (the site's claim on each post guards this too)
+concurrency:
+  group: x-bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # prints what the bot did or is waiting on. Fails the run on a 401 (secret mismatch) or a 500
+      # (a post failed, or needs checking on X by hand). No request body on purpose: SvelteKit
+      # turns away cross-site form posts, and a bodyless POST isn't one. www on purpose: the bare
+      # domain answers with a 308, which curl would count as success without running anything
+      - run: |
+          curl --fail-with-body --silent --show-error --max-time 120 \
+            -X POST "https://www.pardonmypicks.com/bot/$ACTION" \
+            -H "authorization: Bearer $BOT_SECRET"
+        env:
+          BOT_SECRET: ${{ secrets.BOT_SECRET }}
+          # 'run' unless someone picked 'check' on a manual run - schedules have no inputs
+          ACTION: ${{ inputs.action == 'check' && 'check' || 'run' }}
