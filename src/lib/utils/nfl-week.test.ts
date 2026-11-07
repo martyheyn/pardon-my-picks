@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCurrentWeek, getWeekDates } from './nfl-week';
+import { daysSinceWeekStart, easternHour, getCurrentWeek, getWeekDates } from './nfl-week';
 
 // kickoffs below are real games from the picks table, written in ET (-04:00 before the first
 // Sunday of November, -05:00 after)
@@ -77,5 +77,43 @@ describe('getWeekDates', () => {
 
 	it('crosses into the new year for week 18', () => {
 		expect(getWeekDates(2024, 18)).toEqual({ start: '2025-01-01', end: '2025-01-08' });
+	});
+});
+
+describe('daysSinceWeekStart', () => {
+	it('is 0 on the Wednesday a week starts and 6 on its Tuesday', () => {
+		// week 9 of 2026 runs Wed Nov 4 to Tue Nov 10
+		expect(daysSinceWeekStart(2026, 9, new Date('2026-11-04T00:00:00-05:00'))).toBe(0);
+		expect(daysSinceWeekStart(2026, 9, new Date('2026-11-10T00:30:00-05:00'))).toBe(6);
+		expect(daysSinceWeekStart(2026, 9, new Date('2026-11-10T23:59:00-05:00'))).toBe(6);
+	});
+
+	it('keeps counting into the next week, and is negative before the week starts', () => {
+		expect(daysSinceWeekStart(2026, 9, new Date('2026-11-13T12:00:00-05:00'))).toBe(9);
+		expect(daysSinceWeekStart(2026, 9, new Date('2026-11-03T12:00:00-05:00'))).toBe(-1);
+	});
+
+	it('uses the date in New York', () => {
+		// 03:00 UTC Wednesday is still 10pm Tuesday in New York
+		expect(daysSinceWeekStart(2026, 9, new Date('2026-11-11T03:00:00Z'))).toBe(6);
+	});
+
+	it('is not thrown off by the clocks going back', () => {
+		// week 8 of 2026 starts Wed Oct 28; DST ended Sunday Nov 1
+		expect(daysSinceWeekStart(2026, 8, new Date('2026-11-03T23:00:00-05:00'))).toBe(6);
+	});
+
+	it('counts past week 21, where getCurrentWeek stops', () => {
+		// the Tuesday after the 2025 conference championships (week 21 starts Wed Jan 21)
+		expect(daysSinceWeekStart(2025, 21, new Date('2026-01-27T10:00:00-05:00'))).toBe(6);
+		expect(daysSinceWeekStart(2025, 21, new Date('2026-02-04T10:00:00-05:00'))).toBe(14);
+	});
+});
+
+describe('easternHour', () => {
+	it('reads the hour on a New York clock', () => {
+		expect(easternHour(new Date('2026-11-10T01:30:00-05:00'))).toBe(1);
+		expect(easternHour(new Date('2026-11-10T13:00:00Z'))).toBe(8);
+		expect(easternHour(new Date('2026-07-01T04:00:00Z'))).toBe(0);
 	});
 });

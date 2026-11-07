@@ -312,6 +312,27 @@ export function personAhead(
 	return { relation: 'behind', person: ahead.person, gap: ahead.points - row.points };
 }
 
+export type WeekFade<P extends StatsPick> = {
+	// the hosts with a pick this week, best first. Hosts sitting the week out are left off
+	playing: HostStats<P>[];
+	// whoever's last on the season among them - null until they have a win or a loss to fade
+	fade: HostStats<P> | null;
+};
+
+// who to fade this week - the Friday card and the bot's post both ask here so they name the same host
+export function weekFade<P extends StatsPick>(
+	stats: SeasonStats<P>,
+	weekPicks: Pick<StatsPick, 'person'>[]
+): WeekFade<P> {
+	const playing = stats.standings.filter((host) =>
+		weekPicks.some((pick) => pick.person === host.person)
+	);
+
+	const lastPlace = playing[playing.length - 1];
+	const hasDecisions = lastPlace && lastPlace.record.wins + lastPlace.record.losses > 0;
+	return { playing, fade: hasDecisions ? lastPlace : null };
+}
+
 export function computeSeasonStats<P extends StatsPick>(picks: P[]): SeasonStats<P> {
 	const standings = buildStandings(picks);
 	const lastCompleted = latestCompletedWeek(picks);

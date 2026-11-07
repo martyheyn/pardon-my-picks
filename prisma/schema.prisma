@@ -97,6 +97,27 @@ model Tail {
   user      User     @relation(fields: [userId], references: [id])
 }
 
+// one row per X bot post (see src/lib/server/x-bot/run.ts). The unique key is what stops a post
+// going out twice - a run claims the row before it posts
+model BotPost {
+  id        String   @id @db.VarChar(191)
+  // 'fade' | 'standings'
+  type      String   @db.VarChar(32)
+  year      Int
+  week      Int
+  // 'posting' (claimed, in flight - or a run died mid-post: check X before clearing it),
+  // 'posted', or 'failed' (X said no before anything went public, so it's retried)
+  status    String   @db.VarChar(16)
+  attempts  Int      @default(1)
+  text      String   @db.VarChar(512)
+  xPostId   String?  @map("x_post_id") @db.VarChar(64)
+  error     String?  @db.VarChar(1000)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([type, year, week])
+}
+
 enum NFLTeam {
   cardinals
   falcons
