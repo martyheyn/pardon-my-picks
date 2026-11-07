@@ -15,7 +15,8 @@
 	import Topnav from '$lib/components/structure/topnav.svelte';
 	import type { Alert, PageMeta } from '$lib/utils/types';
 	import type { Page } from '@sveltejs/kit';
-	import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
+	import { PUBLIC_CURRENT_YEAR } from '$env/static/public';
+	import { getCurrentWeek } from '$lib/utils/nfl-week';
 
 	let { data, children }: { data: PageData; children?: Snippet } = $props();
 
@@ -38,7 +39,7 @@
 
 	const sideNavCollasped = writable(true);
 	const currYear = writable(Number(PUBLIC_CURRENT_YEAR));
-	const currWeek = writable(Number(PUBLIC_CURRENT_WEEK));
+	const currWeek = writable(getCurrentWeek(Number(PUBLIC_CURRENT_YEAR)));
 	const screenWidth = writable(0);
 	const active = writable('');
 	const fullPageHeight = writable(0);

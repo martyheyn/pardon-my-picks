@@ -3,7 +3,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 
-import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 
 const resultLinksSchema = z.object({
 	gameId: z.string(),
@@ -28,7 +29,7 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 	const pmtWeeklyPicks = await prisma.pick.findMany({
 		where: {
 			year: parseInt(CURRENT_YEAR),
-			week: parseInt(CURRENT_WEEK),
+			week: getCurrentWeek(Number(CURRENT_YEAR)),
 			pmtPersona: true,
 			barstoolEmployee: true,
 			private: false,

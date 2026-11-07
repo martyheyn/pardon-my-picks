@@ -1,4 +1,5 @@
-import { PUBLIC_CURRENT_WEEK, PUBLIC_CURRENT_YEAR } from '$env/static/public';
+import { PUBLIC_CURRENT_YEAR } from '$env/static/public';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 
 export type subItems = {
 	label: string;
@@ -20,8 +21,10 @@ export type sideNavItems = {
 	subItemsOpen?: boolean;
 }[];
 
+// worked out once per module load - fine here, unlike on the server: the browser loads this fresh
+// on every visit, and the server never renders the nav (the root layout only renders in the browser)
 const currWeekSubNavArr: { label: string; icon: string; route: string }[] = [];
-for (let i = 1; i <= Number(PUBLIC_CURRENT_WEEK); i++) {
+for (let i = 1; i <= getCurrentWeek(Number(PUBLIC_CURRENT_YEAR)); i++) {
 	currWeekSubNavArr.push({
 		label: `Week ${i}`,
 		icon: 'calendar',

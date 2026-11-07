@@ -5,19 +5,12 @@ import {
 	hasGameStarted,
 	isBettingOpen
 } from '$lib/utils/helpers';
-import {
-	ODDS_API_KEY,
-	CURRENT_WEEK,
-	CURRENT_YEAR,
-	GAMES_START_DATE,
-	GAMES_END_DATE
-} from '$env/static/private';
+import { ODDS_API_KEY, CURRENT_YEAR } from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
+import { getCurrentWeek, getWeekDates } from '$lib/utils/nfl-week';
 import { prisma } from '$lib/server/prisma';
 
-const currentWeek = Number(CURRENT_WEEK);
-
-const getDbUserPicks = async (userId: string) => {
+const getDbUserPicks = async (userId: string, currentWeek: number) => {
 	const dbUserPicks: PickData[] = await prisma.pick.findMany({
 		where: {
 			userId: userId,
@@ -43,19 +36,21 @@ const getDbUserPicks = async (userId: string) => {
 
 export async function GET({ locals }) {
 	const { user } = locals;
+	const currentWeek = getCurrentWeek(Number(CURRENT_YEAR));
 	let dbUserPicks: PickData[] = [];
 	if (user) {
-		dbUserPicks = await getDbUserPicks(user.id);
+		dbUserPicks = await getDbUserPicks(user.id, currentWeek);
 	}
 
 	// this will be the end of Friday or early Sunday
 	const bettingOpen = isBettingOpen(getDayOfWeek());
 	// const showOdds = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
 
-	// times for testing
-	// create 2 javascript dates for 9-8-2024 and 9-9-2024 in the format of 2024-09-08T00:00:00Z
-	const commenceTimeFrom = `${GAMES_START_DATE}T00:00:00Z`;
-	const commenceTimeTo = `${GAMES_END_DATE}T00:00:00Z`;
+	// midnight UTC on the week's Wednesday is Tuesday evening ET - after the last game of the week
+	// before, ahead of the first one this week
+	const weekDates = getWeekDates(Number(CURRENT_YEAR), currentWeek);
+	const commenceTimeFrom = `${weekDates.start}T00:00:00Z`;
+	const commenceTimeTo = `${weekDates.end}T00:00:00Z`;
 
 	let oddsDataClean: Odds[] = [];
 

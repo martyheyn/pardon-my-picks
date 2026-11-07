@@ -9,7 +9,8 @@ import { prisma } from '$lib/server/prisma';
 import { fail } from '@sveltejs/kit';
 import type { PicksWithTailsAndFades } from '$lib/utils/types';
 import { getLiveGames } from '$lib/utils/live-scores';
-import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const dayOfWeek = getDayOfWeek();
@@ -31,7 +32,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 							homeTeam: game.homeTeam,
 							awayTeam: game.awayTeam,
 							year: parseInt(CURRENT_YEAR),
-							week: parseInt(CURRENT_WEEK),
+							week: getCurrentWeek(Number(CURRENT_YEAR)),
 							marked: false
 						},
 						data: {
@@ -98,7 +99,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
+		if (Number(week) !== getCurrentWeek(Number(CURRENT_YEAR)) || year !== CURRENT_YEAR) {
 			return fail(401, {
 				message: 'Please only fade picks from this current week pal',
 				success: false,
@@ -221,7 +222,7 @@ export const actions: Actions = {
 			});
 		}
 
-		if (week !== CURRENT_WEEK || year !== CURRENT_YEAR) {
+		if (Number(week) !== getCurrentWeek(Number(CURRENT_YEAR)) || year !== CURRENT_YEAR) {
 			return fail(401, {
 				message: 'Please only tail picks from this current week guy',
 				success: false,

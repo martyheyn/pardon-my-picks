@@ -7,6 +7,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { Argon2id } from 'oslo/password';
+import { getCurrentWeek } from '../src/lib/utils/nfl-week.ts';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,8 @@ export const TEST_ADMIN = {
 };
 
 const YEAR = parseInt(process.env.CURRENT_YEAR);
-const WEEK = parseInt(process.env.CURRENT_WEEK);
+// the same week the app is on right now
+const WEEK = getCurrentWeek(YEAR);
 
 async function seedUser({ id, username, password, role }) {
 	const pass = password + process.env.PEPPER;
@@ -107,9 +109,9 @@ async function seedTestPicks() {
 }
 
 async function main() {
-	if (!process.env.PEPPER || !YEAR || !WEEK) {
+	if (!process.env.PEPPER || !YEAR) {
 		throw new Error(
-			'Missing required env vars (PEPPER, CURRENT_YEAR, CURRENT_WEEK) — run via `node --env-file=.env scripts/seed-test-data.js`'
+			'Missing required env vars (PEPPER, CURRENT_YEAR) — run via `node --env-file=.env scripts/seed-test-data.js`'
 		);
 	}
 
