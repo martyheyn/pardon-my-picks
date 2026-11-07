@@ -1,11 +1,12 @@
-import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 import { prisma } from '$lib/server/prisma';
 
 export async function GET() {
 	const weeklyPmtPicks = await prisma.pick.findMany({
 		where: {
 			year: parseInt(CURRENT_YEAR),
-			week: parseInt(CURRENT_WEEK),
+			week: getCurrentWeek(Number(CURRENT_YEAR)),
 			pmtPersona: true
 		},
 		select: {

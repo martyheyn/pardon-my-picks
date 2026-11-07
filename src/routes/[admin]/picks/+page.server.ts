@@ -9,8 +9,8 @@ import type { Odds } from '$lib/utils/types';
 import { fullNameToMascot, mascotToFullName } from '$lib/utils/matching-format';
 
 import { ODDS_API_KEY } from '$env/static/private';
-import { CURRENT_WEEK } from '$env/static/private';
 import { CURRENT_YEAR } from '$env/static/private';
+import { getCurrentWeek, getWeekDates } from '$lib/utils/nfl-week';
 
 type EspnEvent = {
 	id: string;
@@ -56,7 +56,9 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 	}
 
 	return {
-		user: user ? true : false
+		user: user ? true : false,
+		// defaults for the form's date range - the same Wednesday-to-Wednesday window pickem's odds use
+		weekDates: getWeekDates(Number(CURRENT_YEAR), getCurrentWeek(Number(CURRENT_YEAR)))
 	};
 };
 
@@ -85,6 +87,8 @@ export const actions: Actions = {
 		const commenceTimeToRaw = formData.getAll('commenceTimeTo').toString();
 		const commenceTimeFrom = `${commenceTimeFromRaw}T00:00:00Z`;
 		const commenceTimeTo = `${commenceTimeToRaw}T00:00:00Z`;
+		// worked out once, so every pick in this batch lands in the same week
+		const currentWeek = getCurrentWeek(Number(CURRENT_YEAR));
 
 		const person = formData.getAll('person') as string[];
 		const type = formData.getAll('betType') as string[];
@@ -212,7 +216,7 @@ export const actions: Actions = {
 							gameId: gameOdds.id,
 							year: parseInt(CURRENT_YEAR),
 							show: 'PMT',
-							week: parseInt(CURRENT_WEEK),
+							week: currentWeek,
 							person: pick.person,
 							type: pick.type,
 							description: description,

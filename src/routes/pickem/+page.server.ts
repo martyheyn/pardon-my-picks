@@ -17,7 +17,8 @@ import {
 	planPickSave
 } from '$lib/utils/helpers';
 
-import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 
 // TODO: make the teams emuns and the type 'spread' or 'total'
 // Define the schema for the PickData object
@@ -93,6 +94,8 @@ export const actions: Actions = {
 		}
 
 		const picks: PickData[] = result.data;
+		// worked out once, so the already-picked check and the saved picks use the same week
+		const currentWeek = getCurrentWeek(Number(CURRENT_YEAR));
 
 		try {
 			// check if user has already made either pick
@@ -103,7 +106,7 @@ export const actions: Actions = {
 				include: {
 					picks: {
 						where: {
-							week: parseInt(CURRENT_WEEK),
+							week: currentWeek,
 							year: parseInt(CURRENT_YEAR)
 						}
 					}
@@ -166,7 +169,7 @@ export const actions: Actions = {
 					gameId: gameOdds.id,
 					year: parseInt(CURRENT_YEAR),
 					show: 'PMT',
-					week: parseInt(CURRENT_WEEK),
+					week: currentWeek,
 					person: user.username,
 					type: pickType,
 					description: pick.description,
@@ -276,7 +279,7 @@ export const actions: Actions = {
 				where: {
 					userId: user.id,
 					year: parseInt(CURRENT_YEAR),
-					week: parseInt(CURRENT_WEEK)
+					week: getCurrentWeek(Number(CURRENT_YEAR))
 				},
 				select: {
 					id: true,

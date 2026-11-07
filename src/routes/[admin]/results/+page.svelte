@@ -59,6 +59,7 @@
 									id="espnLink"
 									name="espnLink"
 									type="text"
+									value={team.espnLink ?? ''}
 									placeholder="ESPN Link"
 									class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 								/>
@@ -70,6 +71,7 @@
 									id="youtubeLink"
 									name="youtubeLink"
 									type="text"
+									value={team.highlighLink ?? ''}
 									placeholder="Youtube Link"
 									class="py-2 w-full text-black bg-[#fcfeff]! indent-2 border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 								/>

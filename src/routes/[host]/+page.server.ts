@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
-import { CURRENT_WEEK } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
 import { hostPath } from '$lib/config/hosts';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 import { getHostSeason, getHostSeasons } from '$lib/server/host-stats';
 import { hostCardFields, hostCardVersion } from '$lib/server/cards/data';
 import { hostCard } from '$lib/server/cards/templates/host-card';
@@ -22,6 +23,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		(slug) => `/${slug}${url.search}`
 	);
 	const hostSeasons = await getHostSeasons(host.person);
+	const currentWeek = getCurrentWeek(Number(CURRENT_YEAR));
 
 	const nameOf = (person: string) =>
 		hosts.find((other) => other.person === person)?.displayName ?? person;
@@ -58,7 +60,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		// the week page, scrolled to this host, where their picks can be faded or tailed. Only the
 		// current week takes fades and tails, so an old season has nowhere to send anyone
 		pickSide: season.isCurrent
-			? { week: Number(CURRENT_WEEK), href: `/${season.year}/${CURRENT_WEEK}#${host.slug}` }
+			? { week: currentWeek, href: `/${season.year}/${currentWeek}#${host.slug}` }
 			: null,
 		summary: {
 			record: formatRecord(hostStats.record),

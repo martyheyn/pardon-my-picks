@@ -3,7 +3,10 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 
-import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
+// scripts/mark-games.js fills in links for games from the last 14 days, so this page lists what
+// it couldn't over the same window
+const LOOKBACK_DAYS = 14;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const resultLinksSchema = z.object({
 	gameId: z.string(),
@@ -25,21 +28,26 @@ export const load: PageServerLoad = async ({ locals }: { locals: App.Locals }) =
 		throw redirect(303, '/');
 	}
 
+	// the manual fallback for games the grading run couldn't link - usually a box score that's in
+	// and highlights it never matched, so a game missing either link is listed, with what it has
+	// already filled in. Only games that have kicked off: there's nothing to link before that
+	const now = new Date();
 	const pmtWeeklyPicks = await prisma.pick.findMany({
 		where: {
-			year: parseInt(CURRENT_YEAR),
-			week: parseInt(CURRENT_WEEK),
 			pmtPersona: true,
 			barstoolEmployee: true,
 			private: false,
-			espnLink: null,
-			highlighLink: null
+			gameDate: { lte: now, gt: new Date(now.getTime() - LOOKBACK_DAYS * DAY_MS) },
+			OR: [{ espnLink: null }, { espnLink: '' }, { highlighLink: null }, { highlighLink: '' }]
 		},
 		select: {
 			gameId: true,
 			homeTeam: true,
-			awayTeam: true
-		}
+			awayTeam: true,
+			espnLink: true,
+			highlighLink: true
+		},
+		orderBy: { gameDate: 'asc' }
 	});
 
 	const uniqueGames = [...new Map(pmtWeeklyPicks.map((item) => [item.gameId, item])).values()];

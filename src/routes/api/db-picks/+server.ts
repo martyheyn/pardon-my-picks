@@ -1,5 +1,6 @@
 import type { PickData } from '$lib/utils/types';
-import { CURRENT_WEEK, CURRENT_YEAR } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
+import { getCurrentWeek } from '$lib/utils/nfl-week';
 import { prisma } from '$lib/server/prisma';
 
 const getDbUserPicks = async (userId: string) => {
@@ -7,7 +8,7 @@ const getDbUserPicks = async (userId: string) => {
 		where: {
 			userId: userId,
 			year: parseInt(CURRENT_YEAR),
-			week: parseInt(CURRENT_WEEK)
+			week: getCurrentWeek(Number(CURRENT_YEAR))
 		},
 		select: {
 			id: true,
