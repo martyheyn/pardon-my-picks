@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check` — svelte-kit sync + svelte-check (TypeScript typecheck)
 - `npm run lint` — prettier --check + eslint
 - `npm run format` — prettier --write
-- `npm run test:unit` — vitest over `src/**/*.test.ts` (helpers, live scores, team-name matching, NFL week)
+- `npm run test:unit` — vitest over `src/**/*.test.ts` and `scripts/**/*.test.js` (helpers, live scores, team-name matching, NFL week, game-link matching)
 - `npm run test:integration` — playwright e2e (`tests/test.ts` — still asserts the scaffold's "Welcome to SvelteKit" heading and will fail against the real app; do not treat it as a working regression check without fixing it first)
 - `npm test` — runs both of the above
 - `postinstall` runs `prisma generate` automatically
@@ -35,7 +35,7 @@ Fully hand-rolled, no Lucia/Auth.js — see `src/lib/server/auth.ts` for session
 
 Standard SvelteKit file-based routing. Conventions worth knowing before touching routes:
 
-- **`[admin]` is a dynamic param segment, not a `(group)`** — it matches any URL segment; access is enforced purely by the `role !== 'admin'` check inside each nested `+page.server.ts`, not by SvelteKit's routing itself. Contains `picks/` (create official PMT picks, pulls odds from The Odds API) and `results/` (attach ESPN/YouTube highlight links to completed games).
+- **`[admin]` is a dynamic param segment, not a `(group)`** — it matches any URL segment; access is enforced purely by the `role !== 'admin'` check inside each nested `+page.server.ts`, not by SvelteKit's routing itself. Contains `picks/` (create official PMT picks, pulls odds from The Odds API) and `results/` (the manual fallback for Box Score/Highlights links — `mark-games.js` fills them in, and this lists kicked-off games from the last 14 days still missing either one, with whatever's already there filled in).
 - **`[host]` is a root-level catch-all for host pages** (`/hank`, `/pft`) — it matches any single unknown segment. Static routes still win, so a new top-level page is fine as a plain folder, but a mistyped one-segment link now lands on `[host]/+error.svelte` ("Nobody here by that name", with links to every host) instead of `/404`. Slugs come from whoever has picks that season (`resolveHosts` in `lib/config/hosts.ts`), aliases 301 to the canonical slug, past seasons are `?year=2025`, and `[host]/card.png` serves the host's share card (its `?v=` hash makes it safe to cache forever).
 - **`[year]/[week]`** is the public weekly picks page (e.g. `/2025/7`); `fadePick`/`tailPick` form actions let logged-in users react to a pick. Each host's section has `id=<host slug>`, so `/2026/9#pft` jumps to their picks.
 - **The root layout only renders page content in the browser** (`{#if $screenWidth}` in `+layout.svelte`). `<svelte:head>` tags are server-rendered, but the body isn't — curl and crawlers without JS see an empty page, and a browser's own `#anchor` jump on a fresh load fires before the target exists (the week page redoes it in `onMount`). For per-page link previews, return `meta: PageMeta` from a load; the layout falls back to the site-wide tags.
@@ -45,12 +45,13 @@ Standard SvelteKit file-based routing. Conventions worth knowing before touching
 ### External integrations
 
 - **The Odds API** (`ODDS_API_KEY`) — primary odds/live-scores source, used across `api/odds`, `[admin]/picks`, `pickem`, and `lib/utils/live-scores.ts`.
-- **ESPN partner API** — used only by `scripts/mark-games.js`.
+- **ESPN partner API** — used by `scripts/mark-games.js`, and as the `[admin]/picks` fallback for games already kicked off.
+- **YouTube Data API v3** (`YOUTUBE_API_KEY`, a GitHub Actions secret only — the app never calls it) — `scripts/mark-games.js` reads the NFL channel's uploads to find each game's highlights video.
 - **S3** (`@aws-sdk/client-s3`) — user avatar uploads, served via a CloudFront distro (`PUBLIC_AWS_CLOUDFRONT_DISTRO`).
 
 ### `scripts/mark-games.js`
 
-A standalone Node script (its own `scripts/package.json` with just `pg`; connects to Postgres directly, bypassing Prisma) that grades picks. Each run it finds ungraded picks that kicked off in the last 14 days, pulls those games from ESPN, grades the finished ones (rules in `scripts/grading.js`) and settles the `Tail`/`Fade` rows on them. Nothing in it changes week to week. `.github/workflows/mark-games.yml` runs it hourly Sunday–Monday UTC and every 3 hours the rest of the week, with the `DB_*` GitHub Actions secrets; a failed run fails the workflow. Older ungraded picks (or ones with no `gameDate`) are skipped and counted in the log — grade those by hand. To see what it would do: `node --env-file=.env scripts/mark-games.js --dry-run`.
+A standalone Node script (its own `scripts/package.json` with just `pg`; connects to Postgres directly, bypassing Prisma) that grades picks. Each run it finds ungraded picks that kicked off in the last 14 days, pulls those games from ESPN, grades the finished ones (rules in `scripts/grading.js`) and settles the `Tail`/`Fade` rows on them. Last, it puts Box Score and Highlights links on the official picks for finished games from the same 14 days (matching in `scripts/game-links.js`). Box scores are built from the ESPN game id. Highlights are the NFL YouTube channel's "<Team> vs <Team> Game Highlights" video, matched strictly (both teams + "Game Highlights", posted within 3 days after kickoff) and retried every run until it's posted. A link that's already set is never overwritten. Without `YOUTUBE_API_KEY` it skips highlights and still adds box scores; if the NFL renames its videos, highlights just stop matching and the log lists the games it's still waiting on. Nothing in it changes week to week. `.github/workflows/mark-games.yml` runs it hourly Sunday–Monday UTC and every 3 hours the rest of the week, with the `DB_*` and `YOUTUBE_API_KEY` GitHub Actions secrets; a failed run fails the workflow (links run after grading, so a YouTube error can't hold grading up). Older ungraded picks (or ones with no `gameDate`) are skipped and counted in the log — grade those by hand. To see what it would do: `node --env-file=.env scripts/mark-games.js --dry-run`.
 
 ### `src/lib/`
 
