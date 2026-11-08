@@ -86,6 +86,15 @@ export function isBotRequest(request: Request): boolean {
 	return timingSafeEqual(digest(given), digest(`Bearer ${secret}`));
 }
 
+// the admin's own middle line for a week's fade post, written on /admin/x-post - null for the default
+export async function customFadeLine(year: number, week: number): Promise<string | null> {
+	const row = await prisma.botFadeLine.findUnique({
+		where: { year_week: { year, week } },
+		select: { text: true }
+	});
+	return row?.text ?? null;
+}
+
 // the card and the text for one post - also what the /bot/[card].png preview draws
 export async function buildPost(
 	type: BotPostType,
@@ -100,8 +109,9 @@ export async function buildPost(
 		if (weekPicks.length === 0) return null;
 
 		const data = await fridayFadeData(week, weekPicks, stats, hosts);
+		const customLine = await customFadeLine(year, week);
 		return {
-			text: fadePostText({ week, stats, weekPicks, nameOf }),
+			text: fadePostText({ week, stats, weekPicks, nameOf, customLine }),
 			png: await renderCard(fridayFade, data)
 		};
 	}

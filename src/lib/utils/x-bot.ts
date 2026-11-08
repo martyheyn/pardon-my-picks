@@ -3,7 +3,8 @@ import {
 	formatRecord,
 	weekFade,
 	type SeasonStats,
-	type StatsPick
+	type StatsPick,
+	type WinLossPush
 } from './host-stats';
 import { shortPickLabel, standingLine } from './host-copy';
 import { daysSinceWeekStart, easternHour, getCurrentWeek } from './nfl-week';
@@ -174,24 +175,79 @@ export function postLength(text: string): number {
 
 type NameOf = (person: string) => string;
 
+const fadeOpener = (week: number) => `Week ${week} picks are in.`;
+
+// the admin can write their own middle line for a week's fade post on /admin/x-post. Textareas
+// send line breaks as \r\n, and X wants \n
+export function cleanFadeLine(raw: string): string {
+	return raw.replace(/\r\n?/g, '\n').trim();
+}
+
+// how long the post is with this middle line and no picks line - the part that has to fit. The
+// picks line is dropped when the two don't fit together, since the picks are on the card too
+export function fadeLineLength(week: number, line: string): number {
+	return postLength(`${fadeOpener(week)}\n\n${line}`);
+}
+
+// why a custom middle line can't be used, or null when it fits
+export function fadeLineError(week: number, line: string): string | null {
+	if (line === '') return 'The line is empty';
+	const length = fadeLineLength(week, line);
+	if (length > MAX_POST_LENGTH) {
+		return `Too long: the post would be ${length} characters, and X allows ${MAX_POST_LENGTH}`;
+	}
+	return null;
+}
+
+// a saved line the post can use, or null for the default. A line that doesn't fit falls back to
+// the default rather than have X turn the whole post down
+const usableFadeLine = (week: number, line: string | null) => {
+	const cleaned = cleanFadeLine(line ?? '');
+	return fadeLineError(week, cleaned) === null ? cleaned : null;
+};
+
+// "The fade: Zach, 3–13 on the season." - the middle line when the admin hasn't written one
+const fadeLineFor = (name: string, record: WinLossPush) =>
+	`The fade: ${name}, ${formatRecord(record)} on the season.`;
+
+// the default middle line for the admin page to show, or null before anyone has a record to fade
+export function defaultFadeLine({
+	stats,
+	weekPicks,
+	nameOf
+}: {
+	stats: SeasonStats<StatsPick>;
+	weekPicks: StatsPick[];
+	nameOf: NameOf;
+}): string | null {
+	const { fade } = weekFade(stats, weekPicks);
+	return fade ? fadeLineFor(nameOf(fade.person), fade.record) : null;
+}
+
 // "Week 9 picks are in. The fade: Hank, 12–20 on the season. Hank's picks: Jets +3 · ..."
-// Names the same host the Friday card marks as the fade
+// Names the same host the Friday card marks as the fade. customLine replaces the middle line
 export function fadePostText({
 	week,
 	stats,
 	weekPicks,
-	nameOf
+	nameOf,
+	customLine = null
 }: {
 	week: number;
 	stats: SeasonStats<StatsPick>;
 	weekPicks: StatsPick[];
 	nameOf: NameOf;
+	customLine?: string | null;
 }): string {
+	const opener = fadeOpener(week);
+	const custom = usableFadeLine(week, customLine);
 	const { fade } = weekFade(stats, weekPicks);
-	if (!fade) return `Week ${week} picks are in. Every host's picks are on the card.`;
+	if (!fade) {
+		return custom ? `${opener}\n\n${custom}` : `${opener} Every host's picks are on the card.`;
+	}
 
 	const name = nameOf(fade.person);
-	const intro = `Week ${week} picks are in.\n\nThe fade: ${name}, ${formatRecord(fade.record)} on the season.`;
+	const intro = `${opener}\n\n${custom ?? fadeLineFor(name, fade.record)}`;
 	const labels = chronological(weekPicks.filter((pick) => pick.person === fade.person))
 		.map(shortPickLabel)
 		.filter((label) => label !== '');
