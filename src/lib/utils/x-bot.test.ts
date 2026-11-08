@@ -3,8 +3,11 @@ import { computeSeasonStats, type StatsPick } from './host-stats';
 import {
 	MAX_POST_LENGTH,
 	canAttempt,
+	cleanFadeLine,
 	decideFadePost,
 	decideStandingsPost,
+	defaultFadeLine,
+	fadeLineError,
 	fadePostText,
 	postLength,
 	standingsPostText,
@@ -315,6 +318,97 @@ describe('fadePostText', () => {
 
 		expect(text).not.toContain('picks:');
 		expect(postLength(text)).toBeLessThanOrEqual(MAX_POST_LENGTH);
+	});
+
+	describe('with the admin’s own middle line', () => {
+		const weekPicks = [
+			pick({ person: 'Big Cat' }),
+			pick({
+				person: 'Hank',
+				pickTeam: 'jets',
+				homeTeam: 'jets',
+				awayTeam: 'patriots',
+				pickScore: 3
+			})
+		];
+		const stats = computeSeasonStats([...throughWeekEight, ...weekPicks]);
+		const withLine = (customLine: string | null) =>
+			fadePostText({ week: 9, stats, weekPicks, nameOf, customLine });
+
+		it('swaps out only the middle line', () => {
+			expect(withLine('Hank has lost 6 straight. You know what to do.')).toBe(
+				"Week 9 picks are in.\n\nHank has lost 6 straight. You know what to do.\nHank's picks: Jets +3"
+			);
+		});
+
+		it('keeps the default for a blank line', () => {
+			expect(withLine('  \n ')).toBe(withLine(null));
+		});
+
+		it('drops the pick list when the line leaves no room for it', () => {
+			const line = 'x'.repeat(250);
+			expect(withLine(line)).toBe(`Week 9 picks are in.\n\n${line}`);
+		});
+
+		it('falls back to the default rather than send a post X would turn down', () => {
+			expect(withLine('x'.repeat(300))).toBe(withLine(null));
+		});
+
+		it('uses the line before anyone has a record to fade, too', () => {
+			const weekOne = [pick({ person: 'Big Cat', week: 1 }), pick({ person: 'Hank', week: 1 })];
+			expect(
+				fadePostText({
+					week: 1,
+					stats: computeSeasonStats(weekOne),
+					weekPicks: weekOne,
+					nameOf,
+					customLine: 'Season one, week one.'
+				})
+			).toBe('Week 1 picks are in.\n\nSeason one, week one.');
+		});
+	});
+});
+
+describe('defaultFadeLine', () => {
+	it('is the middle line the post uses when the admin has not written one', () => {
+		const weekPicks = [pick({ person: 'Big Cat' }), pick({ person: 'Hank' })];
+		const stats = computeSeasonStats([...throughWeekEight, ...weekPicks]);
+		expect(defaultFadeLine({ stats, weekPicks, nameOf })).toBe(
+			'The fade: Hank, 0–2 on the season.'
+		);
+	});
+
+	it('is null before anyone has a record to fade', () => {
+		const weekPicks = [pick({ person: 'Big Cat', week: 1 })];
+		expect(defaultFadeLine({ stats: computeSeasonStats(weekPicks), weekPicks, nameOf })).toBe(null);
+	});
+});
+
+describe('cleanFadeLine', () => {
+	it("trims and turns a textarea's line breaks into the ones X uses", () => {
+		expect(cleanFadeLine('  Fade Hank.\r\nTrust me.\r\n ')).toBe('Fade Hank.\nTrust me.');
+	});
+});
+
+describe('fadeLineError', () => {
+	// "Week 9 picks are in.\n\n" takes 22 of the 280
+	it('accepts a line that fits', () => {
+		expect(fadeLineError(9, 'x'.repeat(258))).toBe(null);
+	});
+
+	it('turns down a line that would push the post over the limit', () => {
+		expect(fadeLineError(9, 'x'.repeat(259))).toBe(
+			'Too long: the post would be 281 characters, and X allows 280'
+		);
+	});
+
+	it('counts an emoji as two, like X does', () => {
+		expect(fadeLineError(9, '🔥'.repeat(129))).toBe(null);
+		expect(fadeLineError(9, '🔥'.repeat(130))).not.toBe(null);
+	});
+
+	it('turns down an empty line', () => {
+		expect(fadeLineError(9, '')).toBe('The line is empty');
 	});
 });
 

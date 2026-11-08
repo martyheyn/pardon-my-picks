@@ -118,6 +118,19 @@ model BotPost {
   @@unique([type, year, week])
 }
 
+// the admin's own middle line for a week's "who to fade" post, in place of "The fade: Zach, 3–13
+// on the season." Written on /admin/x-post; no row means the default line
+model BotFadeLine {
+  id        String   @id @db.VarChar(191)
+  year      Int
+  week      Int
+  text      String   @db.VarChar(512)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([year, week])
+}
+
 enum NFLTeam {
   cardinals
   falcons

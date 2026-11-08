@@ -36,6 +36,9 @@
 		<h1 class="font-header text-2xl sm:text-3xl">Place this weeks picks here</h1>
 	</div>
 
+	<!-- relative, so it stays under whatever the admin segment is -->
+	<a href="x-post" class="block mt-2 w-fit text-sm underline">Write this week's X post line →</a>
+
 	<div class="my-4 max-w-6xl" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 		<AlertFlash />
 	</div>
