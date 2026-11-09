@@ -315,18 +315,22 @@ export function personAhead(
 export type WeekFade<P extends StatsPick> = {
 	// the hosts with a pick this week, best first. Hosts sitting the week out are left off
 	playing: HostStats<P>[];
-	// whoever's last on the season among them - null until they have a win or a loss to fade
+	// whoever's last on the season among them - null until they have a win or a loss to fade, and in
+	// a week the admin set to no fade
 	fade: HostStats<P> | null;
 };
 
-// who to fade this week - the Friday card and the bot's post both ask here so they name the same host
+// who to fade this week - the Friday card and the bot's post both ask here so they name the same host.
+// callFade is the admin's choice for the week on /admin/x-post: false means nobody is marked
 export function weekFade<P extends StatsPick>(
 	stats: SeasonStats<P>,
-	weekPicks: Pick<StatsPick, 'person'>[]
+	weekPicks: Pick<StatsPick, 'person'>[],
+	{ callFade = true }: { callFade?: boolean } = {}
 ): WeekFade<P> {
 	const playing = stats.standings.filter((host) =>
 		weekPicks.some((pick) => pick.person === host.person)
 	);
+	if (!callFade) return { playing, fade: null };
 
 	const lastPlace = playing[playing.length - 1];
 	const hasDecisions = lastPlace && lastPlace.record.wins + lastPlace.record.losses > 0;

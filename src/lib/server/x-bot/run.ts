@@ -86,13 +86,21 @@ export function isBotRequest(request: Request): boolean {
 	return timingSafeEqual(digest(given), digest(`Bearer ${secret}`));
 }
 
-// the admin's own middle line for a week's fade post, written on /admin/x-post - null for the default
-export async function customFadeLine(year: number, week: number): Promise<string | null> {
+export type FadePostSettings = {
+	// the admin's own middle line, or null for the default (or no line at all, in a no-fade week)
+	line: string | null;
+	// false when the admin set the week to no fade - nobody is named or marked
+	callFade: boolean;
+};
+
+// the admin's settings for a week's fade post, written on /admin/x-post. With no row it's a fade
+// with the default line
+export async function fadePostSettings(year: number, week: number): Promise<FadePostSettings> {
 	const row = await prisma.botFadeLine.findUnique({
 		where: { year_week: { year, week } },
-		select: { text: true }
+		select: { text: true, callFade: true }
 	});
-	return row?.text ?? null;
+	return { line: row?.text ?? null, callFade: row?.callFade ?? true };
 }
 
 // the card and the text for one post - also what the /bot/[card].png preview draws
@@ -108,10 +116,11 @@ export async function buildPost(
 		const weekPicks = picks.filter((pick) => pick.week === week);
 		if (weekPicks.length === 0) return null;
 
-		const data = await fridayFadeData(week, weekPicks, stats, hosts);
-		const customLine = await customFadeLine(year, week);
+		// read once and handed to both, so the card and the text agree on whether there's a fade
+		const { line, callFade } = await fadePostSettings(year, week);
+		const data = await fridayFadeData(week, weekPicks, stats, hosts, callFade);
 		return {
-			text: fadePostText({ week, stats, weekPicks, nameOf, customLine }),
+			text: fadePostText({ week, stats, weekPicks, nameOf, customLine: line, callFade }),
 			png: await renderCard(fridayFade, data)
 		};
 	}

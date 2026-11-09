@@ -9,6 +9,7 @@ import {
 	defaultFadeLine,
 	fadeLineError,
 	fadePostText,
+	fadeSettingsChange,
 	postLength,
 	standingsPostText,
 	type BotPostRecord
@@ -367,6 +368,36 @@ describe('fadePostText', () => {
 			).toBe('Week 1 picks are in.\n\nSeason one, week one.');
 		});
 	});
+
+	describe('in a week the admin set to no fade', () => {
+		const weekPicks = [
+			pick({ person: 'Big Cat' }),
+			pick({
+				person: 'Hank',
+				pickTeam: 'jets',
+				homeTeam: 'jets',
+				awayTeam: 'patriots',
+				pickScore: 3
+			})
+		];
+		const stats = computeSeasonStats([...throughWeekEight, ...weekPicks]);
+		const noFade = (customLine: string | null) =>
+			fadePostText({ week: 9, stats, weekPicks, nameOf, customLine, callFade: false });
+
+		it('names nobody when there is no line', () => {
+			expect(noFade(null)).toBe("Week 9 picks are in. Every host's picks are on the card.");
+		});
+
+		it('uses the line without a fade or anyone’s picks under it', () => {
+			expect(noFade('PFT is 12–2 in primetime games.')).toBe(
+				'Week 9 picks are in.\n\nPFT is 12–2 in primetime games.'
+			);
+		});
+
+		it('drops a line too long to post, same as a fade week', () => {
+			expect(noFade('x'.repeat(300))).toBe(noFade(null));
+		});
+	});
 });
 
 describe('defaultFadeLine', () => {
@@ -381,6 +412,48 @@ describe('defaultFadeLine', () => {
 	it('is null before anyone has a record to fade', () => {
 		const weekPicks = [pick({ person: 'Big Cat', week: 1 })];
 		expect(defaultFadeLine({ stats: computeSeasonStats(weekPicks), weekPicks, nameOf })).toBe(null);
+	});
+
+	it('is null in a week set to no fade', () => {
+		const weekPicks = [pick({ person: 'Big Cat' }), pick({ person: 'Hank' })];
+		const stats = computeSeasonStats([...throughWeekEight, ...weekPicks]);
+		expect(defaultFadeLine({ stats, weekPicks, nameOf, callFade: false })).toBe(null);
+	});
+});
+
+describe('fadeSettingsChange', () => {
+	it('deletes the row for a fade week with no line, since that is the default', () => {
+		expect(fadeSettingsChange({ week: 9, callFade: true, line: '' })).toEqual({ kind: 'reset' });
+	});
+
+	it('saves a fade week with its own line', () => {
+		expect(fadeSettingsChange({ week: 9, callFade: true, line: 'Fade Hank.' })).toEqual({
+			kind: 'save',
+			callFade: true,
+			text: 'Fade Hank.'
+		});
+	});
+
+	it('saves a no-fade week with or without a line', () => {
+		expect(fadeSettingsChange({ week: 9, callFade: false, line: '' })).toEqual({
+			kind: 'save',
+			callFade: false,
+			text: null
+		});
+		expect(fadeSettingsChange({ week: 9, callFade: false, line: 'PFT is 12–2.' })).toEqual({
+			kind: 'save',
+			callFade: false,
+			text: 'PFT is 12–2.'
+		});
+	});
+
+	it('turns down a line too long to post, in either kind of week', () => {
+		for (const callFade of [true, false]) {
+			expect(fadeSettingsChange({ week: 9, callFade, line: 'x'.repeat(259) })).toEqual({
+				kind: 'invalid',
+				message: 'Too long: the post would be 281 characters, and X allows 280'
+			});
+		}
 	});
 });
 

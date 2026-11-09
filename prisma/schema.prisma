@@ -118,13 +118,15 @@ model BotPost {
   @@unique([type, year, week])
 }
 
-// the admin's own middle line for a week's "who to fade" post, in place of "The fade: Zach, 3–13
-// on the season." Written on /admin/x-post; no row means the default line
+// the admin's settings for a week's "who to fade" post, written on /admin/x-post. text is their own
+// middle line in place of "The fade: Zach, 3–13 on the season." (null for none). callFade false
+// means nobody is named or marked as the fade that week. No row means a fade with the default line
 model BotFadeLine {
   id        String   @id @db.VarChar(191)
   year      Int
   week      Int
-  text      String   @db.VarChar(512)
+  text      String?  @db.VarChar(512)
+  callFade  Boolean  @default(true) @map("call_fade")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 

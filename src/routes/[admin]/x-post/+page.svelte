@@ -28,11 +28,15 @@
 		}
 	});
 
-	// what's in the box. Follows the saved line whenever the page reloads after a save or a clear
+	// what's in the form. Follows the saved settings whenever the page reloads after a save or a reset
 	let line = $state('');
+	// the radios' value, sent as-is - the server treats anything but 'no' as a fade
+	let fadeChoice = $state<'yes' | 'no'>('yes');
 	$effect(() => {
-		line = data.savedLine ?? '';
+		line = data.saved?.line ?? '';
+		fadeChoice = (data.saved?.callFade ?? true) ? 'yes' : 'no';
 	});
+	let callFade = $derived(fadeChoice === 'yes');
 
 	// the same count the server checks when the line is saved
 	let length = $derived(fadeLineLength(data.week, cleanFadeLine(line)));
@@ -46,7 +50,7 @@
 	<div
 		class="flex text-3xl pb-2 border-b border-b-black border-opacity-10 dark:border-white dark:border-opacity-100 max-w-6xl"
 	>
-		<h1 class="font-header text-2xl sm:text-3xl">Week {data.week} fade post on X</h1>
+		<h1 class="font-header text-2xl sm:text-3xl">Week {data.week} post on X</h1>
 	</div>
 
 	<div class="my-4 max-w-6xl" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
@@ -79,8 +83,8 @@
 					<p>No week {data.week} picks yet. A line saved now is used once they're in.</p>
 				{/if}
 				<p class="text-sm opacity-70">
-					It goes out {PICKS_QUIET_MINUTES} minutes after the last pick is entered (never before
-					{FIRST_POST_HOUR_ET}am ET), so save your line before then.
+					This is with what's saved. It goes out {PICKS_QUIET_MINUTES} minutes after the last pick is
+					entered (never before {FIRST_POST_HOUR_ET}am ET), so save before then.
 				</p>
 			</section>
 
@@ -93,20 +97,45 @@
 				class="flex flex-col gap-y-3"
 			>
 				<input type="hidden" name="week" value={data.week} />
-				<label for="line" class="font-semibold">Your middle line</label>
+
+				<fieldset class="flex flex-col gap-y-2">
+					<legend class="font-semibold mb-2">Fade or stat?</legend>
+					<label class="flex items-center gap-x-2 w-fit">
+						<input type="radio" name="callFade" value="yes" bind:group={fadeChoice} />
+						Call out a fade (default)
+					</label>
+					<label class="flex items-center gap-x-2 w-fit">
+						<input type="radio" name="callFade" value="no" bind:group={fadeChoice} />
+						No fade, just a stat
+					</label>
+					<p class="text-sm opacity-70">
+						{callFade
+							? 'The card marks last place as THE FADE and the post names them.'
+							: 'Nobody is marked on the card or named in the post.'}
+					</p>
+				</fieldset>
+
+				<label for="line" class="font-semibold">
+					{callFade ? 'Your middle line' : 'Your stat (optional)'}
+				</label>
 				<textarea
 					id="line"
 					name="line"
 					rows="3"
 					bind:value={line}
-					placeholder={data.defaultLine ?? ''}
+					placeholder={callFade ? (data.defaultLine ?? '') : 'Optional: a stat for the post'}
 					class="py-2 px-2 w-full text-black bg-[#fcfeff]! border focus:outline-none focus:border-blue-300 rounded-md transition duration-150 ease-in-out"
 				></textarea>
 				<p class="text-sm" class:text-red-500={length > MAX_POST_LENGTH}>
 					{length} / {MAX_POST_LENGTH} characters
 				</p>
-				{#if data.defaultLine}
+				{#if callFade && data.defaultLine}
 					<p class="text-sm opacity-70">Default: {data.defaultLine}</p>
+				{:else if !callFade}
+					<p class="text-sm opacity-70">
+						Left blank, the post just says "Week {data.week} picks are in. Every host's picks are on the
+						card."
+					</p>
 				{/if}
 
 				<div class="flex gap-x-3">
@@ -116,7 +145,7 @@
 					>
 						Save
 					</button>
-					{#if data.savedLine}
+					{#if data.saved}
 						<button
 							class="w-fit px-4 py-1.5 rounded-md border border-black/20 dark:border-white/40 transition-all duration-300 ease-in-out"
 							type="submit"

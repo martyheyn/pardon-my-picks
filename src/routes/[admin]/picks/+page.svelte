@@ -37,7 +37,9 @@
 	</div>
 
 	<!-- relative, so it stays under whatever the admin segment is -->
-	<a href="x-post" class="block mt-2 w-fit text-sm underline">Write this week's X post line →</a>
+	<a href="x-post" class="block mt-2 w-fit text-sm underline">
+		Set up this week's X post (fade or stat) →
+	</a>
 
 	<div class="my-4 max-w-6xl" transition:fly={{ x: -50, duration: 300, delay: 50 }}>
 		<AlertFlash />
