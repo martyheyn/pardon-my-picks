@@ -25,9 +25,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			await Promise.all(
 				gameScores.map((game) =>
 					prisma.pick.updateMany({
-						// matched on teams + week instead of gameId - picks entered through the admin ESPN
-						// fallback store ESPN's event id, everything else stores the-odds-api's id, and a
-						// matchup only happens once a week. Graded picks are left to mark-games.js
+						// matched on teams + week instead of gameId - picks saved before the switch to ESPN
+						// store the-odds-api's id, and a matchup only happens once a week. Graded picks are
+						// left to mark-games.js
 						where: {
 							homeTeam: game.homeTeam,
 							awayTeam: game.awayTeam,

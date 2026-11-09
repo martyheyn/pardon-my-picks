@@ -30,48 +30,26 @@ export type PickByPerson = {
 	[key: string]: PicksWithTailsAndFades[];
 };
 
-export type Scores = {
-	away_team: $Enums.NFLTeam;
-	commence_time: string;
-	completed: boolean;
-	home_team: $Enums.NFLTeam;
-	id: string;
-	last_update: string;
-	scores:
-		| {
-				name: string;
-				score: string;
-		  }[]
-		| null;
-	pickId?: string;
-	sport_key: string;
-	sport_title: string;
-};
-
+// one game's spread and total, built from ESPN by espnEventToOdds in utils/espn.ts
 export type Odds = {
-	away_team: string;
-	bookmakers: {
-		key: string;
-		last_update: string;
-		markets: {
-			key: string;
-			last_update: string;
-			outcomes: {
-				id: string;
-				name: string;
-				price: number;
-				point: number;
-				sorted?: number;
-			}[];
-		}[];
-		title: string;
-	}[];
-	gameId: string;
-	commence_time: string;
-	home_team: string;
+	// the board's row id - espnEventToOdds starts it as the event id, /api/odds swaps in a random one
 	id: string;
-	sport_key: string;
-	sport_title: string;
+	// ESPN's event id, saved on the pick as gameId
+	gameId: string;
+	home_team: string;
+	away_team: string;
+	// UTC ISO string
+	commence_time: string;
+	markets: {
+		key: 'spreads' | 'totals';
+		outcomes: {
+			// the user's saved pick on this outcome, '' when there isn't one
+			id: string;
+			// a team's full name for spreads, 'Over' or 'Under' for totals
+			name: string;
+			point: number;
+		}[];
+	}[];
 };
 
 export type PickData = {

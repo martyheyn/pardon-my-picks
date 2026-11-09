@@ -38,8 +38,8 @@ export const fullNameToMascot = {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// a pick's saved kickoff and ESPN's can drift apart (a flexed game, the odds api and ESPN
-// disagreeing on the time), but never by days - and the limit keeps a playoff rematch a week
+// a pick's saved kickoff and ESPN's can drift apart (a flexed game, or older picks whose kickoff
+// came from the-odds-api), but never by days - and the limit keeps a playoff rematch a week
 // later from being taken for the game a pick was on
 const MAX_KICKOFF_GAP_MS = 3 * DAY_MS;
 

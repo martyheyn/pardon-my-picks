@@ -4,27 +4,14 @@ import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { generateSecureRandomString } from '$lib/utils/helpers';
 import { type $Enums } from '@prisma/client';
-import type { Odds } from '$lib/utils/types';
 
 import { fullNameToMascot, mascotToFullName } from '$lib/utils/matching-format';
 
-import { ODDS_API_KEY } from '$env/static/private';
 import { CURRENT_YEAR } from '$env/static/private';
 import { getCurrentWeek, getWeekDates } from '$lib/utils/nfl-week';
+import { espnWeekDateRange, fetchEspnEvents, type EspnEvent } from '$lib/utils/espn';
 
-type EspnEvent = {
-	id: string;
-	date: string;
-	status?: { type?: { completed?: boolean } };
-	competitions: Array<{
-		competitors: Array<{
-			homeAway: 'home' | 'away';
-			team: { displayName: string };
-		}>;
-	}>;
-};
-
-// the fields the pick-creation flow needs, whether they came from the-odds-api or ESPN
+// the fields the pick-creation flow needs from an ESPN game
 type GameInfo = {
 	id: string;
 	home_team: string;
@@ -85,8 +72,6 @@ export const actions: Actions = {
 
 		const commenceTimeFromRaw = formData.getAll('commenceTimeFrom').toString();
 		const commenceTimeToRaw = formData.getAll('commenceTimeTo').toString();
-		const commenceTimeFrom = `${commenceTimeFromRaw}T00:00:00Z`;
-		const commenceTimeTo = `${commenceTimeToRaw}T00:00:00Z`;
 		// worked out once, so every pick in this batch lands in the same week
 		const currentWeek = getCurrentWeek(Number(CURRENT_YEAR));
 
@@ -119,30 +104,11 @@ export const actions: Actions = {
 				});
 			}
 
-			// add in data from odds api
-			const weeklyGameOddsRes = await fetch(
-				`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}`
+			// ESPN's schedule, the same feed scripts/mark-games.js grades from. It keeps games after
+			// kickoff, so picks can still be entered for a game already in progress
+			const espnEvents = await fetchEspnEvents(
+				espnWeekDateRange({ start: commenceTimeFromRaw, end: commenceTimeToRaw })
 			);
-			const weeklyOddsGames: Odds[] = await weeklyGameOddsRes.json();
-			console.log('weeklyOddsGames', weeklyOddsGames);
-
-			// the-odds-api only lists games that haven't kicked off yet, so once a game
-			// starts it disappears from that feed - fall back to ESPN's schedule (same
-			// source scripts/mark-games.js already uses to grade results) so picks can
-			// still be entered for games already in progress
-			let espnEvents: EspnEvent[] | null = null;
-			const getEspnEvents = async (): Promise<EspnEvent[]> => {
-				if (espnEvents) return espnEvents;
-				const espnDatesFrom = commenceTimeFromRaw.replaceAll('-', '');
-				const espnDatesTo = commenceTimeToRaw.replaceAll('-', '');
-				const espnRes = await fetch(
-					`https://partners.api.espn.com/v2/sports/football/nfl/events?dates=${espnDatesFrom}-${espnDatesTo}&limit=1000`
-				);
-				const espnJson = await espnRes.json();
-				const events: EspnEvent[] = espnJson.events ?? [];
-				espnEvents = events;
-				return events;
-			};
 
 			const findEspnGameForTeam = (events: EspnEvent[], team: string): GameInfo | null => {
 				const event = events.find((e) =>
@@ -159,37 +125,24 @@ export const actions: Actions = {
 					home_team: home.team.displayName,
 					away_team: away.team.displayName,
 					commence_time: event.date,
-					completed: event.status?.type?.completed ?? false
+					completed: event.competitions[0].status?.type?.completed ?? false
 				};
 			};
 
 			try {
 				for (let i = 0; i < filledPicks.length; i++) {
 					const pick = filledPicks[i];
-					console.log('pick.pickTeam', pick.pickTeam);
-					let gameOdds: GameInfo | undefined = weeklyOddsGames.filter(
-						(game) =>
-							fullNameToMascot[game.home_team] === pick.pickTeam ||
-							fullNameToMascot[game.away_team] === pick.pickTeam
-					)[0];
-					console.log('gameOdds', gameOdds);
+					const gameOdds = findEspnGameForTeam(espnEvents, pick.pickTeam as string);
 
 					if (!gameOdds) {
-						const events = await getEspnEvents();
-						const espnMatch = findEspnGameForTeam(events, pick.pickTeam as string);
+						return fail(400, {
+							message: 'Could not find this game in the ESPN schedule',
+							success: false
+						});
+					}
 
-						if (!espnMatch) {
-							return fail(400, {
-								message: 'Could not find this game in the odds API or the ESPN schedule',
-								success: false
-							});
-						}
-
-						if (espnMatch.completed) {
-							return fail(400, { message: 'Game has already finished', success: false });
-						}
-
-						gameOdds = espnMatch;
+					if (gameOdds.completed) {
+						return fail(400, { message: 'Game has already finished', success: false });
 					}
 
 					let description;

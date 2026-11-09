@@ -55,7 +55,8 @@ export function getCurrentWeek(season: number, now: Date = new Date()): number {
 const weekStart = (season: number, week: number) =>
 	new Date(weekOneStart(season).getTime() + (week - 1) * WEEK_MS);
 
-// a week's Wednesday and the next one, as 'YYYY-MM-DD' - the range the-odds-api is asked for games in
+// a week's Wednesday and the next one, as 'YYYY-MM-DD' - espnWeekDateRange in utils/espn.ts turns
+// this into the range ESPN is asked for games in
 export function getWeekDates(season: number, week: number): { start: string; end: string } {
 	const start = weekStart(season, week);
 	const end = new Date(start.getTime() + WEEK_MS);

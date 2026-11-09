@@ -33,7 +33,7 @@ export function hasGameStarted(gameDate: Date | string, now: Date = new Date()):
 	return new Date(gameDate).getTime() <= now.getTime();
 }
 
-// the pickem page labels a new spread pick 'spread', but saved picks (and the-odds-api market key)
+// the pickem page labels a new spread pick 'spread', but saved picks (and the odds board's market key)
 // use 'spreads' - normalize before comparing so a saved spread and a new spread count as the same type
 export function normalizePickType(type: string): 'spreads' | 'totals' | null {
 	if (type === 'spread' || type === 'spreads') return 'spreads';

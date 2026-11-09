@@ -5,9 +5,10 @@ import {
 	hasGameStarted,
 	isBettingOpen
 } from '$lib/utils/helpers';
-import { ODDS_API_KEY, CURRENT_YEAR } from '$env/static/private';
+import { CURRENT_YEAR } from '$env/static/private';
 import { fullNameToMascot } from '$lib/utils/matching-format';
 import { getCurrentWeek, getWeekDates } from '$lib/utils/nfl-week';
+import { espnEventToOdds, espnWeekDateRange, fetchEspnEvents } from '$lib/utils/espn';
 import { prisma } from '$lib/server/prisma';
 
 const getDbUserPicks = async (userId: string, currentWeek: number) => {
@@ -46,77 +47,39 @@ export async function GET({ locals }) {
 	const bettingOpen = isBettingOpen(getDayOfWeek());
 	// const showOdds = dayOfWeek !== 0 && dayOfWeek !== 1 && dayOfWeek !== 2;
 
-	// midnight UTC on the week's Wednesday is Tuesday evening ET - after the last game of the week
-	// before, ahead of the first one this week
 	const weekDates = getWeekDates(Number(CURRENT_YEAR), currentWeek);
-	const commenceTimeFrom = `${weekDates.start}T00:00:00Z`;
-	const commenceTimeTo = `${weekDates.end}T00:00:00Z`;
 
 	let oddsDataClean: Odds[] = [];
 
-	// I only want to do this on initial load if there is no odds data,
-	// do not need reloading every action, that is what is messing with id's
 	try {
-		const odds = await fetch(
-			`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}` // &commenceTimeFrom=${commenceTimeFrom}&commenceTimeTo=${commenceTimeTo}
-		);
-		const oddsData: Odds[] | { message: string; error_code: string; details_url: string } =
-			await odds.json();
-		if (!Array.isArray(oddsData)) {
-			console.error('The Odds API returned a non-array response:', oddsData);
-			return new Response(
-				JSON.stringify({
-					success: false,
-					message: 'Error fetching odds data.'
-				})
-			);
-		}
+		const events = await fetchEspnEvents(espnWeekDateRange(weekDates));
 
-		const oddsDataFiltered = oddsData.filter(
-			(game) =>
-				game.bookmakers.length > 0 &&
-				game.bookmakers[0].markets.length > 1 &&
-				!hasGameStarted(game.commence_time)
-		);
+		// games without a line yet come back null and are left off the board, same as kicked-off ones
+		const upcomingGames = events
+			.map(espnEventToOdds)
+			.filter((game): game is Odds => game !== null && !hasGameStarted(game.commence_time));
 
-		oddsDataClean = oddsDataFiltered.map((game) => {
-			// only this weeks games
-			game.bookmakers[0].markets.forEach((market) => {
-				market.outcomes = market.outcomes
-					.map((outcome) => {
-						let id = '';
-						if (dbUserPicks.length > 0) {
-							dbUserPicks.map((pick) => {
-								if (
-									pick.homeTeam === fullNameToMascot[game.home_team] &&
-									pick.awayTeam === fullNameToMascot[game.away_team] &&
-									pick.gameId === game.id &&
-									// TODO: need to change this so it is not dependent on the exact number as that might change
-									((pick.type === 'totals' &&
-										outcome.name === (pick.description.indexOf('Over') > -1 ? 'Over' : 'Under')) ||
-										(pick.type == 'spreads' && pick.pickTeam === fullNameToMascot[outcome.name]))
-								) {
-									id = pick.id;
-								}
-							});
-						}
+		oddsDataClean = upcomingGames.map((game) => {
+			game.markets.forEach((market) => {
+				market.outcomes = market.outcomes.map((outcome) => {
+					// matched on teams rather than gameId - a matchup only happens once a week, and picks
+					// saved before the switch to ESPN carry the-odds-api's game id
+					const savedPick = dbUserPicks.find(
+						(pick) =>
+							pick.homeTeam === fullNameToMascot[game.home_team] &&
+							pick.awayTeam === fullNameToMascot[game.away_team] &&
+							((pick.type === 'totals' &&
+								outcome.name === (pick.description.indexOf('Over') > -1 ? 'Over' : 'Under')) ||
+								(pick.type === 'spreads' && pick.pickTeam === fullNameToMascot[outcome.name]))
+					);
 
-						return {
-							...outcome,
-							id,
-							sorted: game.away_team === outcome.name ? 1 : 2
-						};
-					})
-					.sort((a, b) => a.sorted - b.sorted);
+					return { ...outcome, id: savedPick ? savedPick.id : '' };
+				});
 			});
 
-			// commence_time stays the UTC ISO string the-odds-api sends - a locale string like
-			// "10/25/2026, 8:20:00 PM" drops the timezone, so the browser would read it as its own local time
-			return {
-				...game,
-				id: generateSecureRandomString(18),
-				gameId: game.id
-			};
+			// commence_time stays a UTC ISO string - a locale string like "10/25/2026, 8:20:00 PM" drops
+			// the timezone, so the browser would read it as its own local time
+			return { ...game, id: generateSecureRandomString(18) };
 		});
 	} catch (error) {
 		console.error('error', error);
