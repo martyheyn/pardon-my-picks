@@ -8,7 +8,7 @@
 	} from '$lib/utils/matching-format';
 	import type { SpecialBetKey } from '$lib/utils/matching-format';
 	import Race from '$lib/components/race.svelte';
-	import AvatarModal from '$lib/components/avatar-modal.svelte';
+	import { hostHref } from '$lib/config/hosts';
 	import { fade, slide } from 'svelte/transition';
 	import { linear, quadInOut } from 'svelte/easing';
 	import Icon from '$lib/components/icon.svelte';
@@ -160,9 +160,16 @@
 		}
 	};
 
-	// modal
-	let showModal = $state(false);
-	let profilePic = $state('');
+	// the host page for the season picked in the dropdown (their latest one for all-time stats)
+	const hostPageHref = (person: string) => {
+		const year = statsHeaderYearNum[selectedStat];
+		return hostHref({
+			person,
+			years: data.hostSeasons[person] ?? [],
+			currentYear: data.currentYear,
+			preferredYear: year === 0 ? null : year
+		});
+	};
 
 	let dropdownOpen = $state(false);
 </script>
@@ -193,7 +200,9 @@
 			${dropdownOpen ? 'dark:border-b dark:border-b-white' : ''}`}
 		>
 			<h2 class="text-base">
-				{selectedStat === 'All Time Stats' ? 'All Time Stats (2023, 2024, 2025 & 2026)' : selectedStat}
+				{selectedStat === 'All Time Stats'
+					? 'All Time Stats (2023, 2024, 2025 & 2026)'
+					: selectedStat}
 			</h2>
 			<button
 				class={`transition-all duration-300 ease-in-out sm:opacity-0 sm:-translate-y-2
@@ -243,21 +252,30 @@
 		{#each personData as persona}
 			<div class="card px-4 sm:px-6" id={personasLabelToslug(persona.person)}>
 				<div class="flex justify-between items-start">
-					<p class="text-2xl transition duration-200 ease-in-out">
-						{persona.person}
-					</p>
-					<button
-						onclick={() => {
-							showModal = true;
-							profilePic = personaAvatarPath(persona.person);
-						}}
-					>
+					{#if hostPageHref(persona.person)}
+						<!-- the name and photo go to the host's page, where their card is -->
+						<a href={hostPageHref(persona.person)} class="text-2xl hover:underline">
+							{persona.person}
+						</a>
+						<a
+							href={hostPageHref(persona.person)}
+							title={`${persona.person}'s season and card`}
+							class="transition-opacity duration-200 ease-in-out hover:opacity-80"
+						>
+							<img
+								src={personaAvatarPath(persona.person)}
+								alt={persona.person}
+								class="w-16 h-16 rounded-full"
+							/>
+						</a>
+					{:else}
+						<p class="text-2xl">{persona.person}</p>
 						<img
 							src={personaAvatarPath(persona.person)}
-							alt="avatar"
+							alt={persona.person}
 							class="w-16 h-16 rounded-full"
 						/>
-					</button>
+					{/if}
 				</div>
 
 				<div class="flex flex-col gap-y-[10px]">
@@ -484,5 +502,3 @@
 
 	<Race raceYear={statsHeaderYearNum[selectedStat]} />
 </div>
-
-<AvatarModal bind:showModal imgSrc={profilePic} />

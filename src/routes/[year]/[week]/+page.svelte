@@ -14,7 +14,7 @@
 	import SpecialBet from '$lib/components/special-bet.svelte';
 	import AlertFlash from '$lib/components/alert.svelte';
 	import type { Alert } from '$lib/utils/types';
-	import { hostSlug } from '$lib/config/hosts';
+	import { hostPath, hostSlug } from '$lib/config/hosts';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -142,18 +142,26 @@
 			class="grid grid-cols-1 md:grid-cols-8 my-8 md:gap-x-6 lg:gap-x-12 gap-y-6 md:gap-y-12 max-w-6xl font-paragraph transition-all duration-300 ease-in-out"
 		>
 			{#each picksArr as pickPerson}
-				<!-- id matches the host page slug, so a host page can link straight to /2026/10#pft -->
-				<div
+				<!-- id matches the host page slug, so a host page can link straight to /2026/10#pft. The
+				name and photo link back to that host's page for this season, where their card is -->
+				<a
 					id={hostSlug(Object.keys(pickPerson)[0])}
-					class="flex flex-row justify-start items-center md:items-start md:flex-col gap-x-4 md:col-span-2 scroll-mt-4"
+					href={hostPath(hostSlug(Object.keys(pickPerson)[0]), {
+						year: Number(year),
+						isCurrent: Number(year) === $currYear
+					})}
+					title={`${Object.keys(pickPerson)[0]}'s season and card`}
+					class="group flex flex-row justify-start items-center md:items-start md:flex-col gap-x-4 md:col-span-2 scroll-mt-4"
 				>
-					<h2 class="text-2xl pl-3 font-semibold text-left">{Object.keys(pickPerson)}</h2>
+					<h2 class="text-2xl pl-3 font-semibold text-left group-hover:underline">
+						{Object.keys(pickPerson)}
+					</h2>
 					<img
 						src={personaImgPath(Object.keys(pickPerson)[0])}
-						alt="sad max"
-						class=" w-16 h-16 md:rounded-none md:w-full md:min-h-[225px] md:max-h-[300px] object-fit"
+						alt={Object.keys(pickPerson)[0]}
+						class=" w-16 h-16 md:rounded-none md:w-full md:min-h-[225px] md:max-h-[300px] object-fit transition-opacity duration-200 ease-in-out group-hover:opacity-80"
 					/>
-				</div>
+				</a>
 
 				<div class="md:col-span-6">
 					<div

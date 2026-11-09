@@ -175,10 +175,27 @@ export const load: PageServerLoad = async () => {
 		}
 	});
 
+	// every season each host made picks in, so their name and photo can link to a host page that
+	// exists - host pages only cover seasons with picks. Same filters as getHostSeasons
+	const hostSeasonRows = await prisma.pick.groupBy({
+		by: ['person', 'year'],
+		where: {
+			pmtPersona: true,
+			barstoolEmployee: true,
+			year: { lte: currYear }
+		}
+	});
+	const hostSeasons: Record<string, number[]> = {};
+	for (const { person, year } of hostSeasonRows) {
+		hostSeasons[person] = [...(hostSeasons[person] ?? []), year];
+	}
+
 	return {
 		personData: personData,
 		typeBets: typeBetData,
-		specialBets: specialBets
+		specialBets: specialBets,
+		hostSeasons,
+		currentYear: currYear
 	};
 };
 
