@@ -130,3 +130,27 @@ export function parseSeason(yearParam: string | null, currentYear: number): Seas
 export function hostPath(slug: string, season: Season): string {
 	return season.isCurrent ? `/${slug}` : `/${slug}?year=${season.year}`;
 }
+
+// where a host's name or photo links to on the stats page: their page for the season being looked
+// at, or their latest season when they made no picks in it (all-time stats, or a host who's left).
+// A host page only exists for seasons with picks, so this never points at a 404. Null for someone
+// with no seasons at all
+export function hostHref({
+	person,
+	years,
+	currentYear,
+	preferredYear
+}: {
+	person: string;
+	// every season the person made host picks in
+	years: number[];
+	currentYear: number;
+	// the season the page is showing, or null for all time
+	preferredYear: number | null;
+}): string | null {
+	if (years.length === 0) return null;
+
+	const year =
+		preferredYear !== null && years.includes(preferredYear) ? preferredYear : Math.max(...years);
+	return hostPath(hostSlug(person), { year, isCurrent: year === currentYear });
+}
