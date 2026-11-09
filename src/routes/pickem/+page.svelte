@@ -402,7 +402,7 @@
 							</div>
 
 							<div class="w-full col-span-5 flex flex-row gap-x-4 sm:gap-x-6 justify-end">
-								{#each odd.bookmakers[0].markets as bets}
+								{#each odd.markets as bets}
 									<div class="grid grid-rows-3 gap-y-4 place-content-center">
 										<div class="flex justify-center items-center font-header font-semibold text-lg">
 											{bets.key.charAt(0).toUpperCase() + bets.key.slice(1)}

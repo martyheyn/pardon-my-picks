@@ -2,8 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { z } from 'zod';
 
-import { ODDS_API_KEY } from '$env/static/private';
-import type { Odds } from '$lib/utils/types';
+import { espnEventToOdds, fetchEspnEvent } from '$lib/utils/espn';
 import { prisma } from '$lib/server/prisma';
 import { type $Enums, type Prisma } from '@prisma/client';
 import { type PickData } from '$lib/utils/types';
@@ -129,12 +128,9 @@ export const actions: Actions = {
 			// whole save instead of leaving the user with their old picks deleted and only one new one
 			const picksToCreate: Prisma.PickUncheckedCreateInput[] = [];
 			for (const pick of plan.newPicks) {
-				// add in data from odds api
-				const gameOddsRes = await fetch(
-					`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=spreads,totals&oddsFormat=american&bookmakers=draftkings&eventIds=${pick.gameId}`
-				);
-				const gameOddsJson: Odds[] = await gameOddsRes.json();
-				const gameOdds = gameOddsJson[0];
+				// the line is looked up again here rather than trusted from the browser
+				const event = pick.gameId ? await fetchEspnEvent(pick.gameId) : null;
+				const gameOdds = event ? espnEventToOdds(event) : null;
 
 				if (!gameOdds) {
 					return fail(400, { message: 'Odds not available for this game', success: false });
@@ -148,9 +144,7 @@ export const actions: Actions = {
 				}
 
 				const pickType = normalizePickType(pick.type);
-				const betTypeData = gameOdds.bookmakers[0].markets.find(
-					(market) => market.key === pickType
-				);
+				const betTypeData = gameOdds.markets.find((market) => market.key === pickType);
 				if (!pickType || !betTypeData) {
 					return fail(400, { message: 'Invalid pick', success: false });
 				}
@@ -166,7 +160,7 @@ export const actions: Actions = {
 
 				picksToCreate.push({
 					id: pick.id,
-					gameId: gameOdds.id,
+					gameId: gameOdds.gameId,
 					year: parseInt(CURRENT_YEAR),
 					show: 'PMT',
 					week: currentWeek,
