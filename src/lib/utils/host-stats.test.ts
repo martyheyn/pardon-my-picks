@@ -68,4 +68,14 @@ describe('weekFade', () => {
 	it('has nobody playing when the week has no picks', () => {
 		expect(weekFade(computeSeasonStats(season), [])).toEqual({ playing: [], fade: null });
 	});
+
+	it('still lists who is playing but marks no fade in a week the admin set to no fade', () => {
+		const weekPicks = ['Big Cat', 'PFT', 'Hank'].map((person) => pick({ person, week: 9 }));
+		const { playing, fade } = weekFade(computeSeasonStats([...season, ...weekPicks]), weekPicks, {
+			callFade: false
+		});
+
+		expect(playing.map((host) => host.person)).toEqual(['Big Cat', 'PFT', 'Hank']);
+		expect(fade).toBeNull();
+	});
 });

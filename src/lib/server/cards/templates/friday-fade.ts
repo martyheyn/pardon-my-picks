@@ -17,7 +17,7 @@ export type FridayFadeRow = {
 };
 
 export type FridayFadeData = {
-	// "Week 9 · Who to fade"
+	// "Week 9 · Who to fade", or "Week 9 · The picks" in a week set to no fade
 	eyebrow: string;
 	headline: string;
 	rows: FridayFadeRow[];

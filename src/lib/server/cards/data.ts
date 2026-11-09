@@ -89,16 +89,18 @@ async function fridayPick(pick: StatsPick): Promise<FridayFadePick> {
 	};
 }
 
-// every host's picks for the week, with whoever's in last place on the season marked as the fade.
-// Hosts sitting the week out are left off
+// every host's picks for the week, with whoever's in last place on the season marked as the fade -
+// unless the admin set the week to no fade (callFade false), when nobody is marked. Hosts sitting
+// the week out are left off
 export async function fridayFadeData(
 	week: number,
 	weekPicks: StatsPick[],
 	stats: SeasonStats<StatsPick>,
-	hosts: HostConfig[]
+	hosts: HostConfig[],
+	callFade: boolean
 ): Promise<FridayFadeData> {
 	const nameOf = nameLookup(hosts);
-	const { playing, fade } = weekFade(stats, weekPicks);
+	const { playing, fade } = weekFade(stats, weekPicks, { callFade });
 
 	const rows = await Promise.all(
 		playing.map(async (host) => ({
@@ -113,7 +115,7 @@ export async function fridayFadeData(
 	);
 
 	return {
-		eyebrow: `Week ${week} · Who to fade`,
+		eyebrow: `Week ${week} · ${callFade ? 'Who to fade' : 'The picks'}`,
 		headline: fade
 			? `FADE ${nameOf(fade.person).toUpperCase()}: ${formatRecord(fade.record)} THIS SEASON`
 			: `WEEK ${week} PICKS ARE IN`,

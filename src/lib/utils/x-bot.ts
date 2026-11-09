@@ -206,42 +206,74 @@ const usableFadeLine = (week: number, line: string | null) => {
 	return fadeLineError(week, cleaned) === null ? cleaned : null;
 };
 
+// what saving /admin/x-post's form does. A fade week with no line is the default, so its row is
+// deleted rather than saved. A no-fade week is always saved, with or without a line - leaving the
+// line blank there means no middle line at all
+export type FadeSettingsChange =
+	| { kind: 'invalid'; message: string }
+	| { kind: 'reset' }
+	| { kind: 'save'; callFade: boolean; text: string | null };
+
+export function fadeSettingsChange({
+	week,
+	callFade,
+	line
+}: {
+	week: number;
+	callFade: boolean;
+	// already run through cleanFadeLine
+	line: string;
+}): FadeSettingsChange {
+	if (line !== '') {
+		const invalid = fadeLineError(week, line);
+		if (invalid) return { kind: 'invalid', message: invalid };
+	}
+	if (callFade && line === '') return { kind: 'reset' };
+	return { kind: 'save', callFade, text: line === '' ? null : line };
+}
+
 // "The fade: Zach, 3–13 on the season." - the middle line when the admin hasn't written one
 const fadeLineFor = (name: string, record: WinLossPush) =>
 	`The fade: ${name}, ${formatRecord(record)} on the season.`;
 
 // the default middle line for the admin page to show, or null before anyone has a record to fade
+// and in a week set to no fade
 export function defaultFadeLine({
 	stats,
 	weekPicks,
-	nameOf
+	nameOf,
+	callFade = true
 }: {
 	stats: SeasonStats<StatsPick>;
 	weekPicks: StatsPick[];
 	nameOf: NameOf;
+	callFade?: boolean;
 }): string | null {
-	const { fade } = weekFade(stats, weekPicks);
+	const { fade } = weekFade(stats, weekPicks, { callFade });
 	return fade ? fadeLineFor(nameOf(fade.person), fade.record) : null;
 }
 
 // "Week 9 picks are in. The fade: Hank, 12–20 on the season. Hank's picks: Jets +3 · ..."
-// Names the same host the Friday card marks as the fade. customLine replaces the middle line
+// Names the same host the Friday card marks as the fade. customLine replaces the middle line.
+// With callFade off nobody is named: just the opener and the admin's line, if there is one
 export function fadePostText({
 	week,
 	stats,
 	weekPicks,
 	nameOf,
-	customLine = null
+	customLine = null,
+	callFade = true
 }: {
 	week: number;
 	stats: SeasonStats<StatsPick>;
 	weekPicks: StatsPick[];
 	nameOf: NameOf;
 	customLine?: string | null;
+	callFade?: boolean;
 }): string {
 	const opener = fadeOpener(week);
 	const custom = usableFadeLine(week, customLine);
-	const { fade } = weekFade(stats, weekPicks);
+	const { fade } = weekFade(stats, weekPicks, { callFade });
 	if (!fade) {
 		return custom ? `${opener}\n\n${custom}` : `${opener} Every host's picks are on the card.`;
 	}
